@@ -1,5 +1,11 @@
 package com.example.mynavigator;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
@@ -10,7 +16,9 @@ import com.example.mynavigator.ui.map.MapFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
+import com.muddzdev.styleabletoast.StyleableToast;
 
+import androidx.core.app.NotificationCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -21,7 +29,10 @@ import androidx.appcompat.widget.Toolbar;
 
 public class MainActivity extends AppCompatActivity
         {
-
+            NotificationManager manager;
+            NotificationCompat.Builder builder;
+            private static String CHANNEL_ID = "channel1";
+            private static String CHANEL_NAME = "Channel1";
 
     private AppBarConfiguration mAppBarConfiguration;
     public double myLat =0;
@@ -80,8 +91,30 @@ public class MainActivity extends AppCompatActivity
     public void setMyLatLog(double lat , double log){
         myLat = lat;
         myLog = log;
-        Toast.makeText(getApplicationContext(),"MainActivity에도 내위치 도착했음",Toast.LENGTH_LONG).show();
+        StyleableToast.makeText(getApplicationContext(),"MainActivity에도 내위치 도착했음",Toast.LENGTH_LONG,R.style.mytoast).show();
 
     }
+
+    public void showNoti(){
+        builder = null;
+        manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE); //버전 오레오 이상일 경우
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+         manager.createNotificationChannel(
+                 new NotificationChannel(CHANNEL_ID, CHANEL_NAME, NotificationManager.IMPORTANCE_DEFAULT) );
+         builder = new NotificationCompat.Builder(this,CHANNEL_ID);
+
+         //하위 버전일 경우
+        }else{
+            builder = new NotificationCompat.Builder(this);
+        }
+        builder.setContentTitle("카나리아 Notification Bar")
+                .setContentText("아직 제대로 구현이 안되서 앱꺼져도 알람 안없어짐 ㅋㅋㅋㅋ")
+                .setSmallIcon(R.drawable.carlary_app_logo3)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setOngoing(true);
+
+        Notification notification = builder.build();
+        manager.notify(1,notification); }
+
 
 }

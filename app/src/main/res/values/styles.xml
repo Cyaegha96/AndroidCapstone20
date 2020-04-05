@@ -16,5 +16,15 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="mytoast">
+        <item name="stTextBold">true</item>
+        <item name="stTextColor">#fff</item>
+        <item name="stTextSize">14sp</item>
+        <item name="stColorBackground">#8BC34A</item>
+        <item name="stSolidBackground">true</item>
+        <item name="stIconStart">@drawable/bird</item>
+        <item name="stLength">LONG</item>
+        <item name="stRadius">20dp</item>
+    </style>
 
 </resources>
