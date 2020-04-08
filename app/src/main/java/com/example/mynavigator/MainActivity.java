@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.Menu;
 import android.widget.Toast;
 
+import com.example.mynavigator.ui.data.Data;
+import com.example.mynavigator.ui.data.DataAdapter;
 import com.example.mynavigator.ui.home.HomeFragment;
 import com.example.mynavigator.ui.map.MapFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -27,17 +29,19 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-public class MainActivity extends AppCompatActivity
-        {
-            NotificationManager manager;
-            NotificationCompat.Builder builder;
-            private static String CHANNEL_ID = "channel1";
-            private static String CHANEL_NAME = "Channel1";
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity {
+
+    NotificationManager manager;
+    NotificationCompat.Builder builder;
+    private static String CHANNEL_ID = "channel1";
+    private static String CHANEL_NAME = "Channel1";
 
     private AppBarConfiguration mAppBarConfiguration;
     public double myLat =0;
     public double myLog = 0;
-
+    List<Data> dataList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +49,7 @@ public class MainActivity extends AppCompatActivity
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        initLoadDBReturn();
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +77,23 @@ public class MainActivity extends AppCompatActivity
         Bundle bundle = new Bundle(2);
         bundle.putDouble("lat",myLat);
         bundle.putDouble("log",myLog);
+    }
+    private void initLoadDBReturn() {
+
+        DataAdapter mDbHelper = new DataAdapter(getApplicationContext());
+        mDbHelper.createDatabase();
+        mDbHelper.open();
+
+        // db에 있는 값들을 model을 적용해서 넣는다.
+        dataList = mDbHelper.getTableData();
+
+        // db 닫기
+        mDbHelper.close();
+
+    }
+
+    public List<Data> getDataList(){
+        return dataList;
     }
 
     @Override
