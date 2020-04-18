@@ -26,5 +26,14 @@
         <item name="stLength">LONG</item>
         <item name="stRadius">20dp</item>
     </style>
-
+    <style name="mytoast2">
+        <item name="stTextBold">true</item>
+        <item name="stTextColor">#f4fa4d</item>
+        <item name="stTextSize">14sp</item>
+        <item name="stColorBackground">#27d986</item>
+        <item name="stSolidBackground">true</item>
+        <item name="stIconStart">@drawable/bird</item>
+        <item name="stLength">LONG</item>
+        <item name="stRadius">20dp</item>
+    </style>
 </resources>

@@ -16,6 +16,12 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.cocoahero.android.geojson.GeoJSON;
+import com.cocoahero.android.geojson.GeoJSONObject;
+import com.cocoahero.android.geojson.Polygon;
+import com.cocoahero.android.geojson.Position;
+import com.cocoahero.android.geojson.PositionList;
+import com.cocoahero.android.geojson.Ring;
 import com.example.mynavigator.MainActivity;
 import com.example.mynavigator.R;
 import com.example.mynavigator.ui.data.Data;
@@ -31,11 +37,13 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
+import org.json.JSONException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class MapFragment extends Fragment
-        implements OnMapReadyCallback {
-
+        implements OnMapReadyCallback{
     private MapViewModel mapViewModel;
     private MapView mapView;
 
@@ -60,8 +68,6 @@ public class MapFragment extends Fragment
         return root;
     }
 
-
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
@@ -72,10 +78,12 @@ public class MapFragment extends Fragment
         myLocation.setLongitude(myLog);
 
         MapsInitializer.initialize(this.getActivity());
+
+        googleMap.setMyLocationEnabled(true);
+
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
 
         googleMap.animateCamera(cameraUpdate);
-
         googleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(myLat, myLog))
                 .title("내 현위치\n")
@@ -84,22 +92,24 @@ public class MapFragment extends Fragment
         List<Data> dList = ((MainActivity)getActivity()).getDataList();
         if(dList != null){
             for(int i=0;i<dList.size();i++){
+
                 float dLat = dList.get(i).getLatitude();
                 float dLog = dList.get(i).getLongitude();
-                String dAccidentType = dList.get(i).getAccidentType();
-                String dName = dList.get(i).getPlaceName();
 
                 Location l = new Location("d");
                 l.setLatitude(dLat);
                 l.setLongitude(dLog);
 
+                if(myLocation.distanceTo(l) <= 1000){
+                    //거리 비교해서 1km 안에 있는거만 표시하자
+
+                String dAccidentType = dList.get(i).getAccidentType();
+                String dName = dList.get(i).getPlaceName();
+
                 BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.marker);
                 Bitmap b=bitmapdraw.getBitmap();
                 Bitmap smallMarker = Bitmap.createScaledBitmap(b, 200, 200, false);
 
-
-                if(myLocation.distanceTo(l) <= 1000){
-                    //거리 비교해서 1km 안에 있는거만 표시하자
 
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(dLat, dLog ))
@@ -113,10 +123,12 @@ public class MapFragment extends Fragment
                             .fillColor(Color.RED)
                             .radius(30)
                             .strokeColor(Color.BLACK));
+
                 }
             }
         }
     }
+
 
 
 }

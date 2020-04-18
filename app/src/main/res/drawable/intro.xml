@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:drawable="@color/colorPrimary"
+        />
+    <item>
+        <bitmap
+            android:src="@drawable/canary_shadow"
+            android:gravity="center"
+            />
+    </item>
+    <item>
+        <bitmap
+            android:src="@drawable/logo_1"
+            android:gravity="bottom"
+            />
+    </item>
+</layer-list>

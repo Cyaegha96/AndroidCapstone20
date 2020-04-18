@@ -4,7 +4,11 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -15,12 +19,14 @@ import com.example.mynavigator.ui.data.Data;
 import com.example.mynavigator.ui.data.DataAdapter;
 import com.example.mynavigator.ui.home.HomeFragment;
 import com.example.mynavigator.ui.map.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 import com.muddzdev.styleabletoast.StyleableToast;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -33,51 +39,55 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    NotificationManager manager;
-    NotificationCompat.Builder builder;
-    private static String CHANNEL_ID = "channel1";
-    private static String CHANEL_NAME = "Channel1";
 
     private AppBarConfiguration mAppBarConfiguration;
-    public double myLat =0;
-    public double myLog = 0;
+    public double myLat =37.56;
+    public double myLog = 126.97;
     List<Data> dataList;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        initLoadDBReturn();
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        Intent i = getIntent();
+        int title = i.getIntExtra("sign", -1);
+        if(title == 2){
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
+        }else{
+            setContentView(R.layout.activity_main);
 
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.nav_home, R.id.nav_map, R.id.nav_data)
-                .setDrawerLayout(drawer)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
-        NavigationUI.setupWithNavController(navigationView, navController);
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            initLoadDBReturn();
+            FloatingActionButton fab = findViewById(R.id.fab);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent email = new Intent(Intent.ACTION_SEND);
+                    email.setType("plain/text");
+                    String[] address = {"zazae51@gmail.com"};
+                    email.putExtra(Intent.EXTRA_EMAIL, address);
+                    email.putExtra(Intent.EXTRA_SUBJECT, "제목");
+                    email.putExtra(Intent.EXTRA_TEXT, "내용 미리보기 (미리적을 수 있음)");
+                    startActivity(email);
+                }
+            });
 
-        //데이터 전달을 위함... 가능할까?
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            NavigationView navigationView = findViewById(R.id.nav_view);
+            // Passing each menu ID as a set of Ids because each
+            // menu should be considered as top level destinations.
 
-        Bundle bundle = new Bundle(2);
-        bundle.putDouble("lat",myLat);
-        bundle.putDouble("log",myLog);
+            mAppBarConfiguration = new AppBarConfiguration.Builder(
+                    R.id.nav_home, R.id.nav_map, R.id.nav_data)
+                    .setDrawerLayout(drawer)
+                    .build();
+            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+            NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
+            NavigationUI.setupWithNavController(navigationView, navController);
+        }
     }
+
     private void initLoadDBReturn() {
 
         DataAdapter mDbHelper = new DataAdapter(getApplicationContext());
@@ -109,33 +119,20 @@ public class MainActivity extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
-    public void setMyLatLog(double lat , double log){
-        myLat = lat;
-        myLog = log;
+    public void setMyLatLog(LatLng latLng){
+        myLat = latLng.latitude;
+        myLog = latLng.longitude;
         StyleableToast.makeText(getApplicationContext(),"MainActivity에도 내위치 도착했음",Toast.LENGTH_LONG,R.style.mytoast).show();
 
     }
+    public void startCanaryService(){
+        startService(new Intent(getApplicationContext(), CanaryService.class));
+    }
 
-    public void showNoti(){
-        builder = null;
-        manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE); //버전 오레오 이상일 경우
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-         manager.createNotificationChannel(
-                 new NotificationChannel(CHANNEL_ID, CHANEL_NAME, NotificationManager.IMPORTANCE_DEFAULT) );
-         builder = new NotificationCompat.Builder(this,CHANNEL_ID);
+    public void stopCanaryService(){
+        stopService(new Intent(getApplicationContext(), CanaryService.class));
+    }
 
-         //하위 버전일 경우
-        }else{
-            builder = new NotificationCompat.Builder(this);
-        }
-        builder.setContentTitle("카나리아 Notification Bar")
-                .setContentText("아직 제대로 구현이 안되서 앱꺼져도 알람 안없어짐 ㅋㅋㅋㅋ")
-                .setSmallIcon(R.drawable.carlary_app_logo3)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setOngoing(true);
-
-        Notification notification = builder.build();
-        manager.notify(1,notification); }
 
 
 }
