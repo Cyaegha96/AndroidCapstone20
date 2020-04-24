@@ -40,4 +40,10 @@
         android:name="com.example.mynavigator.ui.data.DataFragment"
         android:label="@string/menu_data"
         tools:layout="@layout/fragment_data" />
+
+    <fragment
+        android:id="@+id/nav_graph"
+        android:name="com.example.mynavigator.ui.data.GraphFragment"
+        android:label="Graph 그래프보기"
+        tools:layout="@layout/fragment_graph_view" />
 </navigation>

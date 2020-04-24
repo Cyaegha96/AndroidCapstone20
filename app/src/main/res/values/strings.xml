@@ -11,4 +11,9 @@
     <string name="menu_map">Map 지도보기</string>
     <string name="menu_data">Data 데이타보기</string>
     <string name="home_second">Home Second</string>
+    <string name="request_updates">Request updates</string>
+    <string name="remove_updates">Remove updates</string>
+    <string name="unknown_location">Unknown location</string>
+
+
 </resources>

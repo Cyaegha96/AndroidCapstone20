@@ -3,20 +3,19 @@ package com.example.mynavigator.ui.data;
 public class Data {
 
     public int accidentCode;
-    public String accidentYear;
+    public int accidentYear;
     public String accidentType;
     public int placeCode;
     public String cityName;
     public String placeName;
     public int accidentCount;
     public int casualtiesCount;
-    public int killedCount;
+    public int deadCount;
     public int seriousCount;
     public int slightlyCount;
     public int injuredCount;
     public float latitude;
     public float longitude;
-    public String accidentPolygon;
     public String dataDate;
 
     public int getAccidentCode() {
@@ -27,11 +26,11 @@ public class Data {
         this.accidentCode = accidentCode;
     }
 
-    public String getAccidentYear() {
+    public int getAccidentYear() {
         return accidentYear;
     }
 
-    public void setAccidentYear(String accidentYear) {
+    public void setAccidentYear(int accidentYear) {
         this.accidentYear = accidentYear;
     }
 
@@ -83,12 +82,12 @@ public class Data {
         this.casualtiesCount = casualtiesCount;
     }
 
-    public int getKilledCount() {
-        return killedCount;
+    public int getDeadCount() {
+        return deadCount;
     }
 
-    public void setKilledCount(int killedCount) {
-        this.killedCount = killedCount;
+    public void setDeadCount(int deadCount) {
+        this.deadCount = deadCount;
     }
 
     public int getSeriousCount() {
@@ -129,14 +128,6 @@ public class Data {
 
     public void setLongitude(float longitude) {
         this.longitude = longitude;
-    }
-
-    public String getAccidentPolygon() {
-        return accidentPolygon;
-    }
-
-    public void setAccidentPolygon(String accidentPolygon) {
-        this.accidentPolygon = accidentPolygon;
     }
 
     public String getDataDate() {

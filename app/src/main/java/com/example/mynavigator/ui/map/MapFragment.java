@@ -103,12 +103,12 @@ public class MapFragment extends Fragment
                 if(myLocation.distanceTo(l) <= 1000){
                     //거리 비교해서 1km 안에 있는거만 표시하자
 
-                String dAccidentType = dList.get(i).getAccidentType();
-                String dName = dList.get(i).getPlaceName();
+                    String dAccidentType = dList.get(i).getAccidentType();
+                    String dName = dList.get(i).getPlaceName();
 
-                BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.marker);
-                Bitmap b=bitmapdraw.getBitmap();
-                Bitmap smallMarker = Bitmap.createScaledBitmap(b, 200, 200, false);
+                    BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.marker);
+                    Bitmap b=bitmapdraw.getBitmap();
+                    Bitmap smallMarker = Bitmap.createScaledBitmap(b, 200, 200, false);
 
 
                     googleMap.addMarker(new MarkerOptions()

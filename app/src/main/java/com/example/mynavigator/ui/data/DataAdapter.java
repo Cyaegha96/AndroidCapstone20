@@ -87,21 +87,20 @@ public class DataAdapter
                     // TODO : Record 기술
                     // id, name, account, privateKey, secretKey, Comment
                     data.setAccidentCode(mCur.getInt(0));
-                    data.setAccidentYear(mCur.getString(1));
+                    data.setAccidentYear(mCur.getInt(1));
                     data.setAccidentType(mCur.getString(2));
                     data.setPlaceCode(mCur.getInt(3));
                     data.setCityName(mCur.getString(4));
                     data.setPlaceName(mCur.getString(5));
                     data.setAccidentCount(mCur.getInt(6));
                     data.setCasualtiesCount(mCur.getInt(7));
-                    data.setKilledCount(mCur.getInt(8));
+                    data.setDeadCount(mCur.getInt(8));
                     data.setSeriousCount(mCur.getInt(9));
                     data.setSlightlyCount(mCur.getInt(10));
                     data.setInjuredCount(mCur.getInt(11));
                     data.setLatitude(mCur.getFloat(12));
                     data.setLongitude(mCur.getFloat(13));
-                    data.setAccidentPolygon(mCur.getString(14));
-                    data.setDataDate(mCur.getString(15));
+                    data.setDataDate(mCur.getString(14));
 
                     // 리스트에 넣기
                     placeList.add(data);

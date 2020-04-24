@@ -102,7 +102,7 @@ public class HomeFragment extends Fragment  {
                         StyleableToast.makeText(getActivity().getApplicationContext(),
                                 "내위치 : 위도:" + currPosition.latitude + "\n경도:" + currPosition.longitude, Toast.LENGTH_LONG, R.style.mytoast).show();
                         ((MainActivity) getActivity()).setMyLatLog(currPosition); //MainActivity로 전달
-                         //Service를 시작하라는 내용
+                        //Service를 시작하라는 내용
                     }
                     touchFlag = true; //Flag 교체
 

@@ -3,7 +3,6 @@ package com.example.mynavigator.ui.data;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -74,7 +73,7 @@ public class ItemView extends LinearLayout {
             else if(i==7)
                 getdata += data.getCasualtiesCount()+"";
             else if(i==8)
-                getdata += data.getKilledCount()+"";
+                getdata += data.getDeadCount()+"";
             else if(i==9)
                 getdata += data.getSeriousCount()+"";
             else if(i==10)
