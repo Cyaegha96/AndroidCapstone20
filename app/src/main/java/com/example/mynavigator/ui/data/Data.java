@@ -1,5 +1,6 @@
 package com.example.mynavigator.ui.data;
 
+
 public class Data {
 
     public int accidentCode;
@@ -17,6 +18,7 @@ public class Data {
     public float latitude;
     public float longitude;
     public String dataDate;
+
 
     public int getAccidentCode() {
         return accidentCode;
@@ -137,5 +139,6 @@ public class Data {
     public void setDataDate(String dataDate) {
         this.dataDate = dataDate;
     }
+
 }
 

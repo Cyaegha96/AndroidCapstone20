@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -44,9 +46,16 @@ import java.util.List;
 
 public class MapFragment extends Fragment
         implements OnMapReadyCallback{
+
+    private static final String TAG = "MapFragment";
     private MapViewModel mapViewModel;
     private MapView mapView;
+    private int focusingDistanceLevel =1000 ;
 
+    private double myLat;
+    private double myLog;
+    private Location myLocation;
+    private List<Data> dList;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         mapViewModel =
@@ -69,11 +78,14 @@ public class MapFragment extends Fragment
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
 
-        double myLat =  ((MainActivity)getActivity()).myLat;
-        double myLog = ((MainActivity)getActivity()).myLog;
-        Location myLocation = new Location("내위치");
+        myLat =  ((MainActivity)getActivity()).myLat;
+        myLog = ((MainActivity)getActivity()).myLog;
+
+        dList = ((MainActivity)getActivity()).getDataList();
+
+        myLocation = new Location("내위치");
         myLocation.setLatitude(myLat);
         myLocation.setLongitude(myLog);
 
@@ -84,12 +96,23 @@ public class MapFragment extends Fragment
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
 
         googleMap.animateCamera(cameraUpdate);
-        googleMap.addMarker(new MarkerOptions()
-                .position(new LatLng(myLat, myLog))
-                .title("내 현위치\n")
-                .snippet("GPS로 확인"));
+        googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+            @Override
+            public void onCameraMove() {
 
-        List<Data> dList = ((MainActivity)getActivity()).getDataList();
+                CameraPosition cameraPosition = googleMap.getCameraPosition();
+                Log.d(TAG,"현재 카메라 줌레벨:"+cameraPosition.zoom);
+                if(cameraPosition.zoom <15.0){
+                    focusingDistanceLevel = 5000;
+                }else{
+                    focusingDistanceLevel = 1000;
+                }
+            }
+        });
+        markerSetting(googleMap);
+    }
+
+    public void markerSetting(GoogleMap googleMap){
         if(dList != null){
             for(int i=0;i<dList.size();i++){
 
@@ -100,7 +123,7 @@ public class MapFragment extends Fragment
                 l.setLatitude(dLat);
                 l.setLongitude(dLog);
 
-                if(myLocation.distanceTo(l) <= 1000){
+                if(myLocation.distanceTo(l) <= focusingDistanceLevel){
                     //거리 비교해서 1km 안에 있는거만 표시하자
 
                     String dAccidentType = dList.get(i).getAccidentType();
@@ -110,25 +133,22 @@ public class MapFragment extends Fragment
                     Bitmap b=bitmapdraw.getBitmap();
                     Bitmap smallMarker = Bitmap.createScaledBitmap(b, 200, 200, false);
 
-
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(dLat, dLog ))
                             .title(dAccidentType+"\n")
                             .snippet(dName)
                             .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
 
-
                     googleMap.addCircle(new CircleOptions()
                             .center(new LatLng(dLat, dLog ))
-                            .fillColor(Color.RED)
+                            .fillColor(0x22FF0000) //투명한 원 그리려면 색상값 앞에 0x22 가 붙어야 함!
                             .radius(30)
-                            .strokeColor(Color.BLACK));
+                            .strokeColor(Color.BLACK)
+                            .strokeWidth(2));
 
                 }
             }
         }
     }
-
-
 
 }

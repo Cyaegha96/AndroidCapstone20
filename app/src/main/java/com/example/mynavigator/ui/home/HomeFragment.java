@@ -1,18 +1,12 @@
 package com.example.mynavigator.ui.home;
 
 import android.Manifest;
-import android.content.BroadcastReceiver;
+import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
-import android.location.LocationProvider;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,43 +18,48 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import com.example.mynavigator.CanaryService;
+import com.example.mynavigator.AlertReceiver;
 import com.example.mynavigator.MainActivity;
 import com.example.mynavigator.R;
-import com.example.mynavigator.ui.map.MapFragment;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
+import com.example.mynavigator.ui.data.Data;
 import com.google.android.gms.maps.model.LatLng;
 import com.muddzdev.styleabletoast.StyleableToast;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Locale;
 
-public class HomeFragment extends Fragment  {
+public class HomeFragment extends Fragment {
 
+    private static final String TAG = "HomeFragment";
     private HomeViewModel homeViewModel;
     private Button button;
 
     private LocationManager locationManager;
     private static final int REQUEST_CODE_LOCATION = 2;
 
+    List<Data> dataList;
     LatLng currPosition;
     Location userLocation;
-    private boolean touchFlag = false;
+    AlertReceiver receiver;
+    PendingIntent proximityIntent;
+    private boolean touchFlag;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
+        Log.i(TAG, " onCreateView() ");
+        if (savedInstanceState != null) {
+            String data = savedInstanceState.getString("touchFlagKey");
+            if (data.equals("true")) {
+                touchFlag = true;
+            } else if (data.equals("false")) {
+                touchFlag = false;
+            }
+        }
         homeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
@@ -72,19 +71,35 @@ public class HomeFragment extends Fragment  {
                 textView.setText(s);
             }
         });
-
-        //기본적으로 갖고 오는 데이터
-        //이부분을 어떻게 객체화할지 고민하고 있음 흐으음...
-        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        if (ActivityCompat.checkSelfPermission(getContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    this.REQUEST_CODE_LOCATION);
-        }
-        userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         button = (Button) root.findViewById(R.id.button);
+
+        return root;
+    }
+
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.i(TAG, " onCreate() ");
+        super.onCreate(savedInstanceState);
+        touchFlag = false;
+        if (savedInstanceState != null) {
+            String data = savedInstanceState.getString("touchFlagKey");
+            if (data.equals("true")) {
+                touchFlag = true;
+            } else if (data.equals("false")) {
+                touchFlag = false;
+            }
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.i(TAG, " onStart() ");
+        //기본적으로 갖고 오는 데이터
+
+        locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+        userLocation = getFirstLocation();
 
         //알림창을 띄우고, 서비스를 시작합니다.
         button.setOnClickListener(new View.OnClickListener() {
@@ -92,89 +107,97 @@ public class HomeFragment extends Fragment  {
             @Override
             public void onClick(View v) {
 
-                if(touchFlag == false){
+                if (touchFlag == false) {
                     //버튼을 한번 눌렀을 때 => 켜짐
-                    ((MainActivity)getActivity()).startCanaryService();
-                    userLocation = getMyLocation();
-                    currPosition = new LatLng(userLocation.getLatitude(),userLocation.getLongitude());
+                    ((MainActivity) getActivity()).startCanaryService();
+                    dataList =  ((MainActivity) getActivity()).getDataList();
+                    Log.d(TAG,"dataList 잘 가져 왔냐??: "+dataList.get(0).accidentType+" "+dataList.get(0).getAccidentYear());
+                    receiver = new AlertReceiver();
+                    IntentFilter filter = new IntentFilter("kr.ac.koreatech.msp.locationAlert");
+                    getActivity().getApplicationContext().registerReceiver(receiver, filter);
+
+                    // ProximityAlert 등록을 위한 PendingIntent 객체 얻기
+                    /*
+                    Intent intent = new Intent("kr.ac.koreatech.msp.locationAlert");
+                    proximityIntent = PendingIntent.getBroadcast(getActivity().getApplicationContext(), 0, intent, 0);
+                    Log.d("TAG","Fragment:Call MainActivity, startCanaryService");
+
+                    try {
+                        // 근접 경보 등록 메소드
+                        // void addProximityAlert(double latitude, double longitude, float radius, long expiration, PendingIntent intent)
+                        // 아래 위도, 경도 값의 위치는 2공학관 420호 창가 부근
+                        for(int i = 0; i< dataList.size() ; i++){
+                            LatLng d = new LatLng(dataList.get(i).getLatitude(),dataList.get(i).getLongitude());
+                            Location l = new Location("l");
+                            l.setLatitude(d.latitude);
+                            l.setLongitude(d.longitude);
+                            if(userLocation.distanceTo(l) < 1000)
+                                locationManager.addProximityAlert(d.latitude, d.longitude, 20, -1, proximityIntent);
+                        }
+
+                    } catch (SecurityException e) {
+                        e.printStackTrace();
+                    }
+                     */
+
+                    if(((MainActivity)getActivity()).isUserLocationHasResult()){
+                        Log.d(TAG,"Activity의 userLocation 값을 가져옴");
+                        userLocation = ((MainActivity)getActivity()).getUserLocation();
+                    }
+                    else{
+                        Log.d(TAG,"사전에 받아둔 로케이션 값을 사용함.");
+                        Log.d(TAG,"경도: "+ userLocation.getLatitude()+ "위도"+userLocation.getLongitude());
+                    }
+                    currPosition = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
 
                     if (userLocation != null) {
                         StyleableToast.makeText(getActivity().getApplicationContext(),
-                                "내위치 : 위도:" + currPosition.latitude + "\n경도:" + currPosition.longitude, Toast.LENGTH_LONG, R.style.mytoast).show();
-                        ((MainActivity) getActivity()).setMyLatLog(currPosition); //MainActivity로 전달
+                                "내위치 : 위도:" + String.format("%.2f", currPosition.latitude) + "\n경도:" + String.format("%.2f", currPosition.longitude), Toast.LENGTH_LONG, R.style.mytoast).show();
+                        ((MainActivity) getActivity()).setUserLocation(userLocation); //MainActivity로 전달
                         //Service를 시작하라는 내용
                     }
                     touchFlag = true; //Flag 교체
 
-                }else{
+                } else {
                     //버튼을 다시 한번 눌렀을 때->꺼짐.
-                    locationManager.removeUpdates(locationListener);
                     touchFlag = false; //Flag 교체
-                    ((MainActivity)getActivity()).stopCanaryService();
+                    ((MainActivity) getActivity()).stopCanaryService();
+                    locationManager.removeProximityAlert(proximityIntent);
+                    getActivity().getApplicationContext().unregisterReceiver(receiver);
+                    StyleableToast.makeText(getActivity().getApplicationContext(),
+                            "서비스 종료", Toast.LENGTH_LONG, R.style.mytoast).show();
+
                 }
 
             }
         });
-
-        return root;
     }
 
-
-
-    private Location getMyLocation() {
-
-        //위험 권한 체크
+    public Location getFirstLocation(){
         if (ActivityCompat.checkSelfPermission(getContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     this.REQUEST_CODE_LOCATION);
-            return getMyLocation();
-        } else {
-
-            //Criteria를 통해 정확한 위치를 얻어낸다.
-            Criteria criteria = new Criteria();// 정확도
-            criteria.setAccuracy(Criteria.NO_REQUIREMENT); // 전원 소비량
-            criteria.setPowerRequirement(Criteria.NO_REQUIREMENT); // 고도, 높이 값을 얻어 올지를 결정
-            criteria.setAltitudeRequired(true); // provider 기본 정보(방위, 방향)
-            criteria.setBearingRequired(true);// 속도
-            criteria.setSpeedRequired(true); // 위치 정보를 얻어 오는데 들어가는 금전적 비용
-            criteria.setCostAllowed(true);
-
-            String bestProvider = locationManager.getBestProvider(criteria, true);
-            locationManager.requestLocationUpdates(bestProvider,
-                    1000, 1, locationListener);
-
+            return getFirstLocation();
+        }else{
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if(location == null){
+                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+            return location;
         }
-        return userLocation;
-
     }
-    private LocationListener locationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            userLocation = location;
-            currPosition = new LatLng(location.getLatitude(),location.getLongitude());
-            StyleableToast.makeText(getActivity().getApplicationContext(),
-                    "위치 업데이트\n" +
-                            "위도:" + currPosition.latitude + "\n" +
-                            "경도:" + currPosition.longitude,
-                    Toast.LENGTH_LONG, R.style.mytoast2).show();
-        }
 
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (touchFlag == false)
+            outState.putString("touchFlagKey", "false");
+        else if (touchFlag == true)
+            outState.putString("touchFlagKey", "true");
+        Log.d("HomeFragment/onsave", "touchFlagKey" + touchFlag);
+    }
 
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
-        }
-    };
 }
