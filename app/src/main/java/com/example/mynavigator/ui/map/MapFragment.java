@@ -36,6 +36,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
 
@@ -85,11 +86,13 @@ public class MapFragment extends Fragment
 
         dList = ((MainActivity)getActivity()).getDataList();
 
+
         myLocation = new Location("내위치");
         myLocation.setLatitude(myLat);
         myLocation.setLongitude(myLog);
 
         MapsInitializer.initialize(this.getActivity());
+
 
         googleMap.setMyLocationEnabled(true);
 
@@ -109,6 +112,7 @@ public class MapFragment extends Fragment
                 }
             }
         });
+
         markerSetting(googleMap);
     }
 
@@ -129,6 +133,7 @@ public class MapFragment extends Fragment
                     String dAccidentType = dList.get(i).getAccidentType();
                     String dName = dList.get(i).getPlaceName();
 
+                    String blurCount = "발생건수" + dList.get(i).getAccidentCount();
                     BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.marker);
                     Bitmap b=bitmapdraw.getBitmap();
                     Bitmap smallMarker = Bitmap.createScaledBitmap(b, 200, 200, false);
@@ -136,8 +141,9 @@ public class MapFragment extends Fragment
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(dLat, dLog ))
                             .title(dAccidentType+"\n")
-                            .snippet(dName)
+                            .snippet(dName+"\n"+blurCount)
                             .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+
 
                     googleMap.addCircle(new CircleOptions()
                             .center(new LatLng(dLat, dLog ))

@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -176,7 +177,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startCanaryService(){
-        startService(new Intent(this, CanaryService.class));
+        Intent intent = new Intent(this, CanaryService.class);
+        startService(intent);
 
     }
 

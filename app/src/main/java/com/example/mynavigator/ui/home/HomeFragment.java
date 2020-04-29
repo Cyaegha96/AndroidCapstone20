@@ -1,9 +1,7 @@
 package com.example.mynavigator.ui.home;
 
 import android.Manifest;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -23,7 +21,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
-import com.example.mynavigator.AlertReceiver;
 import com.example.mynavigator.MainActivity;
 import com.example.mynavigator.R;
 import com.example.mynavigator.ui.data.Data;
@@ -44,8 +41,6 @@ public class HomeFragment extends Fragment {
     List<Data> dataList;
     LatLng currPosition;
     Location userLocation;
-    AlertReceiver receiver;
-    PendingIntent proximityIntent;
     private boolean touchFlag;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -112,9 +107,9 @@ public class HomeFragment extends Fragment {
                     ((MainActivity) getActivity()).startCanaryService();
                     dataList =  ((MainActivity) getActivity()).getDataList();
                     Log.d(TAG,"dataList 잘 가져 왔냐??: "+dataList.get(0).accidentType+" "+dataList.get(0).getAccidentYear());
-                    receiver = new AlertReceiver();
-                    IntentFilter filter = new IntentFilter("kr.ac.koreatech.msp.locationAlert");
-                    getActivity().getApplicationContext().registerReceiver(receiver, filter);
+                    //receiver = new AlertReceiver();
+                    //IntentFilter filter = new IntentFilter("kr.ac.koreatech.msp.locationAlert");
+                   // getActivity().getApplicationContext().registerReceiver(receiver, filter);
 
                     // ProximityAlert 등록을 위한 PendingIntent 객체 얻기
                     /*
@@ -162,8 +157,7 @@ public class HomeFragment extends Fragment {
                     //버튼을 다시 한번 눌렀을 때->꺼짐.
                     touchFlag = false; //Flag 교체
                     ((MainActivity) getActivity()).stopCanaryService();
-                    locationManager.removeProximityAlert(proximityIntent);
-                    getActivity().getApplicationContext().unregisterReceiver(receiver);
+                   // getActivity().getApplicationContext().unregisterReceiver(receiver);
                     StyleableToast.makeText(getActivity().getApplicationContext(),
                             "서비스 종료", Toast.LENGTH_LONG, R.style.mytoast).show();
 
