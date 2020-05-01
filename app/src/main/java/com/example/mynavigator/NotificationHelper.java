@@ -48,9 +48,9 @@ public class NotificationHelper extends ContextWrapper {
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 267, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
-//                .setContentTitle(title)
-//                .setContentText(body)
-                .setSmallIcon(R.drawable.ic_launcher_background)
+             .setContentTitle(title)
+              .setContentText(body)
+                .setSmallIcon(R.drawable.carlary_app_logo3)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setStyle(new NotificationCompat.BigTextStyle().setSummaryText("summary").setBigContentTitle(title).bigText(body))
                 .setContentIntent(pendingIntent)
@@ -58,7 +58,6 @@ public class NotificationHelper extends ContextWrapper {
                 .build();
 
         NotificationManagerCompat.from(this).notify(new Random().nextInt(), notification);
-
 
     }
 

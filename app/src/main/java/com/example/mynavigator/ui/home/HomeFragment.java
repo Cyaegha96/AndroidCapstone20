@@ -5,18 +5,21 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -33,28 +36,28 @@ public class HomeFragment extends Fragment {
 
     private static final String TAG = "HomeFragment";
     private HomeViewModel homeViewModel;
+    private ImageView canaryImage;
     private Button button;
 
     private LocationManager locationManager;
-    private static final int REQUEST_CODE_LOCATION = 2;
+    private int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
+    private int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
 
     List<Data> dataList;
     LatLng currPosition;
     Location userLocation;
-    private boolean touchFlag;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        Log.i(TAG, " onCreate() ");
+        super.onCreate(savedInstanceState);
+
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         Log.i(TAG, " onCreateView() ");
-        if (savedInstanceState != null) {
-            String data = savedInstanceState.getString("touchFlagKey");
-            if (data.equals("true")) {
-                touchFlag = true;
-            } else if (data.equals("false")) {
-                touchFlag = false;
-            }
-        }
         homeViewModel =
                 ViewModelProviders.of(this).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
@@ -66,26 +69,19 @@ public class HomeFragment extends Fragment {
                 textView.setText(s);
             }
         });
+        canaryImage = (ImageView) root.findViewById(R.id.CanaryBird);
         button = (Button) root.findViewById(R.id.button);
+        if (!((MainActivity) getActivity()).isLaunchingService(getContext()) ) {
+            button.setText("내 위치 요청하기");
+            canaryImage.setImageResource(R.drawable.canary_wait);
+        }else{
+            button.setText("카나리아 서비스 실행중~~");
+            canaryImage.setImageResource(R.drawable.canary);
+        }
 
         return root;
     }
 
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        Log.i(TAG, " onCreate() ");
-        super.onCreate(savedInstanceState);
-        touchFlag = false;
-        if (savedInstanceState != null) {
-            String data = savedInstanceState.getString("touchFlagKey");
-            if (data.equals("true")) {
-                touchFlag = true;
-            } else if (data.equals("false")) {
-                touchFlag = false;
-            }
-        }
-    }
 
     @Override
     public void onStart() {
@@ -102,38 +98,15 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                if (touchFlag == false) {
+                if (!((MainActivity) getActivity()).isLaunchingService(getContext()) ) {
                     //버튼을 한번 눌렀을 때 => 켜짐
+                    CanaryStartRequest();
+                    button.setText("카나리아 서비스 실행중~~");
+                    canaryImage.setImageResource(R.drawable.canary);
+
                     ((MainActivity) getActivity()).startCanaryService();
                     dataList =  ((MainActivity) getActivity()).getDataList();
                     Log.d(TAG,"dataList 잘 가져 왔냐??: "+dataList.get(0).accidentType+" "+dataList.get(0).getAccidentYear());
-                    //receiver = new AlertReceiver();
-                    //IntentFilter filter = new IntentFilter("kr.ac.koreatech.msp.locationAlert");
-                   // getActivity().getApplicationContext().registerReceiver(receiver, filter);
-
-                    // ProximityAlert 등록을 위한 PendingIntent 객체 얻기
-                    /*
-                    Intent intent = new Intent("kr.ac.koreatech.msp.locationAlert");
-                    proximityIntent = PendingIntent.getBroadcast(getActivity().getApplicationContext(), 0, intent, 0);
-                    Log.d("TAG","Fragment:Call MainActivity, startCanaryService");
-
-                    try {
-                        // 근접 경보 등록 메소드
-                        // void addProximityAlert(double latitude, double longitude, float radius, long expiration, PendingIntent intent)
-                        // 아래 위도, 경도 값의 위치는 2공학관 420호 창가 부근
-                        for(int i = 0; i< dataList.size() ; i++){
-                            LatLng d = new LatLng(dataList.get(i).getLatitude(),dataList.get(i).getLongitude());
-                            Location l = new Location("l");
-                            l.setLatitude(d.latitude);
-                            l.setLongitude(d.longitude);
-                            if(userLocation.distanceTo(l) < 1000)
-                                locationManager.addProximityAlert(d.latitude, d.longitude, 20, -1, proximityIntent);
-                        }
-
-                    } catch (SecurityException e) {
-                        e.printStackTrace();
-                    }
-                     */
 
                     if(((MainActivity)getActivity()).isUserLocationHasResult()){
                         Log.d(TAG,"Activity의 userLocation 값을 가져옴");
@@ -147,19 +120,19 @@ public class HomeFragment extends Fragment {
 
                     if (userLocation != null) {
                         StyleableToast.makeText(getActivity().getApplicationContext(),
-                                "내위치 : 위도:" + String.format("%.2f", currPosition.latitude) + "\n경도:" + String.format("%.2f", currPosition.longitude), Toast.LENGTH_LONG, R.style.mytoast).show();
+                                "내위치 : 위도:" + String.format("%.2f", currPosition.latitude) + "\n경도:" + String.format("%.2f", currPosition.longitude), Toast.LENGTH_SHORT, R.style.mytoast).show();
                         ((MainActivity) getActivity()).setUserLocation(userLocation); //MainActivity로 전달
                         //Service를 시작하라는 내용
                     }
-                    touchFlag = true; //Flag 교체
 
                 } else {
                     //버튼을 다시 한번 눌렀을 때->꺼짐.
-                    touchFlag = false; //Flag 교체
+                    button.setText("내 위치 요청하기");
+                    canaryImage.setImageResource(R.drawable.canary_wait);
                     ((MainActivity) getActivity()).stopCanaryService();
                    // getActivity().getApplicationContext().unregisterReceiver(receiver);
                     StyleableToast.makeText(getActivity().getApplicationContext(),
-                            "서비스 종료", Toast.LENGTH_LONG, R.style.mytoast).show();
+                            "서비스 종료", Toast.LENGTH_SHORT, R.style.mytoast).show();
 
                 }
 
@@ -168,30 +141,40 @@ public class HomeFragment extends Fragment {
     }
 
     public Location getFirstLocation(){
-        if (ActivityCompat.checkSelfPermission(getContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    this.REQUEST_CODE_LOCATION);
-            return getFirstLocation();
-        }else{
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if(location == null){
                 location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             }
             return location;
+        } else {
+            //Ask for permission
+            if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)) {
+                ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+            } else {
+                ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+            }
+            return getFirstLocation();
         }
     }
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        if (touchFlag == false)
-            outState.putString("touchFlagKey", "false");
-        else if (touchFlag == true)
-            outState.putString("touchFlagKey", "true");
-        Log.d("HomeFragment/onsave", "touchFlagKey" + touchFlag);
+
+    public void CanaryStartRequest(){
+        if (Build.VERSION.SDK_INT >= 29) {
+            //We need background permission
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            } else {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), Manifest.permission.ACCESS_BACKGROUND_LOCATION)) {
+                    //We show a dialog and ask for permission
+                    ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
+                } else {
+                    ActivityCompat.requestPermissions(getActivity(), new String[] {Manifest.permission.ACCESS_BACKGROUND_LOCATION}, BACKGROUND_LOCATION_ACCESS_REQUEST_CODE);
+                }
+            }
+
+        } else {
+
+        }
     }
 
 }

@@ -3,9 +3,12 @@ package com.example.mynavigator;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.gms.location.ActivityTransitionEvent;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
@@ -22,31 +25,34 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
         NotificationHelper notificationHelper = new NotificationHelper(context);
 
         GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
+        Log.d(TAG, "onReceive: geoFencing BroadCast 메시지 받음");
 
         if (geofencingEvent.hasError()) {
+            Toast.makeText(context,"onReceive: geoFencing 이벤트 에러",Toast.LENGTH_SHORT);
             Log.d(TAG, "onReceive: geoFencing 이벤트 에러");
             return;
         }
 
+        String showingData = "";
         List<Geofence> geofenceList = geofencingEvent.getTriggeringGeofences();
         for (Geofence geofence: geofenceList) {
             Log.d(TAG, "onReceive: " + geofence.getRequestId());
+            showingData += geofence.getRequestId();
         }
-//        Location location = geofencingEvent.getTriggeringLocation();
         int transitionType = geofencingEvent.getGeofenceTransition();
 
         switch (transitionType) {
             case Geofence.GEOFENCE_TRANSITION_ENTER:
                 Toast.makeText(context, "GEOFENCE_TRANSITION_ENTER", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("GEOFENCE_TRANSITION_ENTER", "", MainActivity.class);
+                notificationHelper.sendHighPriorityNotification("사고 다발지역 안에 들어왔습니다!", showingData, MainActivity.class);
                 break;
             case Geofence.GEOFENCE_TRANSITION_DWELL:
                 Toast.makeText(context, "GEOFENCE_TRANSITION_DWELL", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("GEOFENCE_TRANSITION_DWELL", "", MainActivity.class);
+                notificationHelper.sendHighPriorityNotification("사고 다발지역 안을 지나고 있습니다!", showingData, MainActivity.class);
                 break;
             case Geofence.GEOFENCE_TRANSITION_EXIT:
                 Toast.makeText(context, "GEOFENCE_TRANSITION_EXIT", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("GEOFENCE_TRANSITION_EXIT", "", MainActivity.class);
+                notificationHelper.sendHighPriorityNotification("사고 다발지역 안에서 나왔습니다!", showingData, MainActivity.class);
                 break;
         }
 

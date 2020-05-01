@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -51,11 +52,13 @@ public class MapFragment extends Fragment
     private static final String TAG = "MapFragment";
     private MapViewModel mapViewModel;
     private MapView mapView;
+    private float GEOFENCE_RADIUS = 50;
     private int focusingDistanceLevel =1000 ;
 
     private double myLat;
     private double myLog;
     private Location myLocation;
+    GoogleMap mGoogleMap;
     private List<Data> dList;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -81,6 +84,7 @@ public class MapFragment extends Fragment
     @Override
     public void onMapReady(final GoogleMap googleMap) {
 
+        mGoogleMap = googleMap;
         myLat =  ((MainActivity)getActivity()).myLat;
         myLog = ((MainActivity)getActivity()).myLog;
 
@@ -98,12 +102,12 @@ public class MapFragment extends Fragment
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
 
-        googleMap.animateCamera(cameraUpdate);
-        googleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
+        mGoogleMap.animateCamera(cameraUpdate);
+        mGoogleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             @Override
             public void onCameraMove() {
 
-                CameraPosition cameraPosition = googleMap.getCameraPosition();
+                CameraPosition cameraPosition = mGoogleMap.getCameraPosition();
                 Log.d(TAG,"현재 카메라 줌레벨:"+cameraPosition.zoom);
                 if(cameraPosition.zoom <15.0){
                     focusingDistanceLevel = 5000;
@@ -113,7 +117,7 @@ public class MapFragment extends Fragment
             }
         });
 
-        markerSetting(googleMap);
+        markerSetting(mGoogleMap);
     }
 
     public void markerSetting(GoogleMap googleMap){
@@ -127,7 +131,7 @@ public class MapFragment extends Fragment
                 l.setLatitude(dLat);
                 l.setLongitude(dLog);
 
-                if(myLocation.distanceTo(l) <= focusingDistanceLevel){
+               if(myLocation.distanceTo(l) <= focusingDistanceLevel){
                     //거리 비교해서 1km 안에 있는거만 표시하자
 
                     String dAccidentType = dList.get(i).getAccidentType();
@@ -148,12 +152,23 @@ public class MapFragment extends Fragment
                     googleMap.addCircle(new CircleOptions()
                             .center(new LatLng(dLat, dLog ))
                             .fillColor(0x22FF0000) //투명한 원 그리려면 색상값 앞에 0x22 가 붙어야 함!
-                            .radius(30)
+                            .radius(GEOFENCE_RADIUS)
                             .strokeColor(Color.BLACK)
                             .strokeWidth(2));
 
-                }
+               }
             }
+        }
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        if(mGoogleMap != null){ //prevent crashing if the map doesn't exist yet (eg. on starting activity)
+            mGoogleMap.clear();
+
+            // add markers from database to the map
         }
     }
 

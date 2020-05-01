@@ -9,10 +9,10 @@
 
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/CanaryBird"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:src="@drawable/canary"
+        android:src="@drawable/canary_wait"
         app:layout_constraintBottom_toTopOf="@+id/text_home"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"

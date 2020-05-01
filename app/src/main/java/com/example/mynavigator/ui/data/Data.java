@@ -3,7 +3,7 @@ package com.example.mynavigator.ui.data;
 
 import java.io.Serializable;
 
-public class Data implements Serializable {
+public class Data {
 
     public int accidentCode;
     public int accidentYear;

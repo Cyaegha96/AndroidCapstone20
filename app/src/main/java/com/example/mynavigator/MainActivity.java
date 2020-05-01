@@ -1,19 +1,21 @@
 package com.example.mynavigator;
 
+import android.app.ActivityManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Parcelable;
+
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -109,6 +111,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        return super.onOptionsItemSelected(item);
+    }
+
     private void initLoadDBReturn() {
 
         DataAdapter mDbHelper = new DataAdapter(getApplicationContext());
@@ -130,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
 
             myLat = intent.getDoubleExtra("lat",0);
             myLog = intent.getDoubleExtra("lng",0);
+            String locationProvider =  intent.getStringExtra("provider");
             float speed = intent.getFloatExtra("speed",0);
             String text = "위치 업데이트\n" +
                     "위도:" + String.format("%.2f", myLat) + "\n" +
@@ -137,13 +146,14 @@ public class MainActivity extends AppCompatActivity {
                     "스피드: " + String.format("%.2f",speed);
             Log.d(TAG,"onReceive : "+text );
             if(myLat != 0 && myLog !=0){
-                userLocation = new Location(LocationManager.GPS_PROVIDER);
+                userLocation = new Location(locationProvider);
                 setMyLatLog(new LatLng(myLat,myLog));
                 userLocation.setSpeed(speed);
+                StyleableToast.makeText(getApplicationContext(),
+                        text,
+                        Toast.LENGTH_LONG, R.style.mytoast2).show();
             }
-            StyleableToast.makeText(getApplicationContext(),
-                    text,
-                    Toast.LENGTH_LONG, R.style.mytoast2).show();
+
         }
     };
 
@@ -167,8 +177,6 @@ public class MainActivity extends AppCompatActivity {
     public void setMyLatLog(LatLng latLng){
         myLat = latLng.latitude;
         myLog = latLng.longitude;
-        StyleableToast.makeText(getApplicationContext(),"MainActivity에도 내위치 도착했음",Toast.LENGTH_LONG, R.style.mytoast).show();
-
     }
 
     public void setUserLocation(Location userLocation) {
@@ -211,6 +219,20 @@ public class MainActivity extends AppCompatActivity {
                 getString(mainTextStringId),
                 Snackbar.LENGTH_INDEFINITE)
                 .setAction(getString(actionStringId), listener).show();
+    }
+
+    //t
+    public Boolean isLaunchingService(Context mContext){
+
+        ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);
+
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (CanaryService.class.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+
+        return  false;
     }
 
 

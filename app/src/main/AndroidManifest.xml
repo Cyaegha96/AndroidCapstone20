@@ -39,7 +39,10 @@
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="location" />
-
+        <receiver
+            android:name=".GeofenceBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true"></receiver>
         <receiver
             android:name=".StopServiceReceiver"
             android:enabled="true"
