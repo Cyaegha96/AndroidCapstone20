@@ -80,7 +80,7 @@ public class DataFragment extends Fragment {
     }
     class SingerAdapter extends BaseAdapter {
 
-        ArrayList<Data> items = new ArrayList<Data>();
+        ArrayList<Data> items = new ArrayList<>();
         public void addItem(Data item){
             items.add(item);
         }

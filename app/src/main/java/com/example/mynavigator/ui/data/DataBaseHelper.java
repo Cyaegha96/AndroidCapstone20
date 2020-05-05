@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.SQLInput;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
@@ -22,11 +23,13 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private static String DB_PATH = "";
     // TODO : assets 폴더에 있는 DB명 또는 별도의 데이터베이스 파일이름
     private static String DB_NAME ="sample_db.db";
+    private static String DB_NAME_CW ="crosswalk_db.db";
 
     private SQLiteDatabase mDataBase;
+    private SQLiteDatabase cwDataBase;
     private final Context mContext;
 
-    public DataBaseHelper(Context context)
+    public DataBaseHelper(Context context, String DB_NAME, int version)
     {
         super(context, DB_NAME, null, 1);// 1은 데이터베이스 버젼
         if(android.os.Build.VERSION.SDK_INT >= 17){
@@ -65,12 +68,31 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     {
         File dbFile = new File(DB_PATH + DB_NAME);
         //Log.v("dbFile", dbFile + "   "+ dbFile.exists());
-        return dbFile.exists();
+
+        File cwFile = new File(DB_PATH + DB_NAME_CW);
+
+        return dbFile.exists()&&cwFile.exists();
+
     }
 
     //assets폴더에서 데이터베이스를 복사한다.
     private void copyDataBase() throws IOException
     {
+
+
+        InputStream cwInput = mContext.getAssets().open(DB_NAME_CW);
+        String cwFileName = DB_PATH + DB_NAME_CW;
+        OutputStream cwOutput = new FileOutputStream(cwFileName);
+        byte[] cwBuffer = new byte[1024];
+        int cwLength;
+        while ((cwLength = cwInput.read(cwBuffer))>0)
+        {
+            cwOutput.write(cwBuffer, 0, cwLength);
+        }
+        cwOutput.flush();
+        cwOutput.close();
+        cwInput.close();
+
         InputStream mInput = mContext.getAssets().open(DB_NAME);
         String outFileName = DB_PATH + DB_NAME;
         OutputStream mOutput = new FileOutputStream(outFileName);
@@ -83,12 +105,14 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         mOutput.flush();
         mOutput.close();
         mInput.close();
+
     }
 
     //데이터베이스를 열어서 쿼리를 쓸수있게만든다.
-    public boolean openDataBase() throws SQLException
+    public boolean openDataBase(String db_name) throws SQLException
     {
-        String mPath = DB_PATH + DB_NAME;
+        String mPath = DB_PATH + db_name;
+
         //Log.v("mPath", mPath);
         mDataBase = SQLiteDatabase.openDatabase(mPath, null, SQLiteDatabase.CREATE_IF_NECESSARY);
         //mDataBase = SQLiteDatabase.openDatabase(mPath, null, SQLiteDatabase.NO_LOCALIZED_COLLATORS);
@@ -100,6 +124,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     {
         if(mDataBase != null)
             mDataBase.close();
+
+        if(cwDataBase != null)
+            cwDataBase.close();
         super.close();
     }
 

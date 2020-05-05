@@ -44,6 +44,7 @@ public class ItemView extends LinearLayout {
         textview[11] = (TextView) findViewById(R.id.data_sector11);
         textview[12] = (TextView) findViewById(R.id.data_sector12);
         textview[13] = (TextView) findViewById(R.id.data_sector13);
+
         /*
         for(int i=0;i<=13;i++){
             int getID = getResources().getIdentifier("data_sector"+i,"id","R");
@@ -56,12 +57,13 @@ public class ItemView extends LinearLayout {
     public void setTextview(Data data){
         for(int i=0;i<14;i++){
             String getdata="";
+
             if(i==0)
-                getdata += data.getAccidentCode()+"";
+                getdata += data.getAccidentCode();
             else if(i==1)
                 getdata += data.getAccidentYear()+"";
             else if(i==2)
-                getdata += data.getAccidentType();
+                getdata += data.getAccidentType()+"";
             else if(i==3)
                 getdata += data.getPlaceCode()+"";
             else if(i==4)
@@ -77,13 +79,17 @@ public class ItemView extends LinearLayout {
             else if(i==9)
                 getdata += data.getSeriousCount()+"";
             else if(i==10)
-                getdata+= data.getSeriousCount()+"";
+                getdata+= data.getSlightlyCount()+"";
             else if(i==11)
                 getdata+= data.getInjuredCount()+"";
             else if(i==12)
                 getdata+= data.getLatitude()+"";
             else if(i==13)
                 getdata+= data.getLongitude()+"";
+            else if(i==14)
+                getdata+= data.getDataDate()+"";
+
+
             else
                 getdata += "뭐임";
 

@@ -25,6 +25,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.mynavigator.ui.data.CwData;
+import com.example.mynavigator.ui.data.CwDataAdapter;
 import com.example.mynavigator.ui.data.Data;
 import com.example.mynavigator.ui.data.DataAdapter;
 import com.google.android.gms.location.Geofence;
@@ -48,11 +50,11 @@ public class MainActivity extends AppCompatActivity {
     private Location userLocation;
 
     List<Data> dataList;
+    List<CwData> cwdataList;
     private GeofencingClient mGeofencingClient;
     private ArrayList<Geofence> mGeofenceList;
     private PendingIntent mGeofencePendingIntent;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +122,7 @@ public class MainActivity extends AppCompatActivity {
     private void initLoadDBReturn() {
 
         DataAdapter mDbHelper = new DataAdapter(getApplicationContext());
+
         mDbHelper.createDatabase();
         mDbHelper.open();
 

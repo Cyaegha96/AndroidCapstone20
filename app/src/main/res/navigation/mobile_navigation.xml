@@ -46,4 +46,10 @@
         android:name="com.example.mynavigator.ui.data.GraphFragment"
         android:label="Graph 그래프보기"
         tools:layout="@layout/fragment_graph_view" />
+
+    <fragment
+        android:id="@+id/web_view"
+        android:name="com.example.mynavigator.ui.data.WebViewFragment"
+        android:label="Webview 웹뷰보기"
+        tools:layout="@layout/fragment_web_view" />
 </navigation>

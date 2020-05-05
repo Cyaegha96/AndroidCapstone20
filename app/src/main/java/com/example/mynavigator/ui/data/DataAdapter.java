@@ -13,7 +13,7 @@ import java.util.List;
 public class DataAdapter
 {
     protected static final String TAG = "DataAdapter";
-
+    private static String DB_NAME ="sample_db.db";
     // TODO : TABLE 이름을 명시해야함
     protected static final String TABLE_NAME = "sample_table";
 
@@ -24,7 +24,7 @@ public class DataAdapter
     public DataAdapter(Context context)
     {
         this.mContext = context;
-        mDbHelper = new DataBaseHelper(mContext);
+        mDbHelper = new DataBaseHelper(mContext, DB_NAME, 1);
     }
 
     public DataAdapter createDatabase() throws SQLException
@@ -45,7 +45,7 @@ public class DataAdapter
     {
         try
         {
-            mDbHelper.openDataBase();
+            mDbHelper.openDataBase(DB_NAME);
             mDbHelper.close();
             mDb = mDbHelper.getReadableDatabase();
         }

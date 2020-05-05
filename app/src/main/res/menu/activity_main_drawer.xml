@@ -18,7 +18,12 @@
             android:title="@string/menu_data" />
         <item
             android:id="@+id/nav_graph"
-            android:icon="@android:drawable/ic_dialog_info"
-            android:title="Graph 그래프보기" />
+            android:icon="@drawable/ic_dialog_graph"
+            android:title="@string/menu_graph" />
+
+        <item
+            android:id="@+id/web_view"
+            android:icon="@drawable/ic_web_view"
+            android:title="@string/menu_webview" />
     </group>
 </menu>
