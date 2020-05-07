@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="top"
+    tools:context=".ui.report.report">
+    <LinearLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:weightSum="2"
+        >
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/map2"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            android:layout_weight="1"
+            android:isScrollContainer="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="center"
+                android:text="마커를 통해 원하는 지역을 선택하고\n 아래 내용을 채운 뒤 위험 지역을 제보하세요!"
+                android:textSize="18sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="4">
+
+                <EditText
+                    android:id="@+id/senderNameText"
+                    android:layout_width="118dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="이름" />
+
+                <TextView
+                    android:layout_width="48dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:text="사고유형:" />
+
+                <Spinner
+                    android:id="@+id/spinner_dAccitentType"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="2" />
+            </LinearLayout>
+
+
+            <EditText
+                android:id="@+id/editLatLng"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:focusableInTouchMode="false"
+                android:hint="위치정보는 마커 입력시 자동 등록됩니다"
+                android:minLines="2" />
+
+            <EditText
+                android:id="@+id/editComment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:hint="보행자 다발지역의 사유를 적어주세요"
+                android:minLines="2" />
+
+            <Button
+                android:id="@+id/sendingEmailButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="이메일 보내기" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>

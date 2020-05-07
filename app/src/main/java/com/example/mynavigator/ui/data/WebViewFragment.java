@@ -23,9 +23,7 @@ import com.example.mynavigator.R;
 
 public class WebViewFragment extends Fragment {
 
-
-
-    private String myUrl = "http://naver.com";// 접속 URL (내장HTML의 경우 왼쪽과 같이 쓰고 아니면 걍 URL)
+    private String myUrl = "http://taas.koroad.or.kr/";// 접속 URL (내장HTML의 경우 왼쪽과 같이 쓰고 아니면 걍 URL)
     public WebView mWebView;
 
     @Override
@@ -33,13 +31,12 @@ public class WebViewFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         View v=inflater.inflate(R.layout.fragment_web_view, container, false);
         mWebView = (WebView) v.findViewById(R.id.web_view);
-        mWebView.loadUrl("https://www.naver.com/");
+        mWebView.loadUrl(myUrl);
 
         // Enable Javascript
         WebSettings webSettings = mWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
 
-        // Force links and redirects to open in the WebView instead of in a browser
         mWebView.setWebViewClient(new WebViewClient());
 
         return v;

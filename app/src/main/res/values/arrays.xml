@@ -312,4 +312,11 @@
         <item>제주시</item>
     </string-array>
 
+    <string-array name="spinner_accidentType">
+        <item>스쿨존어린이</item>
+        <item>보행어린이</item>
+        <item>보행노인</item>
+        <item>자전거</item>
+        <item>무단횡단</item>
+    </string-array>
 </resources>
