@@ -60,6 +60,11 @@ public class GraphFragment extends Fragment {
         final Spinner spin_province = getActivity().findViewById(R.id.spinner_province);
         final Spinner spin_city = getActivity().findViewById(R.id.spinner_city);
 
+        accident_type.setPrompt("사고 유형 선택");
+        spin_province.setPrompt("행정 지역 선택");
+        spin_city.setPrompt("시군구 선택");
+
+
         Button btn_refresh = getActivity().findViewById(R.id.btn_refresh);
 
         accident = ArrayAdapter.createFromResource(getContext(), R.array.accident_type, android.R.layout.simple_spinner_dropdown_item);
