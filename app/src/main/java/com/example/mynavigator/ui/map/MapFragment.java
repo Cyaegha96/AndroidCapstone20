@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -90,6 +91,7 @@ public class MapFragment extends Fragment
         mapView.onResume();
         mapView.getMapAsync(this); // 비동기적 방식으로 구글 맵 실행
 
+
         return root;
     }
 
@@ -114,7 +116,9 @@ public class MapFragment extends Fragment
 
 
         googleMap.setMyLocationEnabled(true);
-
+        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
+        googleMap.getUiSettings().setMapToolbarEnabled(true);
 
         mGoogleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             @Override
@@ -136,23 +140,17 @@ public class MapFragment extends Fragment
     }
 
     public void markerSetting(GoogleMap googleMap){
-
-        BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.marker);
-        Bitmap b=bitmapdraw.getBitmap();
-        Bitmap smallMarker = Bitmap.createScaledBitmap(b, 200, 200, false);
-
-        if(dList != null){
-            for(int i=0;i<dList.size();i++){
+        if(dList != null) {
+            for (int i = 0; i < dList.size(); i++) {
 
                 float dLat = dList.get(i).getLatitude();
                 float dLog = dList.get(i).getLongitude();
-                //clusterManager.addItem(new CanaryClusterItem(new LatLng(dLat,dLog),dList.get(i).getAccidentType(),dList.get(i).getPlaceName()));
-               // clusterManager.setRenderer(new CustomIconRenderer(getActivity(),mGoogleMap,clusterManager));
+
                 Location l = new Location("d");
                 l.setLatitude(dLat);
                 l.setLongitude(dLog);
 
-               if(myLocation.distanceTo(l) <= focusingDistanceLevel){
+                if (myLocation.distanceTo(l) <= focusingDistanceLevel) {
                     //거리 비교해서 1km 안에 있는거만 표시하자
 
                     String dAccidentType = dList.get(i).getAccidentType();
@@ -160,21 +158,69 @@ public class MapFragment extends Fragment
 
                     String blurCount = "발생건수" + dList.get(i).getAccidentCount();
 
-                    googleMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(dLat, dLog ))
-                            .title(dAccidentType+"\n")
-                            .snippet(dName+"\n"+blurCount)
-                            .icon(BitmapDescriptorFactory.fromBitmap(smallMarker)));
+                    BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(R.drawable.bicycle);
+                    Bitmap b = bitmapdraw.getBitmap();
+                    Bitmap bicycleMarker = Bitmap.createScaledBitmap(b, 100, 100, false);
+
+                    BitmapDrawable bitmapdraw1 = (BitmapDrawable) getResources().getDrawable(R.drawable.child);
+                    Bitmap c = bitmapdraw1.getBitmap();
+                    Bitmap childMarker = Bitmap.createScaledBitmap(c, 100, 100, false);
+
+                    BitmapDrawable bitmapdraw2 = (BitmapDrawable) getResources().getDrawable(R.drawable.crosswalk);
+                    Bitmap d = bitmapdraw2.getBitmap();
+                    Bitmap crosswalkMarker = Bitmap.createScaledBitmap(d, 100, 100, false);
+
+                    BitmapDrawable bitmapdraw3 = (BitmapDrawable) getResources().getDrawable(R.drawable.old_man);
+                    Bitmap e = bitmapdraw3.getBitmap();
+                    Bitmap old_manMarker = Bitmap.createScaledBitmap(e, 100, 100, false);
+
+                    BitmapDrawable bitmapdraw4 = (BitmapDrawable) getResources().getDrawable(R.drawable.school_zone);
+                    Bitmap f = bitmapdraw4.getBitmap();
+                    Bitmap school_zoneMarker = Bitmap.createScaledBitmap(f, 100, 100, false);
 
 
                     googleMap.addCircle(new CircleOptions()
-                            .center(new LatLng(dLat, dLog ))
+                            .center(new LatLng(dLat, dLog))
                             .fillColor(0x22FF0000) //투명한 원 그리려면 색상값 앞에 0x22 가 붙어야 함!
-                            .radius(GEOFENCE_RADIUS)
+                            .radius(50)
                             .strokeColor(Color.BLACK)
                             .strokeWidth(2));
 
-               }
+
+                    if (dAccidentType.equals("자전거")) {
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(dLat, dLog))
+                                .title(dAccidentType + "\n")
+                                .snippet(dName + "\n" + blurCount)
+                                .icon(BitmapDescriptorFactory.fromBitmap(bicycleMarker)));
+                    } else if (dAccidentType.equals("보행어린이")) {
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(dLat, dLog))
+                                .title(dAccidentType + "\n")
+                                .snippet(dName + "\n" + blurCount)
+                                .icon(BitmapDescriptorFactory.fromBitmap(childMarker)));
+                    } else if (dAccidentType.equals("보행노인")) {
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(dLat, dLog))
+                                .title(dAccidentType + "\n")
+                                .snippet(dName + "\n" + blurCount)
+                                .icon(BitmapDescriptorFactory.fromBitmap(old_manMarker)));
+                    } else if (dAccidentType.equals("스쿨존어린이")) {
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(dLat, dLog))
+                                .title(dAccidentType + "\n")
+                                .snippet(dName + "\n" + blurCount)
+                                .icon(BitmapDescriptorFactory.fromBitmap(school_zoneMarker)));
+                    } else if (dAccidentType.equals("무단횡단")) {
+                        googleMap.addMarker(new MarkerOptions()
+                                .position(new LatLng(dLat, dLog))
+                                .title(dAccidentType + "\n")
+                                .snippet(dName + "\n" + blurCount)
+                                .icon(BitmapDescriptorFactory.fromBitmap(crosswalkMarker)));
+                    }
+
+                }
+
             }
         }
 
@@ -222,6 +268,16 @@ public class MapFragment extends Fragment
                 }
             }
         }
+        googleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                // 마커 클릭시 호출되는 콜백 메서드
+                Toast.makeText(getContext(),
+                        marker.getTitle() + " 클릭했음"
+                        , Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });
     }
     private void intiDBLoadReturn(){
         CwDataAdapter cwDbHelper = new CwDataAdapter(getActivity().getApplicationContext());

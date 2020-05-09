@@ -50,11 +50,26 @@ public class UserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
 
+        SharedPreferences userInfo = getSharedPreferences("userInfo",MODE_PRIVATE);
+        String userName = userInfo.getString("name","이름 없는 사용자");
+        userInfo.getString("choice_do","지역 정보 없음");
+        userInfo.getString("choice_city","도시 정보 없음");
+        int year = userInfo.getInt("year",-1);
+
         final Spinner spin_province = findViewById(R.id.spinner_province);
         final Spinner spin_city = findViewById(R.id.spinner_city);
 
         editUserName = findViewById(R.id.editUserName);
+        if(!userName.equals("이름 없는 사용자")){
+            editUserName.setHint(userName);
+        }
+
         editUserYear = findViewById(R.id.editYear);
+        if(year != -1){
+            editUserYear.setText(year+"년 출생");
+            userYear = year;
+        }
+
         editUserYear.setFocusable(false);
         editUserYear.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,6 +114,7 @@ public class UserActivity extends AppCompatActivity {
         adspin1 = ArrayAdapter.createFromResource(this, R.array.spinner_region, android.R.layout.simple_spinner_dropdown_item);
         adspin1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spin_province.setAdapter(adspin1);
+
 
         spin_province.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 

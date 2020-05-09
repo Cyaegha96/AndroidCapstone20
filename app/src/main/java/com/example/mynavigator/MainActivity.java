@@ -1,6 +1,7 @@
 package com.example.mynavigator;
 
 import android.app.ActivityManager;
+import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,22 +22,27 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.example.mynavigator.service.BackgroundDetectedActivitiesService;
+import com.example.mynavigator.service.CanaryService;
+import com.example.mynavigator.service.Constants;
 import com.example.mynavigator.ui.data.CwData;
-import com.example.mynavigator.ui.data.CwDataAdapter;
 import com.example.mynavigator.ui.data.Data;
 import com.example.mynavigator.ui.data.DataAdapter;
+import com.example.mynavigator.ui.home.HomeFragment;
+import com.example.mynavigator.ui.settings.SettingsActivity;
 import com.example.mynavigator.user.UserActivity;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.muddzdev.styleabletoast.StyleableToast;
@@ -48,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private AppBarConfiguration mAppBarConfiguration;
+
+    //초기위치 (서울한복판)
     public double myLat =37.56;
     public double myLog = 126.97;
     private Location userLocation;
@@ -89,11 +97,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
         initLoadDBReturn();
 
         mGeofenceList = new ArrayList<>();
-
-
         mGeofencePendingIntent = null;
         mGeofencingClient = LocationServices.getGeofencingClient(this);
 
@@ -107,9 +114,9 @@ public class MainActivity extends AppCompatActivity {
                     .setDrawerLayout(drawer)
                     .build();
             NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+
             NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
             NavigationUI.setupWithNavController(navigationView, navController);
-
 
         SharedPreferences userInfo = getSharedPreferences("userInfo",MODE_PRIVATE);
         String userName = userInfo.getString("name","이름 없는 사용자");
@@ -132,12 +139,7 @@ public class MainActivity extends AppCompatActivity {
             subtitle = year+" 년생 " + subtitle+" 거주";
         }
         nav_sub_view.setText(subtitle);
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void initLoadDBReturn() {
@@ -154,10 +156,10 @@ public class MainActivity extends AppCompatActivity {
         mDbHelper.close();
 
     }
+
     private BroadcastReceiver mAlertReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-
             Log.d(TAG,"onReceive : Data 가 Activity에 도착" );
 
             myLat = intent.getDoubleExtra("lat",0);
@@ -193,6 +195,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+
+        switch(item.getItemId()){
+            case R.id.action_settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
@@ -209,13 +223,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startCanaryService(){
-        Intent intent = new Intent(this, CanaryService.class);
-        startService(intent);
-
+        Intent canaryIntent = new Intent(this, CanaryService.class);
+        startService(canaryIntent);
+        Intent detectedIntent = new Intent(MainActivity.this, BackgroundDetectedActivitiesService.class);
+        startService(detectedIntent);
     }
 
     public void stopCanaryService() {
         stopService(new Intent(this, CanaryService.class));
+        stopService(new Intent(this, BackgroundDetectedActivitiesService.class));
 
     }
 
@@ -245,7 +261,6 @@ public class MainActivity extends AppCompatActivity {
                 .setAction(getString(actionStringId), listener).show();
     }
 
-    //t
     public Boolean isLaunchingService(Context mContext){
 
         ActivityManager manager = (ActivityManager) mContext.getSystemService(Context.ACTIVITY_SERVICE);

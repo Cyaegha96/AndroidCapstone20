@@ -6,7 +6,8 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
-
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
     <application
         android:allowBackup="true"
         android:icon="@drawable/carlary_app_logo3"
@@ -15,7 +16,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".user.UserActivity"></activity>
+        <activity
+            android:name=".ui.settings.SettingsActivity"
+            android:label="@string/title_activity_settings"></activity>
+        <activity android:name=".user.UserActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -27,27 +31,32 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
 
         <service
-            android:name=".CanaryService"
+            android:name=".service.CanaryService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="location" />
+        <service
+            android:name=".service.DetectedActivitiesIntentService"
+            android:exported="false" />
+        <service android:name=".service.BackgroundDetectedActivitiesService"></service>
 
         <receiver
-            android:name=".GeofenceBroadcastReceiver"
+            android:name=".service.GeofenceBroadcastReceiver"
             android:enabled="true"
             android:exported="true" />
         <receiver
-            android:name=".StopServiceReceiver"
+            android:name=".service.StopServiceReceiver"
             android:enabled="true"
             android:process=":remote" />
     </application>
