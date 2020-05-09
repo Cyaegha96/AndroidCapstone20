@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="accident_type">
-        <item>사고 종류 선택</item>
         <item>사고발생건수</item>
         <item>사상자수</item>
         <item>사망자수</item>
@@ -12,7 +11,6 @@
 
 
     <string-array name="spinner_region">
-        <item>행정 지역 선택</item>
         <item>서울특별시</item>
         <item>부산광역시</item>
         <item>대구광역시</item>
