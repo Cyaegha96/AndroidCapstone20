@@ -24,11 +24,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     // TODO : assets 폴더에 있는 DB명 또는 별도의 데이터베이스 파일이름
     private static String DB_NAME ="sample_db.db";
     private static String DB_NAME_CW ="crosswalk_db.db";
-    private static String DB_NAME_DD ="dead_db.db";
 
     private SQLiteDatabase mDataBase;
     private SQLiteDatabase cwDataBase;
-    private SQLiteDatabase ddDataBase;
     private final Context mContext;
 
     public DataBaseHelper(Context context, String DB_NAME, int version)
@@ -73,9 +71,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         File cwFile = new File(DB_PATH + DB_NAME_CW);
 
-        File deadFile = new File(DB_PATH + DB_NAME_DD);
-
-        return dbFile.exists()&&cwFile.exists()&&deadFile.exists();
+        return dbFile.exists()&&cwFile.exists();
 
     }
 
@@ -110,19 +106,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         mOutput.close();
         mInput.close();
 
-
-        InputStream dInput = mContext.getAssets().open(DB_NAME_DD);
-        String doutFileName = DB_PATH + DB_NAME_DD;
-        OutputStream dOutput = new FileOutputStream(doutFileName);
-        byte[] dBuffer = new byte[1024];
-        int dLength;
-        while ((dLength = dInput.read(dBuffer))>0)
-        {
-            dOutput.write(dBuffer, 0, dLength);
-        }
-        dOutput.flush();
-        dOutput.close();
-        dInput.close();
     }
 
     //데이터베이스를 열어서 쿼리를 쓸수있게만든다.
@@ -144,10 +127,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         if(cwDataBase != null)
             cwDataBase.close();
-
-        if(ddDataBase != null)
-            cwDataBase.close();
-
         super.close();
     }
 
