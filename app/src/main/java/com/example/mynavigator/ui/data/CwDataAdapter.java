@@ -48,6 +48,7 @@ public class CwDataAdapter {
             mDbHelper.openDataBase(DB_NAME_CW);
             mDbHelper.close();
             mDb = mDbHelper.getReadableDatabase();
+            Log.e(TAG,"open >> mDb에 db가져옴");
         }
         catch (SQLException mSQLException)
         {
@@ -86,27 +87,52 @@ public class CwDataAdapter {
 
                     // TODO : Record 기술
                     // id, name, account, privateKey, secretKey, Comment
-                    cwdata.setCnctrLghtFcltyYn(mCur.getInt(0));
-                    cwdata.setBrllBlckYn(mCur.getInt(1));
-                    cwdata.setTfcilndYn(mCur.getInt(2));
-                    cwdata.setSondSgngnrYn(mCur.getInt(3));
-                    cwdata.setTfclghtYn(mCur.getInt(4));
-                    cwdata.setEt(mCur.getInt(5));
-                    cwdata.setBt(mCur.getInt(6));
-                    cwdata.setCartrkCo(mCur.getInt(7));
-                    cwdata.setLongitude(mCur.getFloat(8));
-                    cwdata.setLatitude(mCur.getFloat(9));
-                    cwdata.setBcyclCrslkCmbnatYn(mCur.getInt(10));
-                    cwdata.setCrslkKnd(mCur.getInt(11));
-                    cwdata.setLnmadr(mCur.getString(12));
-                    cwdata.setRoadNm(mCur.getString(13));
-                    cwdata.setCtprvnNm(mCur.getInt(14));
+
+                    for(int i=0;i<15;i++){
+                        if(!mCur.isNull(i)){
+                            switch (i){
+                                case 0: cwdata.setCnctrLghtFcltyYn(mCur.getInt(0));
+                                    break;
+                                case 1: cwdata.setBrllBlckYn(mCur.getInt(1));
+                                    break;
+                                case 2: cwdata.setTfcilndYn(mCur.getInt(2));
+                                    break;
+                                case 3: cwdata.setSondSgngnrYn(mCur.getInt(3));
+                                    break;
+                                case 4:  cwdata.setTfclghtYn(mCur.getInt(4));
+                                    break;
+                                case 5: cwdata.setEt(mCur.getInt(5));
+                                    break;
+                                case 6:  cwdata.setBt(mCur.getInt(6));
+                                    break;
+                                case 7:  cwdata.setCartrkCo(mCur.getInt(7));
+                                    break;
+                                case 8: cwdata.setLongitude(mCur.getFloat(8));
+                                    break;
+                                case 9:  cwdata.setLatitude(mCur.getFloat(9));
+                                    break;
+                                case 10: cwdata.setBcyclCrslkCmbnatYn(mCur.getInt(10));
+                                    break;
+                                case 11:  cwdata.setCrslkKnd(mCur.getInt(11));
+                                    break;
+                                case 12: cwdata.setLnmadr(mCur.getString(12));
+                                    break;
+                                case 13:  cwdata.setRoadNm(mCur.getString(13));
+                                    break;
+                                case 14: cwdata.setCtprvnNm(mCur.getInt(14));
+                                    break;
+                            }
+                        }else{
+
+                        }
+                    }
 
                     // 리스트에 넣기
                     placeList.add(cwdata);
                 }
 
             }
+            mCur.close();
             return placeList;
         }
         catch (SQLException mSQLException)

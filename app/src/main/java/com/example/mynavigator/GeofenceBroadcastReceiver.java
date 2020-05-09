@@ -55,6 +55,5 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
                 notificationHelper.sendHighPriorityNotification("사고 다발지역 안에서 나왔습니다!", showingData, MainActivity.class);
                 break;
         }
-
     }
 }

@@ -15,12 +15,11 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-
-
+        <activity android:name=".user.UserActivity"></activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBZ1TZ6gVPWNsmVQUgl6uiQqLB66r1aOws" />
+            android:value="AIzaSyBJxeIjXJs_Wvo-LKqJjr-7GeiL_B4fXiU" />
 
         <activity
             android:name=".SplashActivity"
@@ -42,10 +41,11 @@
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="location" />
+
         <receiver
             android:name=".GeofenceBroadcastReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
         <receiver
             android:name=".StopServiceReceiver"
             android:enabled="true"
