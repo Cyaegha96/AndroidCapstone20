@@ -106,19 +106,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <TextView
+    <TextView
 
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="사고지역위치명"
-            android:textColor="#f54266" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="사고지역위치명"
+        android:textColor="#f54266" />
 
-        <TextView
-            android:id="@+id/data_sector5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="사고지역위치명" />
+    <TextView
+        android:id="@+id/data_sector5"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="사고지역위치명" />
     </LinearLayout>
 
     <LinearLayout

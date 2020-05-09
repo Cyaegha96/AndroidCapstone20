@@ -14,7 +14,6 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -102,12 +101,6 @@ public class CanaryService extends Service implements LocationListener {
             boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             if (!isGPSEnabled && !isNetworkEnabled) {
                 Log.d(TAG,"GPS와 Network 공급자 둘다 작동할 수 없는 상황입니다.");
-                //GPS 설정화면으로 이동
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                intent.addCategory(Intent.CATEGORY_DEFAULT);
-                startActivity(intent);
-                stopSelf();
-
             } else {
                 int hasFineLocationPermission = ContextCompat.checkSelfPermission(
                         getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);

@@ -25,9 +25,5 @@
             android:id="@+id/web_view"
             android:icon="@drawable/ic_web_view"
             android:title="@string/menu_webview" />
-        <item
-            android:id="@+id/report"
-            android:icon="@drawable/ic_menu_send"
-            android:title="@string/menu_report" />
     </group>
 </menu>

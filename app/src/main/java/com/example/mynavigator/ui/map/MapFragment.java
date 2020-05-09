@@ -1,10 +1,8 @@
 package com.example.mynavigator.ui.map;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.os.Bundle;
@@ -16,7 +14,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
@@ -29,8 +26,6 @@ import com.cocoahero.android.geojson.PositionList;
 import com.cocoahero.android.geojson.Ring;
 import com.example.mynavigator.MainActivity;
 import com.example.mynavigator.R;
-import com.example.mynavigator.ui.data.CwData;
-import com.example.mynavigator.ui.data.CwDataAdapter;
 import com.example.mynavigator.ui.data.Data;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -38,7 +33,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.CircleOptions;
@@ -46,9 +40,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.maps.android.clustering.Cluster;
-import com.google.maps.android.clustering.ClusterManager;
-import com.google.maps.android.clustering.view.DefaultClusterRenderer;
 
 import org.json.JSONException;
 
@@ -62,15 +53,13 @@ public class MapFragment extends Fragment
     private MapViewModel mapViewModel;
     private MapView mapView;
     private float GEOFENCE_RADIUS = 50;
-    private int focusingDistanceLevel =2000 ;
+    private int focusingDistanceLevel =1000 ;
 
     private double myLat;
     private double myLog;
     private Location myLocation;
     GoogleMap mGoogleMap;
     private List<Data> dList;
-    private List<CwData> cwdataList;
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         mapViewModel =
@@ -83,7 +72,6 @@ public class MapFragment extends Fragment
                 textView.setText(s);
             }
         });
-        intiDBLoadReturn();
 
         mapView = (MapView)root.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
@@ -100,9 +88,6 @@ public class MapFragment extends Fragment
         myLat =  ((MainActivity)getActivity()).myLat;
         myLog = ((MainActivity)getActivity()).myLog;
 
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
-        mGoogleMap.moveCamera(cameraUpdate);
-
         dList = ((MainActivity)getActivity()).getDataList();
 
 
@@ -115,7 +100,9 @@ public class MapFragment extends Fragment
 
         googleMap.setMyLocationEnabled(true);
 
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
 
+        mGoogleMap.animateCamera(cameraUpdate);
         mGoogleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
             @Override
             public void onCameraMove() {
@@ -124,10 +111,8 @@ public class MapFragment extends Fragment
                 Log.d(TAG,"현재 카메라 줌레벨:"+cameraPosition.zoom);
                 if(cameraPosition.zoom <15.0){
                     focusingDistanceLevel = 5000;
-
                 }else{
                     focusingDistanceLevel = 1000;
-
                 }
             }
         });
@@ -136,18 +121,12 @@ public class MapFragment extends Fragment
     }
 
     public void markerSetting(GoogleMap googleMap){
-
-        BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.marker);
-        Bitmap b=bitmapdraw.getBitmap();
-        Bitmap smallMarker = Bitmap.createScaledBitmap(b, 200, 200, false);
-
         if(dList != null){
             for(int i=0;i<dList.size();i++){
 
                 float dLat = dList.get(i).getLatitude();
                 float dLog = dList.get(i).getLongitude();
-                //clusterManager.addItem(new CanaryClusterItem(new LatLng(dLat,dLog),dList.get(i).getAccidentType(),dList.get(i).getPlaceName()));
-               // clusterManager.setRenderer(new CustomIconRenderer(getActivity(),mGoogleMap,clusterManager));
+
                 Location l = new Location("d");
                 l.setLatitude(dLat);
                 l.setLongitude(dLog);
@@ -159,6 +138,9 @@ public class MapFragment extends Fragment
                     String dName = dList.get(i).getPlaceName();
 
                     String blurCount = "발생건수" + dList.get(i).getAccidentCount();
+                    BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.marker);
+                    Bitmap b=bitmapdraw.getBitmap();
+                    Bitmap smallMarker = Bitmap.createScaledBitmap(b, 200, 200, false);
 
                     googleMap.addMarker(new MarkerOptions()
                             .position(new LatLng(dLat, dLog ))
@@ -177,58 +159,6 @@ public class MapFragment extends Fragment
                }
             }
         }
-
-        Log.d(TAG,"cwdataListSize: "+cwdataList.size());
-        if(cwdataList!= null){
-            for(int i=0;i<cwdataList.size();i++) {
-                float dLat = cwdataList.get(i).getLatitude();
-                float dLog = cwdataList.get(i).getLongitude();
-
-                Location l = new Location("d");
-                l.setLatitude(dLat);
-                l.setLongitude(dLog);
-                if(myLocation.distanceTo(l) <= focusingDistanceLevel) {
-                    int crossType = cwdataList.get(i).getCrslkKnd();
-                    String crossStringType;
-                    switch (crossType) {
-                        case 1:
-                            crossStringType = "일반형";
-                            break;
-                        case 2:
-                            crossStringType = "대각선";
-                            break;
-                        case 3:
-                            crossStringType = "스테거드";
-                            break;
-                        case 4:
-                            crossStringType = "도류화";
-                            break;
-                        case 99:
-                            crossStringType = "기타";
-                            break;
-                        default:
-                            crossStringType = "정보 없는 횡단보도";
-                            break;
-                    }
-
-                    String roadNm = cwdataList.get(i).getRoadNm();
-
-                    googleMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(dLat, dLog))
-                            .title(crossStringType + "\n")
-                            .snippet(roadNm + "\n")
-
-                    );
-                }
-            }
-        }
-    }
-    private void intiDBLoadReturn(){
-        CwDataAdapter cwDbHelper = new CwDataAdapter(getActivity().getApplicationContext());
-        cwDbHelper.createDatabase();
-        cwDbHelper.open();
-        cwdataList = cwDbHelper.getTableData();
-        cwDbHelper.close();
     }
 
     @Override
@@ -237,7 +167,6 @@ public class MapFragment extends Fragment
 
         if(mGoogleMap != null){ //prevent crashing if the map doesn't exist yet (eg. on starting activity)
             mGoogleMap.clear();
-            markerSetting(mGoogleMap);
 
             // add markers from database to the map
         }
