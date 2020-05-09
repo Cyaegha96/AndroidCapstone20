@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 
@@ -14,7 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,11 +25,9 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.mynavigator.ui.data.CwData;
 import com.example.mynavigator.ui.data.CwDataAdapter;
 import com.example.mynavigator.ui.data.Data;
 import com.example.mynavigator.ui.data.DataAdapter;
-import com.example.mynavigator.user.UserActivity;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.LocationServices;
@@ -53,11 +49,12 @@ public class MainActivity extends AppCompatActivity {
     private Location userLocation;
 
     List<Data> dataList;
-    List<CwData> cwdataList;
+    List<Data> cwdataList;
     private GeofencingClient mGeofencingClient;
     private ArrayList<Geofence> mGeofenceList;
     private PendingIntent mGeofencePendingIntent;
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,72 +63,54 @@ public class MainActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mAlertReceiver, new IntentFilter("LocationSenderReciever"));
 
-        SharedPreferences firstStartCheck = getSharedPreferences("checkFirst",MODE_PRIVATE);
-        boolean checkFirst = firstStartCheck.getBoolean("checkFirst",false);
-        if(!checkFirst){
-            SharedPreferences.Editor editor = firstStartCheck.edit();
-            editor.putBoolean("checkFirst", true);
-            editor.commit();
-
-            Intent intent = new Intent(MainActivity.this, UserActivity.class);
-            startActivity(intent);
-            finish();
-
-        }
 
         Intent i = getIntent();
         int title = i.getIntExtra("sign", -1);
         if(title == 2){
             finish();
-        }
-        setContentView(R.layout.activity_main);
+        }else{
+            setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
 
-        initLoadDBReturn();
+            initLoadDBReturn();
 
-        mGeofenceList = new ArrayList<>();
+            // Empty list for storing geofences.
+            mGeofenceList = new ArrayList<>();
 
-
-        mGeofencePendingIntent = null;
-        mGeofencingClient = LocationServices.getGeofencingClient(this);
-
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+            // Initially set the PendingIntent used in addGeofences() and removeGeofences() to null.
+            mGeofencePendingIntent = null;
+            mGeofencingClient = LocationServices.getGeofencingClient(this);
 
 
-        mAppBarConfiguration = new AppBarConfiguration.Builder(
+            FloatingActionButton fab = findViewById(R.id.fab);
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent email = new Intent(Intent.ACTION_SEND);
+                    email.setType("plain/text");
+                    String[] address = {"zazae51@gmail.com"};
+                    email.putExtra(Intent.EXTRA_EMAIL, address);
+                    email.putExtra(Intent.EXTRA_SUBJECT, "제목");
+                    email.putExtra(Intent.EXTRA_TEXT, "내용 미리보기 (미리적을 수 있음)");
+                    startActivity(email);
+                }
+            });
+
+            DrawerLayout drawer = findViewById(R.id.drawer_layout);
+            NavigationView navigationView = findViewById(R.id.nav_view);
+            // Passing each menu ID as a set of Ids because each
+            // menu should be considered as top level destinations.
+
+            mAppBarConfiguration = new AppBarConfiguration.Builder(
                     R.id.nav_home, R.id.nav_map, R.id.nav_data)
                     .setDrawerLayout(drawer)
                     .build();
             NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
             NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
             NavigationUI.setupWithNavController(navigationView, navController);
-
-
-        SharedPreferences userInfo = getSharedPreferences("userInfo",MODE_PRIVATE);
-        String userName = userInfo.getString("name","이름 없는 사용자");
-        String choice_do = userInfo.getString("choice_do","지역 정보 없음");
-        String choice_city= userInfo.getString("choice_city","도시 정보 없음");
-        int year = userInfo.getInt("year",-1);
-
-        String subtitle;
-        View navigation_header = navigationView.getHeaderView(0);
-        TextView nav_header_view = navigation_header.findViewById(R.id.navHeaderIdText);
-        TextView nav_sub_view = navigation_header.findViewById(R.id.navHeaderSubText);
-        nav_header_view.setText(userName);
-
-        if(choice_city.equals("없음")){
-            subtitle=choice_do;
-        }else{
-            subtitle= choice_do+"시 "+choice_city;
         }
-        if(year != -1){
-            subtitle = year+" 년생 " + subtitle+" 거주";
-        }
-        nav_sub_view.setText(subtitle);
     }
 
     @Override
@@ -143,15 +122,23 @@ public class MainActivity extends AppCompatActivity {
     private void initLoadDBReturn() {
 
         DataAdapter mDbHelper = new DataAdapter(getApplicationContext());
+        CwDataAdapter cwDbHelper = new CwDataAdapter((getApplicationContext()));
 
         mDbHelper.createDatabase();
         mDbHelper.open();
 
+        cwDbHelper.createDatabase();
+        cwDbHelper.open();
+
+
         // db에 있는 값들을 model을 적용해서 넣는다.
         dataList = mDbHelper.getTableData();
 
+        cwdataList = cwDbHelper.getTableData();
         // db 닫기
         mDbHelper.close();
+
+        cwDbHelper.close();
 
     }
     private BroadcastReceiver mAlertReceiver = new BroadcastReceiver() {

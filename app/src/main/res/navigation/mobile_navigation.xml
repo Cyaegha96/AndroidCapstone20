@@ -52,9 +52,4 @@
         android:name="com.example.mynavigator.ui.data.WebViewFragment"
         android:label="Webview 웹뷰보기"
         tools:layout="@layout/fragment_web_view" />
-    <fragment
-        android:id="@+id/report"
-        android:name="com.example.mynavigator.ui.report.report"
-        android:label="Report 제보하기"
-        tools:layout="@layout/fragment_report" />
 </navigation>

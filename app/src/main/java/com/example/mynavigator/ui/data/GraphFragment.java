@@ -11,10 +11,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.example.mynavigator.MainActivity;
 import com.example.mynavigator.R;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
@@ -60,12 +62,14 @@ public class GraphFragment extends Fragment {
         final Spinner spin_province = getActivity().findViewById(R.id.spinner_province);
         final Spinner spin_city = getActivity().findViewById(R.id.spinner_city);
 
-        Button btn_refresh = getActivity().findViewById(R.id.btn_refresh);
+        accident_type.setPrompt("사고 유형 선택");
+        spin_province.setPrompt("행정 지역 선택");
+        spin_city.setPrompt("시군구 선택");
 
+        Button btn_refresh = getActivity().findViewById(R.id.btn_refresh);
         accident = ArrayAdapter.createFromResource(getContext(), R.array.accident_type, android.R.layout.simple_spinner_dropdown_item);
         accident.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         accident_type.setAdapter(accident);
-
         accident_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 choice_accident = accident_type.getSelectedItem().toString();
@@ -418,6 +422,7 @@ public class GraphFragment extends Fragment {
                 lineChart.animateY(2000, Easing.EaseInCubic);
                 lineChart.invalidate();
             }
+
 
 
         });

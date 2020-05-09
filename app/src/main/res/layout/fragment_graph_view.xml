@@ -19,18 +19,21 @@
 
             <Spinner
                 android:id="@+id/accident_type"
+                android:spinnerMode="dialog"
                 android:layout_width="400dp"
                 android:layout_height="40dp"
                 android:layout_weight="0.21" />
 
             <Spinner
                 android:id="@+id/spinner_province"
+                android:spinnerMode="dialog"
                 android:layout_width="400dp"
                 android:layout_height="40dp"
                 android:layout_weight="0.21" />
 
             <Spinner
                 android:id="@+id/spinner_city"
+                android:spinnerMode="dialog"
                 android:layout_width="400dp"
                 android:layout_height="40dp"
                 android:layout_weight="0.21" />
