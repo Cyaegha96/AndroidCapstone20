@@ -5,21 +5,21 @@ import java.io.Serializable;
 
 public class Data {
 
-    public int accidentCode;
-    public int accidentYear;
-    public String accidentType;
-    public int placeCode;
-    public String cityName;
-    public String placeName;
-    public int accidentCount;
-    public int casualtiesCount;
-    public int deadCount;
-    public int seriousCount;
-    public int slightlyCount;
-    public int injuredCount;
-    public float latitude;
-    public float longitude;
-    public String dataDate;
+    private int accidentCode;
+    private int accidentYear;
+    private String accidentType;
+    private int placeCode;
+    private String cityName;
+    private String placeName;
+    private int accidentCount;
+    private int casualtiesCount;
+    private int deadCount;
+    private int seriousCount;
+    private int slightlyCount;
+    private int injuredCount;
+    private float latitude;
+    private float longitude;
+    private String dataDate;
 
 
     public int getAccidentCode() {

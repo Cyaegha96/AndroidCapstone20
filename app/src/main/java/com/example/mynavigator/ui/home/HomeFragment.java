@@ -1,13 +1,17 @@
 package com.example.mynavigator.ui.home;
 
 import android.Manifest;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -20,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -50,6 +55,11 @@ public class HomeFragment extends Fragment {
     List<Data> dataList;
     LatLng currPosition;
     Location userLocation;
+
+    ProgressDialog progressDialog;
+
+    private Handler handler = new Handler();
+    final private int PROGRESS_DIALOG = 0;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -99,18 +109,18 @@ public class HomeFragment extends Fragment {
         //알림창을 띄우고, 서비스를 시작합니다.
         button.setOnClickListener(new View.OnClickListener() {
 
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
 
                 if (!((MainActivity) getActivity()).isLaunchingService(getContext()) ) {
+
+                    CheckTypeTask task = new CheckTypeTask();
+                    task.execute();
                     //버튼을 한번 눌렀을 때 => 켜짐
                     CanaryStartRequest();
                     button.setText("카나리아 서비스 실행중~~");
                     canaryImage.setImageResource(R.drawable.canary);
-
-                    ((MainActivity) getActivity()).startCanaryService();
-                    dataList =  ((MainActivity) getActivity()).getDataList();
-                    Log.d(TAG,"dataList 잘 가져 왔냐??: "+dataList.get(0).accidentType+" "+dataList.get(0).getAccidentYear());
 
                     if(((MainActivity)getActivity()).isUserLocationHasResult()){
                         Log.d(TAG,"Activity의 userLocation 값을 가져옴");
@@ -129,7 +139,7 @@ public class HomeFragment extends Fragment {
                     }
                     if (userLocation != null) {
                         StyleableToast.makeText(getActivity().getApplicationContext(),
-                                "내위치 : 위도:" + String.format("%.2f", currPosition.latitude) + "\n경도:" + String.format("%.2f", currPosition.longitude), Toast.LENGTH_SHORT, R.style.mytoast).show();
+                                "내위치 : 위도:" + String.format("%.2f", userLocation.getLatitude()) + "\n경도:" + String.format("%.2f", userLocation.getLongitude()), Toast.LENGTH_SHORT, R.style.mytoast).show();
                         ((MainActivity) getActivity()).setUserLocation(userLocation); //MainActivity로 전달
                         //Service를 시작하라는 내용
                     }
@@ -148,6 +158,41 @@ public class HomeFragment extends Fragment {
             }
         });
     }
+
+    private class CheckTypeTask extends AsyncTask<Void ,Void ,Void >{
+
+        ProgressDialog asyncDialog = new ProgressDialog(getContext());
+
+        @Override
+        protected void onPreExecute() {
+            asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            asyncDialog.setMessage("로딩중입니다.");
+
+            asyncDialog.show();
+            super.onPreExecute();
+        }
+
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+           try{
+               ((MainActivity)getActivity()).startCanaryService();
+               Thread.sleep(300);
+           }catch(InterruptedException e){
+               e.printStackTrace();
+           }
+           return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            asyncDialog.dismiss();
+            super.onPostExecute(aVoid);
+        }
+    }
+
+
+
 
     public Location getFirstLocation(){
         if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {

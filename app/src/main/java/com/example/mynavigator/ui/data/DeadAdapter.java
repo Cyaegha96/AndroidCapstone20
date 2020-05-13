@@ -66,7 +66,6 @@ public class DeadAdapter {
     {
         try
         {
-            // Table 이름 -> antpool_bitcoin 불러오기
             String sql ="SELECT * FROM " + TABLE_NAME;
 
             // 모델 넣을 리스트 생성

@@ -3,21 +3,22 @@ package com.example.mynavigator.ui.data;
 
 public class CwData {
 
-    public int cnctrLghtFcltyYn; // bool
-    public int brllBlckYn;// bool
-    public int tfcilndYn;// bool
-    public int sondSgngnrYn;// bool
-    public int tfclghtYn;// bool
-    public int et;
-    public int bt;
-    public int cartrkCo;
-    public float longitude;
-    public float latitude;
-    public int bcyclCrslkCmbnatYn;// bool
-    public int crslkKnd;
-    public String lnmadr;
-    public String roadNm;
-    public int ctprvnNm;
+    private int cnctrLghtFcltyYn; // bool
+    private int brllBlckYn;// bool
+    private int tfcilndYn;// bool
+    private int sondSgngnrYn;// bool
+    private int tfclghtYn;// bool
+    private int et;
+    private int bt;
+    private int cartrkCo;
+    private float longitude;
+    private float latitude;
+    private int bcyclCrslkCmbnatYn;// bool
+    private int crslkKnd;
+    private String lnmadr;
+    private String roadNm;
+    private int ctprvnNm;
+    private String accidentType;
 
 
     public int isCnctrLghtFcltyYn() {
@@ -141,7 +142,11 @@ public class CwData {
     }
 
 
+    public String getAccidentType() {
+        return accidentType;
+    }
 
-
-
+    public void setAccidentType(String accidentType) {
+        this.accidentType = accidentType;
+    }
 }

@@ -2,24 +2,24 @@ package com.example.mynavigator.ui.data;
 
 public class DeadData {
 
-    public int acc_year	;
-    public int occrrnc_dt	;
-    public String dght_cd	;
-    public int dth_dnv_cnt	;
-    public int injpsn_cnt	;
-    public int se_dnv_cnt	;
-    public int sl_dnv_cnt	;
-    public int wnd_dnv_cnt	;
-    public String occrrnc_lc_sgg_cd	;
-    public String acc_ty_cd	;
-    public String aslt_vtr_lclas_cd	;// bool
-    public String aslt_vtr_mlsfc_cd	;
-    public String road_frm_lclas_cd	;
-    public String road_frm_cd	;
-    public String wrngdo_isrty_vhcty_lclas_cd	;
-    public String wrngdo_isrty_vhcty_cd		;
-    public float la_crd		;
-    public float lo_crd		;
+    private int acc_year	;
+    private int occrrnc_dt	;
+    private String dght_cd	;
+    private int dth_dnv_cnt	;
+    private int injpsn_cnt	;
+    private int se_dnv_cnt	;
+    private int sl_dnv_cnt	;
+    private int wnd_dnv_cnt	;
+    private String occrrnc_lc_sgg_cd	;
+    private String acc_ty_cd	;
+    private String aslt_vtr_lclas_cd	;// bool
+    private String aslt_vtr_mlsfc_cd	;
+    private String road_frm_lclas_cd	;
+    private String road_frm_cd	;
+    private String wrngdo_isrty_vhcty_lclas_cd	;
+    private String wrngdo_isrty_vhcty_cd		;
+    private float la_crd		;
+    private float lo_crd		;
 
 
 

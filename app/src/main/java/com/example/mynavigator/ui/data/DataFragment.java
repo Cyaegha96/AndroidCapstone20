@@ -70,7 +70,6 @@ public class DataFragment extends Fragment {
         DataAdapter mDbHelper = new DataAdapter(getActivity().getApplicationContext());
         mDbHelper.createDatabase();
         mDbHelper.open();
-
         // db에 있는 값들을 model을 적용해서 넣는다.
         dataList = mDbHelper.getTableData();
 
