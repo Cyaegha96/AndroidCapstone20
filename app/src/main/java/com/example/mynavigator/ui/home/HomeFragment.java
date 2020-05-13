@@ -166,7 +166,7 @@ public class HomeFragment extends Fragment {
         @Override
         protected void onPreExecute() {
             asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            asyncDialog.setMessage("로딩중입니다.");
+            asyncDialog.setMessage("로딩중입니다...");
 
             asyncDialog.show();
             super.onPreExecute();

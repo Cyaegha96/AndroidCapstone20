@@ -53,8 +53,7 @@ public class MapFragment extends Fragment
     private MapViewModel mapViewModel;
     private MapView mapView;
     private float ACCIDENT_RADIUS = 200;
-    private float GEOFENCE_RADIUS = 50;
-    private int focusingDistanceLevel =1000 ;
+    private float GEOFENCE_RADIUS = 30;
 
     private Bitmap bicycleMarker;
     private Bitmap childMarker;
@@ -260,9 +259,14 @@ public class MapFragment extends Fragment
                 clusterManager.addItem(new CanaryClusterItem(
                         new LatLng(dLat, dLog),
                         crossStringType +"\n",
-                        pname +" 횡단보도"+"\n",
+                        pname +"다발지역 위험도: "+cwdataList.get(i).getAccidentCount()+"\n",
                         mIcon));
 
+                googleMap.addCircle(new CircleOptions()
+                        .center(new LatLng(dLat,dLog))
+                        .fillColor(0x22eb4034)
+                        .strokeWidth(0)
+                        .radius(GEOFENCE_RADIUS));
 
             }
         }
@@ -369,7 +373,6 @@ public class MapFragment extends Fragment
 
             markerOptions.icon(item.getmIcon());
             super.onBeforeClusterItemRendered(item, markerOptions);
-
 
         }
 

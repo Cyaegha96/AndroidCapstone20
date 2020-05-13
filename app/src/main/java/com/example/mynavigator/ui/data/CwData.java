@@ -19,7 +19,7 @@ public class CwData {
     private String roadNm;
     private int ctprvnNm;
     private String accidentType;
-
+    private int accidentCount;
 
     public int isCnctrLghtFcltyYn() {
         return cnctrLghtFcltyYn;
@@ -148,5 +148,13 @@ public class CwData {
 
     public void setAccidentType(String accidentType) {
         this.accidentType = accidentType;
+    }
+
+    public int getAccidentCount() {
+        return accidentCount;
+    }
+
+    public void setAccidentCount(int accidentCount) {
+        this.accidentCount = accidentCount;
     }
 }
