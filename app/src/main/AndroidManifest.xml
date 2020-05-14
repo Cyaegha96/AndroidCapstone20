@@ -65,6 +65,7 @@
             android:name=".service.StopServiceReceiver"
             android:enabled="true"
             android:process=":remote" />
+
     </application>
 
 </manifest>

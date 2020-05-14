@@ -147,6 +147,7 @@
         android:text="안할래요"
         tools:layout_editor_absoluteX="50dp"
         tools:layout_editor_absoluteY="640dp"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
