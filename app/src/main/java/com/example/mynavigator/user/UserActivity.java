@@ -3,6 +3,7 @@ package com.example.mynavigator.user;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -21,15 +22,16 @@ import com.example.mynavigator.R;
 import java.util.Calendar;
 
 public class UserActivity extends AppCompatActivity {
-
+    public static Context mcontext;
     ArrayAdapter<CharSequence>  adspin1, adspin2;
     private EditText editUserName;
     private EditText editUserYear;
     private Button saveButton,cancelButton;
 
-    private String user_name="";
-    private String choice_do="";
-    private String choice_city="";
+    public String user_name="";
+    public String choice_do="";
+    public String choice_city="";
+
     private int userYear;
     private static final int MAX_YEAR = 2099;
     private static final int MIN_YEAR = 1920;
@@ -50,6 +52,7 @@ public class UserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
 
+        mcontext = this;
         SharedPreferences userInfo = getSharedPreferences("userInfo",MODE_PRIVATE);
         String userName = userInfo.getString("name","이름 없는 사용자");
         userInfo.getString("choice_do","지역 정보 없음");

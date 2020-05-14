@@ -7,6 +7,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -14,6 +15,7 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -47,7 +49,7 @@ import java.util.List;
 public class CanaryService extends Service implements LocationListener {
 
     private static final String TAG = "CanaryService";
-    private static Context mContext;
+    public static Context mContext;
 
     Location location; // Location
     double latitude; // Latitude
@@ -75,6 +77,7 @@ public class CanaryService extends Service implements LocationListener {
     private List<Data> dList;
 
     private Vibrator vibrator;
+    CanaryBroadcastReceiver canaryBroadcastReceiver = new CanaryBroadcastReceiver();
 
     @Override
     public void onCreate() {
@@ -84,21 +87,15 @@ public class CanaryService extends Service implements LocationListener {
         initLoadDBReturn();
         geofencingClient = LocationServices.getGeofencingClient(this);
         geofenceHelper = new GeofenceHelper(this);
-        BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                if (intent.getAction().equals(Constants.BROADCAST_DETECTED_ACTIVITY)) {
-                    int type = intent.getIntExtra("type", -1);
-                    int confidence = intent.getIntExtra("confidence", 0);
-                    handleUserActivity(type, confidence);
-                }
-            }
-        };
+        mContext = this;
+
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(canaryBroadcastReceiver, filter);
 
         Log.d(TAG,"onCreate ");
     }
 
-    private void handleUserActivity(int type, int confidence) {
+    public void handleUserActivity(int type, int confidence) {
         label = getString(R.string.activity_unknown);
         icon = R.drawable.ic_still;
 
@@ -332,7 +329,7 @@ public class CanaryService extends Service implements LocationListener {
 
     }
 
-private void createNotification() {
+    private void createNotification() {
 
         switch_detected = 1; // 한번이라도 실행이 되었음
         //아이콘 사용을위해 비트맵설정
@@ -389,9 +386,9 @@ private void createNotification() {
 
     @Override
     public void onLocationChanged(Location location) {
-       if(location.getAccuracy() ==0.0 ){ //정확도가 0일 경우 --> 무시해야함!
-           return;
-       }
+        if(location.getAccuracy() ==0.0 ){ //정확도가 0일 경우 --> 무시해야함!
+            return;
+        }
         this.location = location;
         latitude = location.getLatitude();
         longitude = location.getLongitude();

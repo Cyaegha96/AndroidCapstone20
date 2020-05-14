@@ -1,5 +1,7 @@
 package com.example.mynavigator.ui.data;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
@@ -11,11 +13,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.mynavigator.R;
+import com.example.mynavigator.user.UserActivity;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
@@ -31,25 +35,33 @@ import java.util.List;
 
 public class GraphFragment extends Fragment {
 
-    public List<Data> dataList ;
-
-    String TABLE_NAME = "sample_table";
-    Data data;
-
     ArrayAdapter<CharSequence> accident, adspin1, adspin2; //어댑터를 선언했습니다. adspint1(서울,인천..) adspin2(강남구,강서구..)
-    String choice_accident="";
-    String choice_do="";
-    String choice_city="";
+
+
+
+    private String choice_do = "";
+    private String choice_city = "";
+    private String choice_accident = "";
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+
+
         View root = inflater.inflate(R.layout.fragment_graph_view, container, false);
         return root;
     }
 
     public void onActivityCreated(Bundle saveInstanceState) {
         super.onActivityCreated(saveInstanceState);
+
+
+        SharedPreferences userInfo = getActivity().getSharedPreferences("userInfo", Context.MODE_PRIVATE );
+
+        choice_do = userInfo.getString("choice_do","지역 정보 없음");
+        choice_city = userInfo.getString("choice_city","도시 정보 없음");
+
+
 
         DataBaseHelper mdb = new DataBaseHelper(getContext(), "sample_db.db", 1);
         final SQLiteDatabase sqdb = mdb.getWritableDatabase();
@@ -64,12 +76,14 @@ public class GraphFragment extends Fragment {
         spin_province.setPrompt("행정 지역 선택");
         spin_city.setPrompt("시군구 선택");
 
-
+        Toast.makeText(getContext(), choice_do, Toast.LENGTH_SHORT).show();
         Button btn_refresh = getActivity().findViewById(R.id.btn_refresh);
 
         accident = ArrayAdapter.createFromResource(getContext(), R.array.accident_type, android.R.layout.simple_spinner_dropdown_item);
         accident.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         accident_type.setAdapter(accident);
+
+
 
         accident_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -100,267 +114,49 @@ public class GraphFragment extends Fragment {
         adspin1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spin_province.setAdapter(adspin1);
 
+        if(choice_do.equals("부산"))
+            spin_province.setSelection(adspin1.getPosition("부산광역시"));
+
         spin_province.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             //첫번째 spinner 클릭시 이벤트 발생입니다. setO 정도까지 치시면 자동완성됩니다. 뒤에도 마찬가지입니다.
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                if (adspin1.getItem(i).equals("서울특별시")) {
-                    choice_do = "서울";//버튼 클릭시 출력을 위해 값을 넣었습니다.
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_seoul, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
+                int seoul = R.array.spinner_region_seoul;
+                int busan = R.array.spinner_region_busan;
+                int daegu = R.array.spinner_region_daegu;
+                int incheon = R.array.spinner_region_incheon;
+                int gwangju = R.array.spinner_region_gwangju;
+                int daejeon = R.array.spinner_region_daejeon;
+                int ulsan = R.array.spinner_region_ulsan;
+                int sejong = R.array.spinner_region_sejong;
+                int gyeonggi = R.array.spinner_region_gyeonggi;
+                int gangwon = R.array.spinner_region_gangwon;
+                int chung_buk = R.array.spinner_region_chung_buk;
+                int chung_nam = R.array.spinner_region_chung_nam;
+                int jeon_buk = R.array.spinner_region_jeon_buk;
+                int jeon_nam = R.array.spinner_region_jeon_nam;
+                int gyeong_buk = R.array.spinner_region_gyeong_buk;
+                int gyeong_nam = R.array.spinner_region_gyeong_nam;
+                int jeju = R.array.spinner_region_jeju;
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
 
-                } else if (adspin1.getItem(i).equals("부산광역시")) {
-                    choice_do = "부산";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_busan, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("대구광역시")) {
-                    choice_do = "대구";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_daegu, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("인천광역시")) {
-                    choice_do = "인천";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_incheon, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("광주광역시")) {
-                    choice_do = "광주";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_gwangju, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("대전광역시")) {
-                    choice_do = "대전";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_daejeon, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("울산광역시")) {
-                    choice_do = "울산";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_ulsan, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("세종특별자치시")) {
-                    choice_do = "세종";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_sejong, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("경기도")) {
-                    choice_do = "경기도";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_gyeonggi, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("강원도")) {
-                    choice_do = "강원도";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_gangwon, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("충청북도")) {
-                    choice_do = "충청북도";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_chung_buk, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("충청남도")) {
-                    choice_do = "충청남도";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_chung_nam, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("전라북도")) {
-                    choice_do = "전라북도";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_jeon_buk, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("전라남도")) {
-                    choice_do = "전라남도";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_jeon_nam, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("경상북도")) {
-                    choice_do = "경상북도";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_gyeong_buk, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("경상남도")) {
-                    choice_do = "경상남도";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_gyeong_nam, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                } else if (adspin1.getItem(i).equals("제주특별자치도")) {
-                    choice_do = "제주특별자치도";
-                    adspin2 = ArrayAdapter.createFromResource(getContext(), R.array.spinner_region_jeju, android.R.layout.simple_spinner_dropdown_item);
-                    adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spin_city.setAdapter(adspin2);
-                    spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                            choice_city = adspin2.getItem(i).toString();
-                        }
-
-                        @Override
-                        public void onNothingSelected(AdapterView<?> adapterView) {
-                        }
-                    });
-                }
+                function(spin_city, i, "서울특별시", "서울", seoul);
+                function(spin_city, i, "부산광역시", "부산", busan);
+                function(spin_city, i, "대구광역시", "대구", daegu);
+                function(spin_city, i, "인천광역시", "인천", incheon);
+                function(spin_city, i, "광주광역시", "광주", gwangju);
+                function(spin_city, i, "대전광역시", "대전", daejeon);
+                function(spin_city, i, "울산광역시", "울산", ulsan);
+                function(spin_city, i, "세종특별자치시", "세종특별자치시", sejong);
+                function(spin_city, i, "경기도", "경기도", gyeonggi);
+                function(spin_city, i, "강원도", "강원도", gangwon);
+                function(spin_city, i, "충청북도", "충청북도", chung_buk);
+                function(spin_city, i, "충청남도", "충청남도", chung_nam);
+                function(spin_city, i, "전라북도", "전라북도", jeon_buk);
+                function(spin_city, i, "전라남도", "전라남도", jeon_nam);
+                function(spin_city, i, "경상북도", "경상북도", gyeong_buk);
+                function(spin_city, i, "경상남도", "경상남도", gyeong_nam);
+                function(spin_city, i, "제주특별자치도", "제주특별자치도", jeju);
             }
 
             @Override
@@ -374,11 +170,7 @@ public class GraphFragment extends Fragment {
             //버튼 클릭시 이벤트입니다.
             @Override
             public void onClick(View view) {
-
-
-
                 Cursor c = sqdb.rawQuery("select accidentYear, sum(" + choice_accident + ") from sample_table where cityName LIKE \""+choice_do+"%"+choice_city+"%\"  group by accidentYear", null);
-
 
                 List<Entry> entries = new ArrayList<>();
 
@@ -431,5 +223,24 @@ public class GraphFragment extends Fragment {
     }
 
 
+    void function(Spinner spin_city, int i, String province, String choice, int Spinner){
+        if (adspin1.getItem(i).equals(province)) {
+            choice_do = choice;//버튼 클릭시 출력을 위해 값을 넣었습니다.
+            adspin2 = ArrayAdapter.createFromResource(getContext(), Spinner, android.R.layout.simple_spinner_dropdown_item);
+            adspin2.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spin_city.setAdapter(adspin2);
+            spin_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    choice_city = adspin2.getItem(i).toString();
+                }
 
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+                }
+            });
+
+        }
+
+    }
 }
