@@ -8,7 +8,9 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.os.Build;
+import android.os.Vibrator;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
@@ -42,22 +44,38 @@ public class NotificationHelper extends ContextWrapper {
         notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.createNotificationChannel(notificationChannel);
+
     }
 
-    public void sendHighPriorityNotification(String title, String body, Class activityName) {
+    public void sendHighPriorityNotification(String title, String body, int accidnetCount, Class activityName ) {
+
+
+        long[] pattern;
+        if(accidnetCount >= 1 && accidnetCount <=4){
+            pattern = new long[]{0, 10, 50, 10};
+        }else if(accidnetCount > 5 && accidnetCount <= 10){
+             pattern = new long[]{0, 100, 50, 100};
+
+        }else{
+            pattern = new long[]{10, 100, 50, 200};
+        }
 
         Intent intent = new Intent(this, activityName);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 267, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
              .setContentTitle(title)
               .setContentText(body)
                 .setSmallIcon(R.drawable.carlary_app_logo3)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setStyle(new NotificationCompat.BigTextStyle().setSummaryText("summary").setBigContentTitle(title).bigText(body))
+                .setStyle(new NotificationCompat.BigTextStyle().setSummaryText("발생건수 :"+accidnetCount).setBigContentTitle(title).bigText(body))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
+                .setVibrate(pattern)
                 .build();
+
 
         NotificationManagerCompat.from(this).notify(new Random().nextInt(), notification);
 

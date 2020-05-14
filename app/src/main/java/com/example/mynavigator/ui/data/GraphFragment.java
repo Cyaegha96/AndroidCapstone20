@@ -121,16 +121,16 @@ public class GraphFragment extends Fragment {
             //첫번째 spinner 클릭시 이벤트 발생입니다. setO 정도까지 치시면 자동완성됩니다. 뒤에도 마찬가지입니다.
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-            int city[] = {R.array.spinner_region_seoul, R.array.spinner_region_busan,  R.array.spinner_region_daegu, R.array.spinner_region_incheon, R.array.spinner_region_gwangju, R.array.spinner_region_daejeon, R.array.spinner_region_ulsan, R.array.spinner_region_sejong, R.array.spinner_region_gyeonggi, R.array.spinner_region_gangwon, R.array.spinner_region_chung_buk, R.array.spinner_region_chung_nam, R.array.spinner_region_jeon_buk, R.array.spinner_region_jeon_nam, R.array.spinner_region_gyeong_buk, R.array.spinner_region_gyeong_nam, R.array.spinner_region_jeju};
-            for (int j = 0; j < adspin1.getCount(); j++) {
-                function(spin_city, i, spin_province.getItemAtPosition(j).toString(), province[j], city[j]);
+                int city[] = {R.array.spinner_region_seoul, R.array.spinner_region_busan,  R.array.spinner_region_daegu, R.array.spinner_region_incheon, R.array.spinner_region_gwangju, R.array.spinner_region_daejeon, R.array.spinner_region_ulsan, R.array.spinner_region_sejong, R.array.spinner_region_gyeonggi, R.array.spinner_region_gangwon, R.array.spinner_region_chung_buk, R.array.spinner_region_chung_nam, R.array.spinner_region_jeon_buk, R.array.spinner_region_jeon_nam, R.array.spinner_region_gyeong_buk, R.array.spinner_region_gyeong_nam, R.array.spinner_region_jeju};
+                for (int j = 0; j < adspin1.getCount(); j++) {
+                    function(spin_city, i, spin_province.getItemAtPosition(j).toString(), province[j], city[j]);
+                }
             }
-        }
-        @Override
-        public void onNothingSelected(AdapterView<?> adapterView) {
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
 
-        }
-    });
+            }
+        });
 
         btn_refresh.setOnClickListener(new View.OnClickListener() {
 

@@ -63,7 +63,7 @@ public class CanaryService extends Service implements LocationListener {
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // 1 meters
     private static final long MIN_TIME_BW_UPDATES = 1000 * 1; // 1 second
 
-    private float DATA_RADIUS = 200;
+    private float ACCIDENT_RADIUS = 200;
     private float GEOFENCE_RADIUS = 30;
     private float DISTANCETO_PARAMETER = 700;
     protected LocationManager locationManager;
@@ -285,7 +285,7 @@ public class CanaryService extends Service implements LocationListener {
                 c.setLatitude(cw.getLatitude());
                 c.setLongitude(cw.getLongitude());
 
-            int accidentCount = 0;
+            int dataCount = 0;
             int accidentMagnitude = 0;
 
             Data data = null;
@@ -296,18 +296,18 @@ public class CanaryService extends Service implements LocationListener {
                 l.setLongitude(dList.get(j).getLongitude());
 
                 //만약 보행자 다발 구역 내에 있는 횡단보도라면 표시
-                if(l.distanceTo(c) <= DATA_RADIUS){
+                if(l.distanceTo(c) <= ACCIDENT_RADIUS){
 
                     if(data != null){
                         //일단 다발지 데이터를 받아옵니다.
                         //사고 규모는 발생횟수+사상자수로 판단합니다.
                         data = dList.get(j);
-                        accidentCount = accidentCount+1;
+                        dataCount = dataCount+1;
                         accidentMagnitude = dList.get(j).getAccidentCount() + dList.get(j).getCasualtiesCount();
                     }
                     else{
                        //만약 데이터를 이미 받아왔다면
-                        accidentCount = accidentCount+1;
+                        dataCount = dataCount+1;
 
                         //사고 규모가 더 큰게 들어왓다면  그데이터를 씁니다.
                         if(accidentMagnitude < (dList.get(j).getAccidentCount() + dList.get(j).getCasualtiesCount()) ){
@@ -321,12 +321,12 @@ public class CanaryService extends Service implements LocationListener {
             //최종적으로 결정된 데이터를 이용해 geofence를 추가합니다.
             if(data !=null){
                 cw.setAccidentType(data.getAccidentType());
-                cw.setAccidentCount(accidentCount);
+                cw.setAccidentCount(dataCount);
                 userCwDataList.add(cw);
                 //횡단보도의 좌표를 넣는다.
                 LatLng latLng = new LatLng(c.getLatitude(),c.getLongitude());
-                //알림에 표시할 내용은 (년도) 사고종류 사상자수: x명
-                String geofenceId ="("+data.getAccidentYear() +")" +
+                //알림에 표시할 내용은 //사고 발생건수+  (년도) 사고종류 사상자수: x명
+                String geofenceId = data.getAccidentCount()+"@"+"("+data.getAccidentYear() +")" +
                         data.getAccidentType()+
                         " 사상자수: "+data.getCasualtiesCount()+"명";
                 addGeofence(geofenceId,latLng, GEOFENCE_RADIUS);

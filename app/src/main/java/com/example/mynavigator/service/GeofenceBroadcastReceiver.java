@@ -31,26 +31,29 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
             return;
         }
 
+        int accidnetCount = 0;
         String showingData = "";
         List<Geofence> geofenceList = geofencingEvent.getTriggeringGeofences();
         for (Geofence geofence: geofenceList) {
             Log.d(TAG, "onReceive: " + geofence.getRequestId());
-            showingData += geofence.getRequestId();
+
+            accidnetCount = Integer.parseInt( geofence.getRequestId().split("@")[0]);
+            showingData += geofence.getRequestId().split("@")[1];
         }
         int transitionType = geofencingEvent.getGeofenceTransition();
 
         switch (transitionType) {
             case Geofence.GEOFENCE_TRANSITION_ENTER:
                 Toast.makeText(context, "GEOFENCE_TRANSITION_ENTER", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("사고 다발지역 안에 들어왔습니다!", showingData, MainActivity.class);
+                notificationHelper.sendHighPriorityNotification("사고 다발지역 안에 들어왔습니다!", showingData,accidnetCount, MainActivity.class);
                 break;
             case Geofence.GEOFENCE_TRANSITION_DWELL:
                 Toast.makeText(context, "GEOFENCE_TRANSITION_DWELL", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("사고 다발지역 안을 지나고 있습니다!", showingData, MainActivity.class);
+                notificationHelper.sendHighPriorityNotification("사고 다발지역 안을 지나고 있습니다!", showingData,accidnetCount, MainActivity.class);
                 break;
             case Geofence.GEOFENCE_TRANSITION_EXIT:
                 Toast.makeText(context, "GEOFENCE_TRANSITION_EXIT", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("사고 다발지역 안에서 나왔습니다!", showingData, MainActivity.class);
+                notificationHelper.sendHighPriorityNotification("사고 다발지역 안에서 나왔습니다!", showingData,accidnetCount, MainActivity.class);
                 break;
         }
     }

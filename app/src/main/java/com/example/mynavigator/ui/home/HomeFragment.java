@@ -173,6 +173,7 @@ public class HomeFragment extends Fragment {
         }
 
 
+        @RequiresApi(api = Build.VERSION_CODES.O)
         @Override
         protected Void doInBackground(Void... voids) {
            try{

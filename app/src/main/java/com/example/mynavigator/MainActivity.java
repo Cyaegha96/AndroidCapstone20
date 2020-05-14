@@ -1,7 +1,6 @@
 package com.example.mynavigator;
 
 import android.app.ActivityManager;
-import android.app.Fragment;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -16,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +24,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.fragment.app.FragmentManager;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -33,22 +32,16 @@ import androidx.navigation.ui.NavigationUI;
 
 import com.example.mynavigator.service.BackgroundDetectedActivitiesService;
 import com.example.mynavigator.service.CanaryService;
-import com.example.mynavigator.service.Constants;
-import com.example.mynavigator.ui.data.CwData;
 import com.example.mynavigator.ui.data.Data;
 import com.example.mynavigator.ui.data.DataAdapter;
-import com.example.mynavigator.ui.data.DeadAdapter;
 import com.example.mynavigator.ui.data.DeadData;
-import com.example.mynavigator.ui.home.HomeFragment;
 import com.example.mynavigator.ui.settings.SettingsActivity;
 import com.example.mynavigator.user.UserActivity;
-import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.muddzdev.styleabletoast.StyleableToast;
 
 import java.util.ArrayList;
@@ -222,6 +215,8 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 break;
+            case R.id.action_explanation:
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -277,21 +272,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-    private void showSnackbar(final String text) {
-        View container = findViewById(android.R.id.content);
-        if (container != null) {
-            Snackbar.make(container, text, Snackbar.LENGTH_LONG).show();
-        }
-    }
-    private void showSnackbar(final int mainTextStringId, final int actionStringId,
-                              View.OnClickListener listener) {
-        Snackbar.make(
-                findViewById(android.R.id.content),
-                getString(mainTextStringId),
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(getString(actionStringId), listener).show();
-    }
 
     public Boolean isLaunchingService(Context mContext){
 
