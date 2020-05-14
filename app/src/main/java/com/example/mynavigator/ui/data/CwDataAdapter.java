@@ -67,8 +67,7 @@ public class CwDataAdapter {
     {
         try
         {
-            // Table 이름 -> antpool_bitcoin 불러오기
-            String sql ="SELECT * FROM " + TABLE_NAME;
+            String sql = "SELECT * FROM " + TABLE_NAME;
 
             // 모델 넣을 리스트 생성
             List placeList = new ArrayList();
@@ -107,9 +106,9 @@ public class CwDataAdapter {
                                     break;
                                 case 7:  cwdata.setCartrkCo(mCur.getInt(7));
                                     break;
-                                case 8: cwdata.setLongitude(mCur.getFloat(8));
+                                case 8: cwdata.setLatitude(mCur.getFloat(8));
                                     break;
-                                case 9:  cwdata.setLatitude(mCur.getFloat(9));
+                                case 9:  cwdata.setLongitude(mCur.getFloat(9));
                                     break;
                                 case 10: cwdata.setBcyclCrslkCmbnatYn(mCur.getInt(10));
                                     break;

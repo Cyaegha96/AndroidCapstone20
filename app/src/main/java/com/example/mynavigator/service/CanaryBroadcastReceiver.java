@@ -11,7 +11,8 @@ public class CanaryBroadcastReceiver extends BroadcastReceiver {
         if(ConnectivityManager.CONNECTIVITY_ACTION.equals(intent.getAction())){
             int type = intent.getIntExtra("type", -1);
             int confidence = intent.getIntExtra("confidence", 0);
-            ((CanaryService) CanaryService.mContext).handleUserActivity(type, confidence);
+
+            ((CanaryService)CanaryService.mContext).handleUserActivity(type, confidence);
         }
     }
 }

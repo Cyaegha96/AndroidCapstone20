@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -35,6 +37,8 @@ import com.example.mynavigator.service.Constants;
 import com.example.mynavigator.ui.data.CwData;
 import com.example.mynavigator.ui.data.Data;
 import com.example.mynavigator.ui.data.DataAdapter;
+import com.example.mynavigator.ui.data.DeadAdapter;
+import com.example.mynavigator.ui.data.DeadData;
 import com.example.mynavigator.ui.home.HomeFragment;
 import com.example.mynavigator.ui.settings.SettingsActivity;
 import com.example.mynavigator.user.UserActivity;
@@ -61,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private Location userLocation;
 
     List<Data> dataList;
-    List<CwData> cwdataList;
+    List<DeadData> deadList;
     private GeofencingClient mGeofencingClient;
     private ArrayList<Geofence> mGeofenceList;
     private PendingIntent mGeofencePendingIntent;
@@ -155,6 +159,18 @@ public class MainActivity extends AppCompatActivity {
         // db 닫기
         mDbHelper.close();
 
+       /*
+
+*       DeadAdapter mDeadDbHelper = new DeadAdapter(getApplicationContext());
+
+        mDeadDbHelper.createDatabase();
+        mDeadDbHelper.open();
+
+        deadList = mDeadDbHelper.getTableData();
+
+        mDeadDbHelper.close();
+        */
+
     }
 
     private BroadcastReceiver mAlertReceiver = new BroadcastReceiver() {
@@ -187,6 +203,10 @@ public class MainActivity extends AppCompatActivity {
         return dataList;
     }
 
+    public List<DeadData> getDeadList() {
+        return deadList;
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -209,6 +229,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
@@ -222,11 +243,22 @@ public class MainActivity extends AppCompatActivity {
         setMyLatLog(new LatLng(userLocation.getLatitude(),userLocation.getLongitude()));
     }
 
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public void startCanaryService(){
         Intent canaryIntent = new Intent(this, CanaryService.class);
-        startService(canaryIntent);
+
+        if (Build.VERSION.SDK_INT >= 26) {
+            startForegroundService(canaryIntent);
+        }
+        else {
+           startService(canaryIntent);
+        }
+
         Intent detectedIntent = new Intent(MainActivity.this, BackgroundDetectedActivitiesService.class);
         startService(detectedIntent);
+
+
     }
 
     public void stopCanaryService() {
@@ -270,7 +302,6 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         }
-
         return  false;
     }
 

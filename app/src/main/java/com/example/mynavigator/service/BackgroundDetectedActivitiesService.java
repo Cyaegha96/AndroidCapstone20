@@ -60,13 +60,13 @@ public class BackgroundDetectedActivitiesService extends Service {
                 Constants.DETECTION_INTERVAL_IN_MILLISECONDS,
                 mPendingIntent);
 
-        task.addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void result) {
-                Toast.makeText(getApplicationContext(),
-                        "Successfully requested activity updates",
-                        Toast.LENGTH_SHORT)
-                        .show();
+                task.addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        Toast.makeText(getApplicationContext(),
+                                "Successfully requested activity updates",
+                                Toast.LENGTH_SHORT)
+                                .show();
             }
         });
 
