@@ -30,14 +30,15 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 
 public class GraphFragment extends Fragment {
 
     ArrayAdapter<CharSequence> accident, adspin1, adspin2; //어댑터를 선언했습니다. adspint1(서울,인천..) adspin2(강남구,강서구..)
-
-
+    String province[] = {"서울", "부산", "대구","인천","광주","대전","울산","세종특별자치시","경기도","강원도","충청북도","충청남도","전라북도","전라남도","경상북도", "경상남도", "제주특별자치도"};
+    ArrayList<String> provinces = new ArrayList<>(Arrays.asList(province));
 
     private String choice_do = "";
     private String choice_city = "";
@@ -76,7 +77,6 @@ public class GraphFragment extends Fragment {
         spin_province.setPrompt("행정 지역 선택");
         spin_city.setPrompt("시군구 선택");
 
-        Toast.makeText(getContext(), choice_do, Toast.LENGTH_SHORT).show();
         Button btn_refresh = getActivity().findViewById(R.id.btn_refresh);
 
         accident = ArrayAdapter.createFromResource(getContext(), R.array.accident_type, android.R.layout.simple_spinner_dropdown_item);
@@ -114,56 +114,23 @@ public class GraphFragment extends Fragment {
         adspin1.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spin_province.setAdapter(adspin1);
 
-        if(choice_do.equals("부산"))
-            spin_province.setSelection(adspin1.getPosition("부산광역시"));
+        if(provinces.contains(choice_do))
+            spin_province.setSelection(provinces.indexOf(choice_do));
 
         spin_province.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             //첫번째 spinner 클릭시 이벤트 발생입니다. setO 정도까지 치시면 자동완성됩니다. 뒤에도 마찬가지입니다.
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                int seoul = R.array.spinner_region_seoul;
-                int busan = R.array.spinner_region_busan;
-                int daegu = R.array.spinner_region_daegu;
-                int incheon = R.array.spinner_region_incheon;
-                int gwangju = R.array.spinner_region_gwangju;
-                int daejeon = R.array.spinner_region_daejeon;
-                int ulsan = R.array.spinner_region_ulsan;
-                int sejong = R.array.spinner_region_sejong;
-                int gyeonggi = R.array.spinner_region_gyeonggi;
-                int gangwon = R.array.spinner_region_gangwon;
-                int chung_buk = R.array.spinner_region_chung_buk;
-                int chung_nam = R.array.spinner_region_chung_nam;
-                int jeon_buk = R.array.spinner_region_jeon_buk;
-                int jeon_nam = R.array.spinner_region_jeon_nam;
-                int gyeong_buk = R.array.spinner_region_gyeong_buk;
-                int gyeong_nam = R.array.spinner_region_gyeong_nam;
-                int jeju = R.array.spinner_region_jeju;
-
-
-                function(spin_city, i, "서울특별시", "서울", seoul);
-                function(spin_city, i, "부산광역시", "부산", busan);
-                function(spin_city, i, "대구광역시", "대구", daegu);
-                function(spin_city, i, "인천광역시", "인천", incheon);
-                function(spin_city, i, "광주광역시", "광주", gwangju);
-                function(spin_city, i, "대전광역시", "대전", daejeon);
-                function(spin_city, i, "울산광역시", "울산", ulsan);
-                function(spin_city, i, "세종특별자치시", "세종특별자치시", sejong);
-                function(spin_city, i, "경기도", "경기도", gyeonggi);
-                function(spin_city, i, "강원도", "강원도", gangwon);
-                function(spin_city, i, "충청북도", "충청북도", chung_buk);
-                function(spin_city, i, "충청남도", "충청남도", chung_nam);
-                function(spin_city, i, "전라북도", "전라북도", jeon_buk);
-                function(spin_city, i, "전라남도", "전라남도", jeon_nam);
-                function(spin_city, i, "경상북도", "경상북도", gyeong_buk);
-                function(spin_city, i, "경상남도", "경상남도", gyeong_nam);
-                function(spin_city, i, "제주특별자치도", "제주특별자치도", jeju);
+            int city[] = {R.array.spinner_region_seoul, R.array.spinner_region_busan,  R.array.spinner_region_daegu, R.array.spinner_region_incheon, R.array.spinner_region_gwangju, R.array.spinner_region_daejeon, R.array.spinner_region_ulsan, R.array.spinner_region_sejong, R.array.spinner_region_gyeonggi, R.array.spinner_region_gangwon, R.array.spinner_region_chung_buk, R.array.spinner_region_chung_nam, R.array.spinner_region_jeon_buk, R.array.spinner_region_jeon_nam, R.array.spinner_region_gyeong_buk, R.array.spinner_region_gyeong_nam, R.array.spinner_region_jeju};
+            for (int j = 0; j < adspin1.getCount(); j++) {
+                function(spin_city, i, spin_province.getItemAtPosition(j).toString(), province[j], city[j]);
             }
+        }
+        @Override
+        public void onNothingSelected(AdapterView<?> adapterView) {
 
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
+        }
+    });
 
         btn_refresh.setOnClickListener(new View.OnClickListener() {
 
