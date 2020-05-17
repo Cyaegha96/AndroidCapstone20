@@ -5,10 +5,9 @@ public class RptData {
 
     private String senderName;
     private String accidentType;
-    private double latitude;
-    private double longitude;
+    private float latitude;
+    private float longitude;
     private String reasonSelected;
-
 
 
     public String getSenderName() {
@@ -27,19 +26,19 @@ public class RptData {
         this.accidentType = accidentType;
     }
 
-    public double getLatitude() {
+    public float getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    public void setLatitude(float latitude) {
         this.latitude = latitude;
     }
 
-    public double getLongitude() {
+    public float getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
+    public void setLongitude(float longitude) {
         this.longitude = longitude;
     }
 

@@ -23,6 +23,7 @@ import android.os.IBinder;
 import android.os.Vibrator;
 import android.provider.Settings;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,6 +41,8 @@ import com.example.mynavigator.ui.data.Data;
 import com.example.mynavigator.ui.data.DataAdapter;
 import com.example.mynavigator.ui.data.DeadAdapter;
 import com.example.mynavigator.ui.data.DeadData;
+import com.example.mynavigator.ui.data.ReportAdapter;
+import com.example.mynavigator.ui.data.RptData;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -59,6 +62,7 @@ public class CanaryService extends Service implements LocationListener {
     public static Context mContext;
 
     Location location; // Location
+    Location updatedLocation;
     double latitude; // Latitude
     double longitude; // Longitude
 
@@ -88,6 +92,9 @@ public class CanaryService extends Service implements LocationListener {
     private List<CwData> userCwDataList = new ArrayList<>();
     private List<DeadData> userDeadList = new ArrayList<>();
     private List<DeadData> deadDataList;
+    private List<RptData> rptDataList;
+    private List<RptData> userRptDataList = new ArrayList<>();
+
 
     private Vibrator vibrator;
     CanaryBroadcastReceiver canaryBroadcastReceiver = new CanaryBroadcastReceiver();
@@ -95,7 +102,7 @@ public class CanaryService extends Service implements LocationListener {
     @Override
     public void onCreate() {
         super.onCreate();
-        getLocation();
+        updatedLocation = getLocation();
         createNotification();
         startTracking();
         initLoadDBReturn();
@@ -173,8 +180,8 @@ public class CanaryService extends Service implements LocationListener {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        setUserDataList();
         Log.d(TAG, "onStartCommand ");
+        setUserDataList();
         dataInputGeofence(userDataList);
         Log.d(TAG, "userDataList dataInput");
         return super.onStartCommand(intent, flags, startId);
@@ -268,6 +275,8 @@ public class CanaryService extends Service implements LocationListener {
     public List<CwData> getCwDataList() {
         return userCwDataList;
     }
+    public List<RptData> getRptDataList() {return userRptDataList;}
+
     //보행자 다발지역 리스트 중에서 user로부터 1km 이내의 것들만 골라냅니다.
     private void setUserDataList(){
         for(int i=0;i<dList.size();i++){
@@ -355,6 +364,29 @@ public class CanaryService extends Service implements LocationListener {
             }
         }
 
+        for(int i=0;i<rptDataList.size();i++){
+            addRptList(rptDataList.get(i));
+        }
+    }
+
+    public void addRptList(RptData rptData){
+        Log.d(TAG,"아니 이거 제대로 되는지 확인좀");
+
+        Location r = new Location("r");
+
+        r.setLatitude(rptData.getLatitude());
+        r.setLongitude(rptData.getLongitude());
+        if(location.distanceTo(r) <= DISTANCETO_PARAMETER){
+            if(!userRptDataList.contains(rptData)){
+                userRptDataList.add(rptData);
+                LatLng latLng = new LatLng(r.getLatitude(),r.getLongitude());
+                //알림에 표시할 내용은 사용자 알림에 관한 내용
+                String geofenceId = "1"+"@"+"(제보:"+rptData.getSenderName() +")" +
+                        rptData.getAccidentType()+
+                        " 알림 이유"+rptData.getReasonSelected();
+                addGeofence(geofenceId,latLng, GEOFENCE_RADIUS);
+            }
+        }
     }
 
     private void addGeofence(String geofenceId, LatLng latLng, float radius) {
@@ -367,7 +399,7 @@ public class CanaryService extends Service implements LocationListener {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                       // Log.d(TAG, "onSuccess: Geofence Added...");
+                        //Log.d(TAG, "onSuccess: Geofence Added...");
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -423,6 +455,15 @@ public class CanaryService extends Service implements LocationListener {
         deadDataList = mDeadDbHelper.getTableData();
 
         mDeadDbHelper.close();
+
+        ReportAdapter mReportAdapter = new ReportAdapter(getApplicationContext());
+
+        mReportAdapter.createDatabase();
+        mReportAdapter.open();
+
+        rptDataList = mReportAdapter.getTableData();
+
+        mReportAdapter.close();
 
     }
 
@@ -492,6 +533,16 @@ public class CanaryService extends Service implements LocationListener {
         longitude = location.getLongitude();
         sendLocation(location);
         Log.d(TAG,"Location changed: 위도:" +location.getLatitude()+ " 경도: "+location.getLongitude() );
+
+        //200미터 단위로 geofence 주기적 갱신
+        if(updatedLocation.distanceTo(location) <= 200){
+            Log.d(TAG,"사용자가 초기 위치보다 200m 멀어지면 갱신 갱신");
+            Toast.makeText(getApplicationContext(),"사용자가 초기 위치보다 200m 멀어지면 갱신 갱신",Toast.LENGTH_SHORT);
+            removeGeofence();
+            setUserDataList();
+            dataInputGeofence(userDataList);
+            updatedLocation = location;
+        }
 
     }
 

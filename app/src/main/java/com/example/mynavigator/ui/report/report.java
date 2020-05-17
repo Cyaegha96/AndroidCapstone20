@@ -1,7 +1,9 @@
 package com.example.mynavigator.ui.report;
 
+import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -27,7 +29,9 @@ import android.widget.Toast;
 
 import com.example.mynavigator.MainActivity;
 import com.example.mynavigator.R;
+import com.example.mynavigator.service.CanaryService;
 import com.example.mynavigator.ui.data.DataBaseHelper;
+import com.example.mynavigator.ui.data.RptData;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -106,23 +110,53 @@ public class report extends Fragment
             @Override
             public void onClick(View v) {
 
-                dataBaseHelper = new DataBaseHelper(getContext(),"data_all.db", 1);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("제보");
+                builder.setMessage("제보한 내용을 바로 자신의 DB에 적용하겠습니까?");
+                builder.setPositiveButton("네",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dataBaseHelper = new DataBaseHelper(getContext(),"data_all.db", 1);
+                                // db에 추가하는 코드
+                                dbinsert(senderName.getText().toString(), selectedAccidentType, sendingLatLng.latitude, sendingLatLng.longitude, reasonSelected.getText().toString());
+                                dataBaseHelper.close();
+                                if(((MainActivity)getActivity()).isLaunchingService(getContext())){
+                                    RptData rptData = new RptData();
+                                    rptData.setAccidentType(selectedAccidentType);
+                                    rptData.setSenderName(senderName.getText().toString());
+                                    rptData.setReasonSelected(reasonSelected.getText().toString());
+                                    rptData.setLatitude((float) sendingLatLng.latitude);
+                                    rptData.setLongitude((float) sendingLatLng.longitude);
+                                    ((CanaryService)CanaryService.mContext).addRptList(rptData);
 
-                // db에 추가하는 코드
-                dbinsert(userName, selectedAccidentType, sendingLatLng.latitude, sendingLatLng.longitude, reasonSelected.getText().toString());
+                                }
+                                Log.d(TAG,"DB에 해당 내용이 저장되었습니다!");
+                                String emailText = "["+selectedAccidentType+"]\n"+"경도:"+ sendingLatLng.latitude+ "\n 위도:" +sendingLatLng.longitude;
+                                Intent email = new Intent(Intent.ACTION_SEND);
+                                email.setType("plain/text");
+                                String[] address = {"wldnd1102@naver.com"};
+                                email.putExtra(Intent.EXTRA_EMAIL, address);
+                                email.putExtra(Intent.EXTRA_SUBJECT, senderName.getText()+SENDING_MAIL_TAG);
+                                email.putExtra(Intent.EXTRA_TEXT, emailText);
+                                startActivity(email);
+                            }
+                        });
+                builder.setNegativeButton("아뇨", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(getActivity().getApplicationContext(),"DB의 적용은 바로 이어지지 않습니다. 이메일 제보를 뒤이어 해주세요!",Toast.LENGTH_SHORT);
 
-
-                String emailText = "["+selectedAccidentType+"]\n"+"경도:"+ sendingLatLng.latitude+ "\n 위도:" +sendingLatLng.longitude;
-                Intent email = new Intent(Intent.ACTION_SEND);
-                email.setType("plain/text");
-                String[] address = {"wldnd1102@naver.com"};
-                email.putExtra(Intent.EXTRA_EMAIL, address);
-                email.putExtra(Intent.EXTRA_SUBJECT, senderName.getText()+SENDING_MAIL_TAG);
-                email.putExtra(Intent.EXTRA_TEXT, emailText);
-                startActivity(email);
-
-
-
+                        String emailText = "["+selectedAccidentType+"]\n"+"경도:"+ sendingLatLng.latitude+ "\n 위도:" +sendingLatLng.longitude;
+                        Intent email = new Intent(Intent.ACTION_SEND);
+                        email.setType("plain/text");
+                        String[] address = {"wldnd1102@naver.com"};
+                        email.putExtra(Intent.EXTRA_EMAIL, address);
+                        email.putExtra(Intent.EXTRA_SUBJECT, senderName.getText()+SENDING_MAIL_TAG);
+                        email.putExtra(Intent.EXTRA_TEXT, emailText);
+                        startActivity(email);
+                    }
+                });
+                builder.show();
 
 
             }
@@ -173,8 +207,6 @@ public class report extends Fragment
     private void dbinsert (String sendername, String accidentType, double latitude, double longitude, String reasonSelected){
 
         db = dataBaseHelper.getWritableDatabase();
-
-
 
         db.execSQL("INSERT INTO " + TABLE_NAME + " VALUES(\"" + sendername + "\", \"" + accidentType + "\", \"" + latitude +"\", " + longitude +", \"" + reasonSelected + "\");");
 

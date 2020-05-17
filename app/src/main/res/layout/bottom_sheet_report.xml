@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:id="@+id/bottomSheet"
+    android:layout_height="wrap_content"
+    android:background="@drawable/side_nav_bar_canary4"
+    android:orientation="vertical"
+    android:padding="12dp"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="136dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="5"
+            android:gravity="center"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/bottomSheet_report_accident_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="다발 지역 종류"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                />
+
+
+                <TextView
+                    android:id="@+id/bottomSheet_report_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="제보자이름"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:layout_gravity="right"/>
+            <TextView
+                    android:id="@+id/bottomSheet_report_description"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="왜 다발지역인지 서술하시오"
+                    android:textColor="#FFFFFF"/>
+
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/crossroad_data_imageView"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/canary_shadow" />
+    </LinearLayout>
+
+</LinearLayout>

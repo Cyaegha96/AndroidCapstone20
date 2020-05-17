@@ -24,6 +24,7 @@ import com.example.mynavigator.service.CanaryService;
 import com.example.mynavigator.ui.data.CwData;
 import com.example.mynavigator.ui.data.Data;
 import com.example.mynavigator.ui.data.DeadData;
+import com.example.mynavigator.ui.data.RptData;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -83,6 +84,8 @@ public class MapFragment extends Fragment
     private List<CwData> cwdataList;
     private List<DeadData> deadDataList;
     private List<Marker> markers = new ArrayList<Marker>();
+    private List<RptData> rptDataList;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +106,7 @@ public class MapFragment extends Fragment
 
         crossRoadnull = makeBitmap(R.drawable.crossroadnull,150,150);
 
-        dead = makeBitmap(R.drawable.dead,150,150);
+        dead = makeBitmap(R.drawable.dead,200,200);
 
     }
 
@@ -179,8 +182,41 @@ public class MapFragment extends Fragment
             markerSetting(mGoogleMap);
             cwDataSetting(mGoogleMap);
             deadDataSetting(mGoogleMap);
+            rptDataSetting(mGoogleMap);
 
         }
+    }
+
+    public void rptDataSetting(GoogleMap googleMap){
+        rptDataList = ((CanaryService)CanaryService.mContext).getRptDataList();
+        if(rptDataList != null){
+            for(int i=0;i<rptDataList.size();i++){
+
+                RptData rptData = rptDataList.get(i);
+                float dLat = rptData.getLatitude();
+                float dLog = rptData.getLongitude();
+
+                //순서대로 1. 데이타 타입,2 제보자 이름, 3. 제보 사유를 전달합니다.
+                MarkerOptions marker = new MarkerOptions()
+                        .position(new LatLng(dLat, dLog))
+                        .title("제보위험지역")
+                        .snippet(rptData.getAccidentType()+"@"+
+                                rptData.getSenderName()+"@"+
+                                rptData.getReasonSelected())
+                        .icon(BitmapDescriptorFactory.fromBitmap( makeBitmap(R.drawable.canary,200,200)))
+                        ;
+                //아이콘 설정
+                googleMap.addMarker(marker);
+
+                googleMap.addCircle(new CircleOptions()
+                        .center(new LatLng(dLat,dLog))
+                        .fillColor(0x22eb4034)
+                        .strokeWidth(0)
+                        .radius(GEOFENCE_RADIUS));
+
+            }
+        }
+
     }
 
     public void deadDataSetting(GoogleMap googleMap){
@@ -347,8 +383,10 @@ public class MapFragment extends Fragment
     @Override
     public void onLocationChanged(Location location) {
 
-        if(myLocation.distanceTo(location) < 100){
+        if(myLocation.distanceTo(location) < 200){
             if(mGoogleMap != null){ //prevent crashing if the map doesn't exist yet (eg. on starting activity)
+                Log.d(TAG,"사용자가 초기 위치보다 200m 멀어지면 갱신 갱신");
+                myLocation = location;
                 mGoogleMap.clear();
                 markerSetting(mGoogleMap);
                 cwDataSetting(mGoogleMap);
@@ -373,6 +411,8 @@ public class MapFragment extends Fragment
             bottomSheetDialog.setContentView(CrossroadDataView(marker));
         }else if(marker.getTitle().equals("사망자")){
             bottomSheetDialog.setContentView(DeadDataView(marker));
+        }else if(marker.getTitle().equals("제보위험지역")){
+            bottomSheetDialog.setContentView(ReportDataView(marker));
         }
 
         bottomSheetDialog.show();
@@ -473,6 +513,20 @@ public class MapFragment extends Fragment
         deadRoad.setText(marker.getSnippet().split("@")[2]);
         deadCount.setText("사망자수:" + marker.getSnippet().split("@")[3]);
         deadCar.setText("가해차량:" +marker.getSnippet().split("@")[4] + "["+ marker.getSnippet().split("@")[5]+"]");
+        return root;
+    }
+
+    private View ReportDataView(Marker marker){
+        View  root= getLayoutInflater().inflate(R.layout.bottom_sheet_report, null);
+
+        TextView reportType = root.findViewById(R.id.bottomSheet_report_accident_type);
+        TextView reporterName = root.findViewById(R.id.bottomSheet_report_name);
+        TextView reportReason = root.findViewById(R.id.bottomSheet_report_description);
+
+        reportType.setText(marker.getSnippet().split("@")[0]);
+        reporterName.setText("제보자:" + marker.getSnippet().split("@")[1]);
+        reportReason.setText(marker.getSnippet().split("@")[2]);
+
         return root;
     }
 

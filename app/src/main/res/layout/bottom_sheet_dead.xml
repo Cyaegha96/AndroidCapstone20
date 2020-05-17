@@ -26,9 +26,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="사망자 사고 종류"
-                android:textColor="#000000"
+                android:textColor="#FFFFFF"
                 android:textSize="24sp"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+                />
             <LinearLayout
                 android:layout_marginLeft="10dp"
                 android:padding="3dp"
@@ -43,13 +44,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="위치정보없음"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"/>
                 <TextView
                     android:layout_marginLeft="30dp"
                     android:id="@+id/bottomSheet_roadType"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="도로형태 대분류"
+                    android:textColor="#FFFFFF"
                     />
             </LinearLayout>
             <LinearLayout
@@ -65,6 +68,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="사망자 정보"
+                    android:textColor="#FFFFFF"
                     />
                 <TextView
                     android:layout_marginLeft="30dp"
@@ -72,6 +76,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="가해 차량 종류"
+                    android:textColor="#FFFFFF"
                     />
             </LinearLayout>
         </LinearLayout>
@@ -81,7 +86,7 @@
             android:layout_height="70dp"
             android:layout_weight="1"
             android:layout_gravity="center"
-            app:srcCompat="@drawable/canary_shadow" />
+            app:srcCompat="@drawable/dead" />
     </LinearLayout>
 
 </LinearLayout>
