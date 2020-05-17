@@ -38,6 +38,8 @@ import com.example.mynavigator.ui.data.CwData;
 import com.example.mynavigator.ui.data.CwDataAdapter;
 import com.example.mynavigator.ui.data.Data;
 import com.example.mynavigator.ui.data.DataAdapter;
+import com.example.mynavigator.ui.data.DeadAdapter;
+import com.example.mynavigator.ui.data.DeadData;
 import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -84,6 +86,8 @@ public class CanaryService extends Service implements LocationListener {
     private List<Data> userDataList = new ArrayList<>();
     private List<CwData> cwDataList;
     private List<CwData> userCwDataList = new ArrayList<>();
+    private List<DeadData> userDeadList = new ArrayList<>();
+    private List<DeadData> deadDataList;
 
     private Vibrator vibrator;
     CanaryBroadcastReceiver canaryBroadcastReceiver = new CanaryBroadcastReceiver();
@@ -260,8 +264,10 @@ public class CanaryService extends Service implements LocationListener {
     public List<Data> getUserDataList(){
         return userDataList;
     }
-
-
+    public List<DeadData> getDeadDataList() { return userDeadList; }
+    public List<CwData> getCwDataList() {
+        return userCwDataList;
+    }
     //보행자 다발지역 리스트 중에서 user로부터 1km 이내의 것들만 골라냅니다.
     private void setUserDataList(){
         for(int i=0;i<dList.size();i++){
@@ -332,6 +338,23 @@ public class CanaryService extends Service implements LocationListener {
                 addGeofence(geofenceId,latLng, GEOFENCE_RADIUS);
             }
         }
+        for(int i=0;i<deadDataList.size();i++){
+            DeadData deadData = deadDataList.get(i);
+            Location d = new Location("d");
+            d.setLatitude(deadData.getLa_crd());
+            d.setLongitude(deadData.getLo_crd());
+
+            if(location.distanceTo(d) <=DISTANCETO_PARAMETER ){
+                userDeadList.add(deadData);
+                LatLng latLng = new LatLng(d.getLatitude(),d.getLongitude());
+                //알림에 표시할 내용은 // 사망자는 무조건 강 알림 주자//   (년도) 사고종류 사망자수: x명
+                String geofenceId = "15"+"@"+"("+deadData.getAcc_year() +")" +
+                        deadData.getAcc_ty_cd()+
+                        " 사망자수: "+deadData.getDth_dnv_cnt()+"명";
+                addGeofence(geofenceId,latLng, GEOFENCE_RADIUS);
+            }
+        }
+
     }
 
     private void addGeofence(String geofenceId, LatLng latLng, float radius) {
@@ -391,6 +414,15 @@ public class CanaryService extends Service implements LocationListener {
         cwDbHelper.open();
         cwDataList = cwDbHelper.getTableData();
         cwDbHelper.close();
+
+        DeadAdapter mDeadDbHelper = new DeadAdapter(getApplicationContext());
+
+        mDeadDbHelper.createDatabase();
+        mDeadDbHelper.open();
+
+        deadDataList = mDeadDbHelper.getTableData();
+
+        mDeadDbHelper.close();
 
     }
 
@@ -493,9 +525,5 @@ public class CanaryService extends Service implements LocationListener {
     @Override
     public void onProviderDisabled(String provider) {
 
-    }
-
-    public List<CwData> getCwDataList() {
-        return userCwDataList;
     }
 }

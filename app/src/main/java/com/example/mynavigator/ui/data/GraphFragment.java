@@ -13,13 +13,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.example.mynavigator.R;
-import com.example.mynavigator.user.UserActivity;
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
@@ -64,7 +62,7 @@ public class GraphFragment extends Fragment {
 
 
 
-        DataBaseHelper mdb = new DataBaseHelper(getContext(), "sample_db.db", 1);
+        DataBaseHelper mdb = new DataBaseHelper(getContext(), "data_all.db", 1);
         final SQLiteDatabase sqdb = mdb.getWritableDatabase();
         final LineChart lineChart = getActivity().findViewById(R.id.chart);
 
@@ -123,7 +121,7 @@ public class GraphFragment extends Fragment {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 int city[] = {R.array.spinner_region_seoul, R.array.spinner_region_busan,  R.array.spinner_region_daegu, R.array.spinner_region_incheon, R.array.spinner_region_gwangju, R.array.spinner_region_daejeon, R.array.spinner_region_ulsan, R.array.spinner_region_sejong, R.array.spinner_region_gyeonggi, R.array.spinner_region_gangwon, R.array.spinner_region_chung_buk, R.array.spinner_region_chung_nam, R.array.spinner_region_jeon_buk, R.array.spinner_region_jeon_nam, R.array.spinner_region_gyeong_buk, R.array.spinner_region_gyeong_nam, R.array.spinner_region_jeju};
                 for (int j = 0; j < adspin1.getCount(); j++) {
-                    function(spin_city, i, spin_province.getItemAtPosition(j).toString(), province[j], city[j]);
+                    choice_factor(spin_city, i, spin_province.getItemAtPosition(j).toString(), province[j], city[j]);
                 }
             }
             @Override
@@ -190,7 +188,7 @@ public class GraphFragment extends Fragment {
     }
 
 
-    void function(Spinner spin_city, int i, String province, String choice, int Spinner){
+    void choice_factor(Spinner spin_city, int i, String province, String choice, int Spinner){
         if (adspin1.getItem(i).equals(province)) {
             choice_do = choice;//버튼 클릭시 출력을 위해 값을 넣었습니다.
             adspin2 = ArrayAdapter.createFromResource(getContext(), Spinner, android.R.layout.simple_spinner_dropdown_item);

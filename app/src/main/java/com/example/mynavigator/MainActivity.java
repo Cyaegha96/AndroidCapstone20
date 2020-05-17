@@ -34,6 +34,7 @@ import com.example.mynavigator.service.BackgroundDetectedActivitiesService;
 import com.example.mynavigator.service.CanaryService;
 import com.example.mynavigator.ui.data.Data;
 import com.example.mynavigator.ui.data.DataAdapter;
+import com.example.mynavigator.ui.data.DeadAdapter;
 import com.example.mynavigator.ui.data.DeadData;
 import com.example.mynavigator.ui.settings.SettingsActivity;
 import com.example.mynavigator.user.UserActivity;
@@ -59,9 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     List<Data> dataList;
     List<DeadData> deadList;
-    private GeofencingClient mGeofencingClient;
-    private ArrayList<Geofence> mGeofenceList;
-    private PendingIntent mGeofencePendingIntent;
+
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
     @Override
@@ -96,10 +95,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         initLoadDBReturn();
-
-        mGeofenceList = new ArrayList<>();
-        mGeofencePendingIntent = null;
-        mGeofencingClient = LocationServices.getGeofencingClient(this);
 
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -152,18 +147,6 @@ public class MainActivity extends AppCompatActivity {
         // db 닫기
         mDbHelper.close();
 
-       /*
-
-*       DeadAdapter mDeadDbHelper = new DeadAdapter(getApplicationContext());
-
-        mDeadDbHelper.createDatabase();
-        mDeadDbHelper.open();
-
-        deadList = mDeadDbHelper.getTableData();
-
-        mDeadDbHelper.close();
-        */
-
     }
 
     private BroadcastReceiver mAlertReceiver = new BroadcastReceiver() {
@@ -184,9 +167,7 @@ public class MainActivity extends AppCompatActivity {
                 userLocation = new Location(locationProvider);
                 setMyLatLog(new LatLng(myLat,myLog));
                 userLocation.setSpeed(speed);
-                StyleableToast.makeText(getApplicationContext(),
-                        text,
-                        Toast.LENGTH_LONG, R.style.mytoast2).show();
+              //  StyleableToast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG, R.style.mytoast2).show();
             }
 
         }

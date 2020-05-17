@@ -72,6 +72,7 @@ public class MapFragment extends Fragment
     private Bitmap crossRoad4;
     private Bitmap crossRoad99;
     private Bitmap crossRoadnull;
+    private Bitmap dead;
 
 
     private double myLat;
@@ -80,11 +81,8 @@ public class MapFragment extends Fragment
     GoogleMap mGoogleMap;
     private List<Data> userDataList;
     private List<CwData> cwdataList;
-    private List<DeadData> deadDataList = new ArrayList<>();
-
+    private List<DeadData> deadDataList;
     private List<Marker> markers = new ArrayList<Marker>();
-
-    BottomSheetBehavior bottomSheetBehavior;
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,10 +98,12 @@ public class MapFragment extends Fragment
 
         crossRoad1 = makeBitmap(R.drawable.crossroad1,150,150);
         crossRoad2 = makeBitmap(R.drawable.crossroad2,150,150);
-        crossRoad3 = makeBitmap(R.drawable.crossroad3,150,150);
-        crossRoad4 = makeBitmap(R.drawable.crossroad4,150,150);
+        crossRoad3 = makeBitmap(R.drawable.crossroad3,150,200);
+        crossRoad4 = makeBitmap(R.drawable.crossroad4,150,200);
 
         crossRoadnull = makeBitmap(R.drawable.crossroadnull,150,150);
+
+        dead = makeBitmap(R.drawable.dead,150,150);
 
     }
 
@@ -149,10 +149,7 @@ public class MapFragment extends Fragment
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
         googleMap.moveCamera(cameraUpdate);
 
-        deadDataList = ((MainActivity)getActivity()).getDeadList();
-
-
-        myLocation = new Location("내위치");
+         myLocation = new Location("내위치");
         myLocation.setLatitude(myLat);
         myLocation.setLongitude(myLog);
 
@@ -181,8 +178,47 @@ public class MapFragment extends Fragment
             Log.d(TAG,"addMarker");
             markerSetting(mGoogleMap);
             cwDataSetting(mGoogleMap);
+            deadDataSetting(mGoogleMap);
 
         }
+    }
+
+    public void deadDataSetting(GoogleMap googleMap){
+        deadDataList  = ((CanaryService)CanaryService.mContext).getDeadDataList();
+        Log.d(TAG,"deaddataListSize: "+deadDataList.size());
+
+        if(deadDataList != null){
+            for(int i=0; i<deadDataList.size();i++){
+                DeadData deadData =deadDataList.get(i);
+                float dLat = deadData.getLa_crd();
+                float dLog = deadData.getLo_crd();
+
+                //사망자 정보로 넣을 것은 1. 사망자사고 종류 / 2 장소정보 / 3.도로형태 대분류 4.사망자 수/ 5.가해차량종류 6. 세부종류
+                MarkerOptions marker = new MarkerOptions()
+                        .position(new LatLng(dLat, dLog))
+                        .title("사망자")
+                        .snippet(deadData.getAcc_ty_cd()+"@"+
+                                deadData.getOccrrnc_lc_sgg_cd()+"@"+
+                                deadData.getRoad_frm_cd()+"@"+
+                                deadData.getDth_dnv_cnt()+"@"+
+                                deadData.getWrngdo_isrty_vhcty_lclas_cd()+"@"+
+                                deadData.getWrngdo_isrty_vhcty_cd())
+                        .icon(BitmapDescriptorFactory.fromBitmap(dead));
+
+
+                //아이콘 설정
+                googleMap.addMarker(marker);
+
+                googleMap.addCircle(new CircleOptions()
+                        .center(new LatLng(dLat,dLog))
+                        .fillColor(0x22eb4034)
+                        .strokeWidth(0)
+                        .radius(GEOFENCE_RADIUS));
+
+            }
+
+        }
+
     }
 
     public void cwDataSetting(GoogleMap googleMap){
@@ -335,6 +371,8 @@ public class MapFragment extends Fragment
         }
         else if(marker.getTitle().equals("횡단보도")){
             bottomSheetDialog.setContentView(CrossroadDataView(marker));
+        }else if(marker.getTitle().equals("사망자")){
+            bottomSheetDialog.setContentView(DeadDataView(marker));
         }
 
         bottomSheetDialog.show();
@@ -395,6 +433,8 @@ public class MapFragment extends Fragment
         ImageView bottomSheetCrossroadImageView = root.findViewById(R.id.crossroad_data_imageView);
         TextView bottomSheetPlacename = root.findViewById(R.id.bottomSheet_pname);
         TextView bottomSheetCrossroadAccidentCount = root.findViewById(R.id.bottomSheet_crossroad_accident_count);
+
+
          String crossRoadType = marker.getSnippet().split("@")[0];
         if(crossRoadType.equals("일반형")){
             bottomSheetCrossroadImageView.setImageResource(R.drawable.crossroad1);
@@ -413,6 +453,26 @@ public class MapFragment extends Fragment
         bottomSheetcrossroadType.setText(crossRoadType);
         bottomSheetPlacename.setText(marker.getSnippet().split("@")[1]);
         bottomSheetCrossroadAccidentCount.setText("다발지역 개수: "+marker.getSnippet().split("@")[2]);
+        return root;
+    }
+
+
+
+    private View DeadDataView(Marker marker){
+        //만약 사망자 정보 마커를 클릭했을 시
+        View  root= getLayoutInflater().inflate(R.layout.bottom_sheet_dead, null);
+        //사망자 정보로 넣을 것은 1. 사망자사고 종류 / 2 장소정보 / 3.도로형태 대분류 4.사망자 수/ 5.가해차량종류 6. 세부종류
+        TextView deadType = root.findViewById(R.id.bottomSheet_dead_accident_type);
+        TextView deadPlace = root.findViewById(R.id.bottomSheet_dead_place_name);
+        TextView deadCount = root.findViewById(R.id.bottomSheet_dead_pcount);
+        TextView deadRoad = root.findViewById(R.id.bottomSheet_roadType);
+        TextView deadCar= root.findViewById(R.id.bottomSheet_carType);
+
+        deadType.setText(marker.getSnippet().split("@")[0] +"사망자 발생지역");
+        deadPlace.setText(marker.getSnippet().split("@")[1]);
+        deadRoad.setText(marker.getSnippet().split("@")[2]);
+        deadCount.setText("사망자수:" + marker.getSnippet().split("@")[3]);
+        deadCar.setText("가해차량:" +marker.getSnippet().split("@")[4] + "["+ marker.getSnippet().split("@")[5]+"]");
         return root;
     }
 

@@ -13,7 +13,7 @@ import java.util.List;
 public class CwDataAdapter {
 
     protected static final String TAG = "CwDataAdapter";
-    private static String DB_NAME_CW ="crosswalk_db.db";
+    private static String DB_NAME_CW = "data_all.db";
     // TODO : TABLE 이름을 명시해야함
     protected static final String TABLE_NAME = "cw_table";
 

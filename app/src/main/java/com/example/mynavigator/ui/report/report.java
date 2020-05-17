@@ -51,11 +51,12 @@ public class report extends Fragment
     private LatLng sendingLatLng;
 
     private EditText editLatLng;
+    private EditText editComment;
     private Button sendingEmailButton;
     private TextView senderName;
     private Spinner accidentSpinner;
     private String selectedAccidentType;
-    private double Circle_RADOUS=50;
+    private double Circle_RADOUS=30;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -69,6 +70,7 @@ public class report extends Fragment
         senderName = v.findViewById(R.id.senderNameText);
         senderName.setText(userName);
         editLatLng = v.findViewById(R.id.editLatLng);
+        editComment = v.findViewById(R.id.editComment);
         sendingEmailButton = v.findViewById(R.id.sendingEmailButton);
         sendingEmailButton.setEnabled(false);
 
@@ -93,7 +95,7 @@ public class report extends Fragment
         sendingEmailButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String emailText = "["+selectedAccidentType+"]\n"+"경도:"+ sendingLatLng.latitude+ "\n 위도:" +sendingLatLng.longitude;
+                String emailText = "["+selectedAccidentType+"]\n"+"경도:"+ sendingLatLng.latitude+ "\n 위도:" +sendingLatLng.longitude+"\n"+editComment.getText();
                 Intent email = new Intent(Intent.ACTION_SEND);
                 email.setType("plain/text");
                 String[] address = {"zazae51@gmail.com"};

@@ -13,7 +13,7 @@ import java.util.List;
 public class DeadAdapter {
 
     protected static final String TAG = "DeadDataAdapter";
-    private static String DB_NAME_DD ="dead_db.db";
+    private static String DB_NAME_DD = "data_all.db";
     // TODO : TABLE 이름을 명시해야함
     protected static final String TABLE_NAME = "dead_table";
 
@@ -66,7 +66,7 @@ public class DeadAdapter {
     {
         try
         {
-            String sql ="SELECT * FROM " + TABLE_NAME;
+            String sql = "SELECT * FROM " + TABLE_NAME;
 
             // 모델 넣을 리스트 생성
             List placeList = new ArrayList();

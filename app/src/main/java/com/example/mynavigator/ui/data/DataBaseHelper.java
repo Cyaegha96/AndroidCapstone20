@@ -11,7 +11,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.SQLInput;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
 
@@ -22,11 +21,9 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     // TODO : assets 폴더에 있는 경우 "", 그 외 경로기입
     private static String DB_PATH = "";
     // TODO : assets 폴더에 있는 DB명 또는 별도의 데이터베이스 파일이름
-    private static String DB_NAME ="sample_db.db";
-    private static String DB_NAME_CW ="crosswalk_db.db";
+    private static String DB_NAME = "data_all.db";
 
     private SQLiteDatabase mDataBase;
-    private SQLiteDatabase cwDataBase;
     private final Context mContext;
 
     public DataBaseHelper(Context context, String DB_NAME, int version)
@@ -69,9 +66,7 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         File dbFile = new File(DB_PATH + DB_NAME);
         //Log.v("dbFile", dbFile + "   "+ dbFile.exists());
 
-        File cwFile = new File(DB_PATH + DB_NAME_CW);
-
-        return dbFile.exists()&&cwFile.exists();
+        return dbFile.exists();
 
     }
 
@@ -79,19 +74,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     private void copyDataBase() throws IOException
     {
 
-
-        InputStream cwInput = mContext.getAssets().open(DB_NAME_CW);
-        String cwFileName = DB_PATH + DB_NAME_CW;
-        OutputStream cwOutput = new FileOutputStream(cwFileName);
-        byte[] cwBuffer = new byte[1024];
-        int cwLength;
-        while ((cwLength = cwInput.read(cwBuffer))>0)
-        {
-            cwOutput.write(cwBuffer, 0, cwLength);
-        }
-        cwOutput.flush();
-        cwOutput.close();
-        cwInput.close();
 
         InputStream mInput = mContext.getAssets().open(DB_NAME);
         String outFileName = DB_PATH + DB_NAME;
@@ -105,6 +87,8 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         mOutput.flush();
         mOutput.close();
         mInput.close();
+
+
 
     }
 
@@ -124,9 +108,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     {
         if(mDataBase != null)
             mDataBase.close();
-
-        if(cwDataBase != null)
-            cwDataBase.close();
         super.close();
     }
 
