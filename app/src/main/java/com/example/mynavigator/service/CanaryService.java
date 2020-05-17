@@ -95,6 +95,7 @@ public class CanaryService extends Service implements LocationListener {
     private List<RptData> rptDataList;
     private List<RptData> userRptDataList = new ArrayList<>();
 
+    private int locationChangeCount =0;
 
     private Vibrator vibrator;
     CanaryBroadcastReceiver canaryBroadcastReceiver = new CanaryBroadcastReceiver();
@@ -525,7 +526,7 @@ public class CanaryService extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        if(location.getAccuracy() ==0.0 ){ //정확도가 0일 경우 --> 무시해야함!
+        if(location.getAccuracy() < 0.5 ){ //정확도가 0일 경우 --> 무시해야함!
             return;
         }
         this.location = location;
@@ -534,10 +535,14 @@ public class CanaryService extends Service implements LocationListener {
         sendLocation(location);
         Log.d(TAG,"Location changed: 위도:" +location.getLatitude()+ " 경도: "+location.getLongitude() );
 
-        //200미터 단위로 geofence 주기적 갱신
-        if(updatedLocation.distanceTo(location) <= 200){
-            Log.d(TAG,"사용자가 초기 위치보다 200m 멀어지면 갱신 갱신");
-            Toast.makeText(getApplicationContext(),"사용자가 초기 위치보다 200m 멀어지면 갱신 갱신",Toast.LENGTH_SHORT);
+        //500미터 단위로 geofence 주기적 갱신
+        if(updatedLocation.distanceTo(location) <= 500){
+            locationChangeCount++;
+            if(locationChangeCount < 4){
+                return;
+            }
+            Log.d(TAG,"사용자가 초기 위치보다 500m 멀어지면 갱신 갱신/ locationChangeCount"+locationChangeCount);
+            Toast.makeText(getApplicationContext(),"사용자가 초기 위치보다 500m 멀어지면 갱신 갱신",Toast.LENGTH_SHORT);
             removeGeofence();
             setUserDataList();
             dataInputGeofence(userDataList);

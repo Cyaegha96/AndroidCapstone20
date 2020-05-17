@@ -76,6 +76,7 @@ public class MapFragment extends Fragment
     private Bitmap dead;
 
 
+    private TextView InfoText;
     private double myLat;
     private double myLog;
     private Location myLocation;
@@ -116,6 +117,7 @@ public class MapFragment extends Fragment
                 ViewModelProviders.of(this).get(MapViewModel.class);
         View root = inflater.inflate(R.layout.fragment_map, container, false);
         final TextView textView = root.findViewById(R.id.text_map);
+        InfoText = root.findViewById(R.id.text_map_info);
         mapViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
@@ -178,13 +180,16 @@ public class MapFragment extends Fragment
 
         if(((MainActivity)getActivity()).isUserLocationHasResult()){ //카나리 서비스가 실행중이라면
 
-            Log.d(TAG,"addMarker");
-            markerSetting(mGoogleMap);
-            cwDataSetting(mGoogleMap);
-            deadDataSetting(mGoogleMap);
-            rptDataSetting(mGoogleMap);
-
+            addALLMarker(mGoogleMap);
         }
+    }
+
+    private void addALLMarker(GoogleMap googleMap){
+        Log.d(TAG,"addMarker");
+        markerSetting(googleMap);
+        cwDataSetting(googleMap);
+        deadDataSetting(googleMap);
+        rptDataSetting(googleMap);
     }
 
     public void rptDataSetting(GoogleMap googleMap){
@@ -377,19 +382,21 @@ public class MapFragment extends Fragment
             }
 
         }
+
+        String s = InfoText.getText().toString();
+        InfoText.setText(s+"현재 사용자 근처 보행자 다발구역 갯수는 "+userDataList.size()+"개");
     }
 
 
     @Override
     public void onLocationChanged(Location location) {
 
-        if(myLocation.distanceTo(location) < 200){
+        if(myLocation.distanceTo(location) < 500){
             if(mGoogleMap != null){ //prevent crashing if the map doesn't exist yet (eg. on starting activity)
-                Log.d(TAG,"사용자가 초기 위치보다 200m 멀어지면 갱신 갱신");
+                Log.d(TAG,"사용자가 초기 위치보다 500m 멀어지면 갱신 갱신");
                 myLocation = location;
                 mGoogleMap.clear();
-                markerSetting(mGoogleMap);
-                cwDataSetting(mGoogleMap);
+                addALLMarker(mGoogleMap);
                 // add markers from database to the map
             }
         }
