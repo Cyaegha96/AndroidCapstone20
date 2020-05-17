@@ -1,6 +1,8 @@
 package com.example.mynavigator.ui.data;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -24,9 +26,15 @@ public class DataBaseHelper extends SQLiteOpenHelper {
     // TODO : assets 폴더에 있는 DB명 또는 별도의 데이터베이스 파일이름
     private static String DB_NAME ="sample_db.db";
     private static String DB_NAME_CW ="crosswalk_db.db";
+    private static String DB_NAME_DD ="dead_db.db";
+    private static  String DB_NAME_RPT      = "report_db.db";
+
+    private static final int DATABASE_VERSION      = 1;
+
 
     private SQLiteDatabase mDataBase;
     private SQLiteDatabase cwDataBase;
+    private SQLiteDatabase ddDataBase;
     private final Context mContext;
 
     public DataBaseHelper(Context context, String DB_NAME, int version)
@@ -71,30 +79,30 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         File cwFile = new File(DB_PATH + DB_NAME_CW);
 
-        return dbFile.exists()&&cwFile.exists();
+        File ddFile = new File(DB_PATH + DB_NAME_DD);
+
+        File rptFile = new File(DB_PATH + DB_NAME_RPT);
+
+        return dbFile.exists()&&cwFile.exists()&&ddFile.exists();
 
     }
 
     //assets폴더에서 데이터베이스를 복사한다.
     private void copyDataBase() throws IOException
     {
+        copyData(DB_NAME);
 
+        copyData(DB_NAME_CW);
 
-        InputStream cwInput = mContext.getAssets().open(DB_NAME_CW);
-        String cwFileName = DB_PATH + DB_NAME_CW;
-        OutputStream cwOutput = new FileOutputStream(cwFileName);
-        byte[] cwBuffer = new byte[1024];
-        int cwLength;
-        while ((cwLength = cwInput.read(cwBuffer))>0)
-        {
-            cwOutput.write(cwBuffer, 0, cwLength);
-        }
-        cwOutput.flush();
-        cwOutput.close();
-        cwInput.close();
+        copyData(DB_NAME_DD);
 
-        InputStream mInput = mContext.getAssets().open(DB_NAME);
-        String outFileName = DB_PATH + DB_NAME;
+        copyData(DB_NAME_RPT);
+
+    }
+
+    public void copyData(String db_name) throws IOException {
+        InputStream mInput = mContext.getAssets().open(db_name);
+        String outFileName = DB_PATH + db_name;
         OutputStream mOutput = new FileOutputStream(outFileName);
         byte[] mBuffer = new byte[1024];
         int mLength;
@@ -105,7 +113,6 @@ public class DataBaseHelper extends SQLiteOpenHelper {
         mOutput.flush();
         mOutput.close();
         mInput.close();
-
     }
 
     //데이터베이스를 열어서 쿼리를 쓸수있게만든다.
@@ -127,16 +134,23 @@ public class DataBaseHelper extends SQLiteOpenHelper {
 
         if(cwDataBase != null)
             cwDataBase.close();
+
+        if(ddDataBase != null)
+            ddDataBase.close();
+
         super.close();
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
+
     }
+
 
     @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
 
     }
+
 }

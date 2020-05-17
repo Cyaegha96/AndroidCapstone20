@@ -1,8 +1,10 @@
 package com.example.mynavigator.ui.report;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
@@ -21,9 +23,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.mynavigator.MainActivity;
 import com.example.mynavigator.R;
+import com.example.mynavigator.ui.data.DataBaseHelper;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -43,6 +47,7 @@ public class report extends Fragment
 
     private static final String TAG = "report";
     private static final String SENDING_MAIL_TAG = "카나리아 앱 제보 메일 전송";
+
     private GoogleMap mGoogleMap;
     private MapView mapView;
 
@@ -54,8 +59,13 @@ public class report extends Fragment
     private Button sendingEmailButton;
     private TextView senderName;
     private Spinner accidentSpinner;
+    private EditText reasonSelected;
     private String selectedAccidentType;
     private double Circle_RADOUS=50;
+
+    public static final String TABLE_NAME       = "report_table";
+    private DataBaseHelper dataBaseHelper;
+    private SQLiteDatabase db;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -64,13 +74,15 @@ public class report extends Fragment
         mapView = (MapView) v.findViewById(R.id.map2);
 
         SharedPreferences userInfo = getActivity().getSharedPreferences("userInfo", Context.MODE_PRIVATE);
-        String userName = userInfo.getString("name","이름없는 사용자");
+        final String userName = userInfo.getString("name","이름없는 사용자");
 
         senderName = v.findViewById(R.id.senderNameText);
         senderName.setText(userName);
         editLatLng = v.findViewById(R.id.editLatLng);
         sendingEmailButton = v.findViewById(R.id.sendingEmailButton);
         sendingEmailButton.setEnabled(false);
+
+        reasonSelected = v.findViewById(R.id.editComment);
 
         accidentSpinner = (Spinner) v.findViewById(R.id.spinner_dAccitentType);
         ArrayAdapter arrayAdapter = ArrayAdapter.createFromResource(getActivity(),R.array.spinner_accidentType,android.R.layout.simple_spinner_dropdown_item);
@@ -93,14 +105,24 @@ public class report extends Fragment
         sendingEmailButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                dataBaseHelper = new DataBaseHelper(getContext(),"report_db.db", 1);
+                dbinsert(userName, selectedAccidentType, sendingLatLng.latitude, sendingLatLng.longitude, reasonSelected.getText().toString());
+                Toast.makeText(getContext(), "1" + userName + selectedAccidentType+ sendingLatLng.latitude+ sendingLatLng.longitude+ reasonSelected.getText().toString() , Toast.LENGTH_LONG).show();
+
                 String emailText = "["+selectedAccidentType+"]\n"+"경도:"+ sendingLatLng.latitude+ "\n 위도:" +sendingLatLng.longitude;
                 Intent email = new Intent(Intent.ACTION_SEND);
                 email.setType("plain/text");
-                String[] address = {"zazae51@gmail.com"};
+                String[] address = {"wldnd1102@naver.com"};
                 email.putExtra(Intent.EXTRA_EMAIL, address);
                 email.putExtra(Intent.EXTRA_SUBJECT, senderName.getText()+SENDING_MAIL_TAG);
                 email.putExtra(Intent.EXTRA_TEXT, emailText);
                 startActivity(email);
+
+                         // 버전명
+                // 여기에 DB에 추가 하는 코드 넣기
+
+
+
             }
         });
         mapView.onCreate(savedInstanceState);
@@ -145,4 +167,22 @@ public class report extends Fragment
             }
         });
     }
+
+    private void dbinsert (String sendername, String accidentType, double latitude, double longitude, String reasonSelected){
+
+        db = dataBaseHelper.getWritableDatabase();
+
+        // 쓸수 있는 데이터 베이스 객체를 얻어옴
+
+        db.execSQL("INSERT INTO " + TABLE_NAME + " VALUES(\"" + sendername + "\", \"" + accidentType + "\", \"" + latitude +"\", " + longitude +", \"" + reasonSelected + "\");");
+
+        // 테이블 명 , 널컬럼핵, 입력할 값 ContentValues
+
+    }
+    public void dbdelete(double column_latitude, double column_longitude){
+
+        db = dataBaseHelper.getWritableDatabase();
+        db.delete(TABLE_NAME, column_latitude + "=? AND " + column_longitude + " =? ", new String[]{String.valueOf(column_latitude), String.valueOf(column_longitude)});
+    }
+
 }
