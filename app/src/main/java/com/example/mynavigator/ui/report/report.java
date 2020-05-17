@@ -105,9 +105,12 @@ public class report extends Fragment
         sendingEmailButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 dataBaseHelper = new DataBaseHelper(getContext(),"data_all.db", 1);
+
+                // db에 추가하는 코드
                 dbinsert(userName, selectedAccidentType, sendingLatLng.latitude, sendingLatLng.longitude, reasonSelected.getText().toString());
-                Toast.makeText(getContext(), "1" + userName + selectedAccidentType+ sendingLatLng.latitude+ sendingLatLng.longitude+ reasonSelected.getText().toString() , Toast.LENGTH_LONG).show();
+
 
                 String emailText = "["+selectedAccidentType+"]\n"+"경도:"+ sendingLatLng.latitude+ "\n 위도:" +sendingLatLng.longitude;
                 Intent email = new Intent(Intent.ACTION_SEND);
@@ -118,8 +121,7 @@ public class report extends Fragment
                 email.putExtra(Intent.EXTRA_TEXT, emailText);
                 startActivity(email);
 
-                // 버전명
-                // 여기에 DB에 추가 하는 코드 넣기
+
 
 
 
@@ -172,11 +174,10 @@ public class report extends Fragment
 
         db = dataBaseHelper.getWritableDatabase();
 
-        // 쓸수 있는 데이터 베이스 객체를 얻어옴
+
 
         db.execSQL("INSERT INTO " + TABLE_NAME + " VALUES(\"" + sendername + "\", \"" + accidentType + "\", \"" + latitude +"\", " + longitude +", \"" + reasonSelected + "\");");
 
-        // 테이블 명 , 널컬럼핵, 입력할 값 ContentValues
 
     }
     public void dbdelete(double column_latitude, double column_longitude){
