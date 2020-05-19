@@ -81,7 +81,7 @@
             </LinearLayout>
         </LinearLayout>
         <ImageView
-            android:id="@+id/crossroad_data_imageView"
+            android:id="@+id/dead_data_imageView"
             android:layout_width="70dp"
             android:layout_height="70dp"
             android:layout_weight="1"

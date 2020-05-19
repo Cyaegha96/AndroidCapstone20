@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.mynavigator">
+    package="com.example.moccaCanary">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -19,21 +19,21 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
         <receiver
-            android:name=".service.CanaryBroadcastReceiver"
+            android:name="com.example.moccaCanary.service.CanaryBroadcastReceiver"
             android:enabled="true"
             android:exported="true"></receiver>
 
         <activity
-            android:name=".ui.settings.SettingsActivity"
+            android:name="com.example.moccaCanary.menu.settings.SettingsActivity"
             android:label="@string/title_activity_settings" />
-        <activity android:name=".user.UserActivity" />
+        <activity android:name="com.example.moccaCanary.user.UserActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyBJxeIjXJs_Wvo-LKqJjr-7GeiL_B4fXiU" />
 
         <activity
-            android:name=".SplashActivity"
+            android:name="com.example.moccaCanary.SplashActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -43,27 +43,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="com.example.moccaCanary.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
          android:windowSoftInputMode="adjustPan"></activity>
 
         <service
-            android:name=".service.CanaryService"
+            android:name="com.example.moccaCanary.service.CanaryService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="location" />
         <service
-            android:name=".service.DetectedActivitiesIntentService"
+            android:name="com.example.moccaCanary.service.DetectedActivitiesIntentService"
             android:exported="false" />
-        <service android:name=".service.BackgroundDetectedActivitiesService" />
+        <service android:name="com.example.moccaCanary.service.BackgroundDetectedActivitiesService" />
 
         <receiver
-            android:name=".service.GeofenceBroadcastReceiver"
+            android:name="com.example.moccaCanary.service.GeofenceBroadcastReceiver"
             android:enabled="true"
             android:exported="true" />
         <receiver
-            android:name=".service.StopServiceReceiver"
+            android:name="com.example.moccaCanary.service.StopServiceReceiver"
             android:enabled="true"
             android:process=":remote" />
 
