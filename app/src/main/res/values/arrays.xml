@@ -318,13 +318,29 @@
         <item>무단횡단</item>
     </string-array>
     <!-- Reply Preference -->
-    <string-array name="reply_entries">
-        <item>Reply</item>
-        <item>Reply to all</item>
+    <string-array name="geofence_radius_entries">
+        <item>반경 30m</item>
+        <item>반경 40m</item>
+        <item>반경 50m</item>
+        <item>반경 70m</item>
     </string-array>
 
-    <string-array name="reply_values">
-        <item>reply</item>
-        <item>reply_all</item>
+    <string-array name="geofence_radius_values">
+        <item>30</item>
+        <item>40</item>
+        <item>50</item>
+        <item>70</item>
+    </string-array>
+
+    <string-array name="distanceTo_parameter_entries">
+        <item>반경 500m</item>
+        <item>반경 700m</item>
+        <item>반경 1000m</item>
+    </string-array>
+
+    <string-array name = "distanceTo_parameter_values">
+        <item>500</item>
+        <item>700</item>
+        <item>1000</item>
     </string-array>
 </resources>

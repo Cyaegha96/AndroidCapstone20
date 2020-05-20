@@ -49,7 +49,8 @@ public class NotificationHelper extends ContextWrapper {
 
 
         long[] pattern;
-        if(accidnetCount >= 1 && accidnetCount <=4){
+
+        if(accidnetCount >= 0 && accidnetCount <=4){
             pattern = new long[]{0, 10, 50, 10};
         }else if(accidnetCount > 5 && accidnetCount <= 10){
              pattern = new long[]{0, 100, 50, 100};
@@ -58,17 +59,23 @@ public class NotificationHelper extends ContextWrapper {
             pattern = new long[]{10, 100, 50, 200};
         }
 
+
         Intent intent = new Intent(this, activityName);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 267, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-
+        String summaryText;
+        if(accidnetCount == 0){
+            summaryText = "제보 받은 알림";
+        }else{
+            summaryText =  "발생건수 :"+accidnetCount;
+        }
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
              .setContentTitle(title)
               .setContentText(body)
                 .setSmallIcon(R.drawable.carlary_app_logo3)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setStyle(new NotificationCompat.BigTextStyle().setSummaryText("발생건수 :"+accidnetCount).setBigContentTitle(title).bigText(body))
+                .setStyle(new NotificationCompat.BigTextStyle().setSummaryText(summaryText).setBigContentTitle(title).bigText(body))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .setVibrate(pattern)

@@ -1,46 +1,39 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+<PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory app:title="@string/user_header">
+    <PreferenceCategory android:title="@string/user_header">
         <Preference
-            app:key="userSettings"
-            app:title="사용자 정보 기본 설정"
-            app:summary="사용자 이름, 출생년도, 거주지역 정보를 설정할 수 있습니다.">
+            android:key="userSettings"
+            android:title="사용자 정보 기본 설정"
+            android:summary="사용자 이름, 출생년도, 거주지역 정보를 설정할 수 있습니다.">
         <intent
             android:targetPackage="com.example.mynavigator.user"
             android:targetClass="com.example.mynavigator.user.UserActivity"/>
         </Preference>
     </PreferenceCategory>
-    <PreferenceCategory app:title="@string/messages_header">
-
-        <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
-            app:useSimpleSummaryProvider="true" />
+    <PreferenceCategory android:title="@string/canary_header">
 
         <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
-            app:useSimpleSummaryProvider="true" />
+            android:defaultValue="500"
+            android:entries="@array/distanceTo_parameter_entries"
+            android:entryValues="@array/distanceTo_parameter_values"
+            android:key="distanceTo_parameter"
+            android:summary="카나리아 서비스가 최대 몇백미터까지 탐색을 할지 설정합니다."
+            android:title="@string/distanceTo_parameter"
+            android:showDefault = "true"
+            />
+        <ListPreference
+
+            android:defaultValue="30"
+            android:entries="@array/geofence_radius_entries"
+            android:entryValues="@array/geofence_radius_values"
+            android:key="geofence_radius"
+            android:summary="지오펜스 알림 반경을 설정합니다."
+            android:title="@string/geofence_radius_title"
+            android:showDefault = "true"/>
+
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/sync_header">
-
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
-
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
-
-    </PreferenceCategory>
 
 </PreferenceScreen>

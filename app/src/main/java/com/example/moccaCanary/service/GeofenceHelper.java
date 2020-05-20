@@ -11,6 +11,8 @@ import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.List;
+
 public class GeofenceHelper extends ContextWrapper {
 
     private static final String TAG = "GeofenceHelper";
@@ -19,6 +21,14 @@ public class GeofenceHelper extends ContextWrapper {
     public GeofenceHelper(Context base) {
         super(base);
     }
+
+    public GeofencingRequest getGeofencesRequest(List<Geofence> geofences){
+        return new GeofencingRequest.Builder()
+                .addGeofences(geofences)
+                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                .build();
+    }
+
 
     public GeofencingRequest getGeofencingRequest(Geofence geofence) {
         return new GeofencingRequest.Builder()

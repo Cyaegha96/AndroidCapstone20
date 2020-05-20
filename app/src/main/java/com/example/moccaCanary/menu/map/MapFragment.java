@@ -434,7 +434,7 @@ public class MapFragment extends Fragment
     @Override
     public void onLocationChanged(Location location) {
 
-        if(myLocation.distanceTo(location) >= 500){
+        if(myLocation.distanceTo(location) >= 300){
             if(mGoogleMap != null){ //prevent crashing if the map doesn't exist yet (eg. on starting activity)
                 Log.d(TAG,"사용자가 초기 위치보다 500m 멀어지면 갱신 갱신");
                 myLocation = location;

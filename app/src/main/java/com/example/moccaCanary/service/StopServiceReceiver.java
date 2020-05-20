@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 
 import com.example.moccaCanary.MainActivity;
+import com.example.moccaCanary.menu.home.HomeFragment;
 
 
 public class StopServiceReceiver extends BroadcastReceiver {
@@ -14,6 +15,7 @@ public class StopServiceReceiver extends BroadcastReceiver {
 
         Intent service = new Intent(context, CanaryService.class);
         context.stopService(service);
+
 
         Intent activity = new Intent(context, MainActivity.class);
         activity.putExtra("sign", 2);
