@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/main_background"
+
     tools:context=".user.UserActivity">
+
 
     <ImageView
         android:id="@+id/imageView2"
@@ -15,14 +18,14 @@
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.061"
+        app:layout_constraintVertical_bias="0.172"
         app:srcCompat="@drawable/canary_shadow" />
 
     <ImageView
         android:id="@+id/imageView3"
         android:layout_width="199dp"
         android:layout_height="200dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="108dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView2"
@@ -39,7 +42,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.57" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -132,7 +136,7 @@
         android:id="@+id/SaveUserInfoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="43dp"
+        android:layout_marginBottom="32dp"
         android:text="확인"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -143,11 +147,10 @@
         android:id="@+id/CancelUserInfoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="43dp"
+        android:layout_marginBottom="32dp"
         android:text="안할래요"
-        tools:layout_editor_absoluteX="50dp"
-        tools:layout_editor_absoluteY="640dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:ignore="MissingConstraints" />
+        tools:ignore="MissingConstraints"
+        tools:layout_editor_absoluteX="52dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

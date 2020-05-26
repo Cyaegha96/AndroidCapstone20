@@ -57,7 +57,7 @@ public class DataFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 showCount += 10;
-                listview.setAdapter(adapter);
+                listview.invalidateViews();
             }
         });
 
