@@ -136,7 +136,7 @@ public class GraphFragment extends Fragment {
             //버튼 클릭시 이벤트입니다.
             @Override
             public void onClick(View view) {
-                Cursor c = sqdb.rawQuery("select accidentYear, sum(" + choice_accident + ") from sample_table where cityName LIKE \""+choice_do+"%"+choice_city+"%\"  group by accidentYear", null);
+                Cursor c = sqdb.rawQuery("select accidentYear, sum(" + choice_accident + ") from sample_table where placeName LIKE \""+choice_do+"%"+choice_city+"%\"  group by accidentYear", null);
 
                 List<Entry> entries = new ArrayList<>();
 
@@ -146,15 +146,16 @@ public class GraphFragment extends Fragment {
 
                 LineDataSet lineDataSet = new LineDataSet(entries, choice_accident);
                 lineDataSet.setLineWidth(2);
-                lineDataSet.setCircleRadius(6);
-                lineDataSet.setCircleColor(Color.parseColor("#FFA1B4DC"));
-                lineDataSet.setCircleHoleColor(Color.BLUE);
-                lineDataSet.setColor(Color.parseColor("#FFA1B4DC"));
+                lineDataSet.setCircleRadius(4);
+                lineDataSet.setCircleColor(Color.parseColor("#000000"));
+                lineDataSet.setCircleHoleColor(Color.BLACK);
+                lineDataSet.setColor(Color.parseColor("#000000"));
                 lineDataSet.setDrawCircleHole(true);
                 lineDataSet.setDrawCircles(true);
                 lineDataSet.setDrawHorizontalHighlightIndicator(false);
                 lineDataSet.setDrawHighlightIndicators(false);
-                lineDataSet.setDrawValues(false);
+                lineDataSet.setDrawValues(true);
+                lineDataSet.setValueTextSize(10);
 
                 LineData lineData = new LineData(lineDataSet);
                 lineChart.setData(lineData);
