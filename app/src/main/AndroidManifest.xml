@@ -28,12 +28,19 @@
         <activity
             android:name="com.example.moccaCanary.menu.settings.SettingsActivity"
             android:parentActivityName=".MainActivity"
-            android:label="@string/title_activity_settings" />
-        <activity android:name="com.example.moccaCanary.user.UserActivity" />
+            android:label="@string/title_activity_settings"
+            android:theme="@style/AppTheme.PopupOverlay"/>
+
+        <activity
+            android:name="com.example.moccaCanary.user.UserActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.PopupOverlay"
+            />
+
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBJxeIjXJs_Wvo-LKqJjr-7GeiL_B4fXiU" />
+            android:value="AIzaSyBZ1TZ6gVPWNsmVQUgl6uiQqLB66r1aOws" />
 
         <activity
             android:name="com.example.moccaCanary.SplashActivity"

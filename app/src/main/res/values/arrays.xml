@@ -83,6 +83,7 @@
         <item>남구</item>
         <item>남동구</item>
         <item>동구</item>
+        <item>미추홀구</item>
         <item>부평구</item>
         <item>서구</item>
         <item>연수구</item>
@@ -126,7 +127,7 @@
     </string-array>
 
     <string-array name="spinner_region_sejong">
-        <item>없음</item>
+        <item>세종특별자치시</item>
     </string-array>
 
     <string-array name="spinner_region_gyeonggi">

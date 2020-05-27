@@ -5,4 +5,10 @@
         <item name="windowNoTitle">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
+
+    <style name="AppThemetest" parent="AppTheme">
+        <!-- Customize your theme here. -->
+        <item name="android:textColorPrimary">@color/black</item>
+    </style>
+
 </resources>

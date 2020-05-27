@@ -54,7 +54,7 @@ public class UserActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
-
+        getSupportActionBar().setElevation(0);
         mcontext = this;
         SharedPreferences userInfo = getSharedPreferences("userInfo", MODE_PRIVATE);
         String userName = userInfo.getString("name", "이름 없는 사용자");

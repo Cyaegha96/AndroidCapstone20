@@ -57,14 +57,14 @@ public class MainActivity extends AppCompatActivity {
     List<Data> dataList;
     List<DeadData> deadList;
 
-    final Geocoder geocoder = new Geocoder(this);
+    Geocoder geocoder;
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        geocoder = new Geocoder(this);
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mAlertReceiver, new IntentFilter("LocationSenderReciever"));
 

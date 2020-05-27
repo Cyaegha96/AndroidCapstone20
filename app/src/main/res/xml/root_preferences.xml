@@ -1,7 +1,8 @@
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory android:title="@string/user_header">
+    <PreferenceCategory
+        android:title="@string/user_header">
         <Preference
             android:key="userSettings"
             android:title="사용자 정보 기본 설정"
