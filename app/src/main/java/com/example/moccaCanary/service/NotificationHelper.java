@@ -66,8 +66,12 @@ public class NotificationHelper extends ContextWrapper {
         String summaryText;
         if(accidnetCount == 0){
             summaryText = "제보 받은 알림";
-        }else{
+        }else if (accidnetCount <100){
             summaryText =  "발생건수 :"+accidnetCount;
+        }else if(accidnetCount==100){
+            summaryText = "사망사고 발생지역";
+        }else{
+            summaryText="";
         }
 
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)

@@ -37,6 +37,7 @@ import com.example.moccaCanary.menu.data.DataAdapter;
 import com.example.moccaCanary.menu.data.DataBaseHelper;
 import com.example.moccaCanary.menu.data.DeadData;
 import com.example.moccaCanary.menu.settings.SettingsActivity;
+import com.example.moccaCanary.user.IntroActivity;
 import com.example.moccaCanary.user.UserActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
@@ -57,14 +58,14 @@ public class MainActivity extends AppCompatActivity {
     List<Data> dataList;
     List<DeadData> deadList;
 
-    Geocoder geocoder;
+   Geocoder geocoder;
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        geocoder = new Geocoder(this);
+
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mAlertReceiver, new IntentFilter("LocationSenderReciever"));
 
@@ -75,12 +76,12 @@ public class MainActivity extends AppCompatActivity {
             editor.putBoolean("checkFirst", true);
             editor.commit();
 
-            Intent intent = new Intent(MainActivity.this, UserActivity.class);
+            Intent intent = new Intent(MainActivity.this, IntroActivity.class);
             startActivity(intent);
             finish();
 
         }
-
+        geocoder= new Geocoder(this);
         Intent i = getIntent();
         int title = i.getIntExtra("sign", -1);
         if(title == 2){

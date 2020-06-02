@@ -6,9 +6,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.media.Image;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +28,10 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.moccaCanary.MainActivity;
 import com.example.moccaCanary.R;
+import com.example.moccaCanary.menu.data.DeadAdapter;
+import com.example.moccaCanary.menu.data.ReportAdapter;
+import com.example.moccaCanary.menu.data.TmacsDataAdapter;
+import com.example.moccaCanary.menu.data.tmacsData;
 import com.example.moccaCanary.service.CanaryService;
 import com.example.moccaCanary.menu.data.CwData;
 import com.example.moccaCanary.menu.data.Data;
@@ -48,19 +55,23 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MapFragment extends Fragment
         implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
-        LocationSource.OnLocationChangedListener {
+        GoogleMap.OnCameraMoveListener,
+        GoogleMap.OnCameraIdleListener
+       {
 
     private static final String TAG = "MapFragment";
     private MapViewModel mapViewModel;
     private MapView mapView;
     private float ACCIDENT_RADIUS = 200;
-    private float GEOFENCE_RADIUS = 30;
+    private float GEOFENCE_RADIUS = 50;
+    private float DISTANCETO_PARAMETER = 500;
 ////-------------------------------
 ///bitmap layer
 
@@ -78,6 +89,8 @@ public class MapFragment extends Fragment
     private Bitmap crossRoad99;
     private Bitmap crossRoadnull;
 
+    private Bitmap eyeIcon;
+
     private Bitmap dead;
     private Bitmap deadCrossroad;
     private Bitmap deadDriveWay;
@@ -90,12 +103,18 @@ public class MapFragment extends Fragment
     private double myLog;
     private Location myLocation;
     GoogleMap mGoogleMap;
+
+    private Geocoder geocoder;
+
+    //HAVE
     private List<Data> userDataList;
     private List<CwData> cwdataList;
     private List<DeadData> deadDataList;
     private List<Marker> markers = new ArrayList<Marker>();
     private List<Circle> circles = new ArrayList<>();
     private List<RptData> rptDataList;
+    private List<tmacsData> tmacsList;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,7 +141,7 @@ public class MapFragment extends Fragment
         deadDriveWay = makeBitmap(R.drawable.dead_driveway,250,250);
         deadWalkerWay = makeBitmap(R.drawable.dead_walkerway,250,250);
         deadWayEdge = makeBitmap(R.drawable.dead_wayedge,250,250);
-
+        eyeIcon = makeBitmap(R.drawable.eye_icon, 150,150);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -138,7 +157,15 @@ public class MapFragment extends Fragment
                 textView.setText(s);
             }
         });
-
+        myLat =  ((MainActivity)getActivity()).myLat;
+        myLog = ((MainActivity)getActivity()).myLog;
+        if(((MainActivity)getActivity()).isUserLocationHasResult()) { //카나리 서비스가 실행중이라면
+            myLocation =  ((CanaryService)CanaryService.mContext).getLocationOUT();
+            myLat = myLocation.getLatitude();
+            myLog = myLocation.getLongitude();
+        }
+        geocoder= new Geocoder(getContext());
+        initDB();
         mapView = (MapView) root.findViewById(R.id.map);
         mapView.onCreate(savedInstanceState);
         mapView.onResume();
@@ -152,25 +179,45 @@ public class MapFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
     }
 
+    public void initDB(){
+        DeadAdapter mDeadDbHelper = new DeadAdapter(getContext());
+
+        mDeadDbHelper.createDatabase();
+        mDeadDbHelper.open();
+
+        deadDataList = mDeadDbHelper.getTableData();
+
+        mDeadDbHelper.close();
+
+        ReportAdapter mReportAdapter = new ReportAdapter(getContext());
+
+        mReportAdapter.createDatabase();
+        mReportAdapter.open();
+
+        rptDataList = mReportAdapter.getTableData();
+
+        mReportAdapter.close();
+
+        TmacsDataAdapter tmacsDataAdapter = new TmacsDataAdapter(getContext());
+        String userLocationGeocodeString = userLocationGeocode(myLocation.getLatitude(),myLocation.getLongitude());
+        String userLocationRegion = userLocationGeocodeString.split("@")[0];
+
+        tmacsDataAdapter.createDatabase();
+        tmacsDataAdapter.open();
+
+        tmacsList = tmacsDataAdapter.getTableData(userLocationRegion);
+        tmacsDataAdapter.close();
+    }
+
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         Log.d(TAG,"onMapReady");
 
         mGoogleMap = googleMap;
-        myLat =  ((MainActivity)getActivity()).myLat;
-        myLog = ((MainActivity)getActivity()).myLog;
-        if(((MainActivity)getActivity()).isUserLocationHasResult()) { //카나리 서비스가 실행중이라면
-            Location mylocation =  ((CanaryService)CanaryService.mContext).getLocationOUT();
-            myLat = mylocation.getLatitude();
-            myLog = mylocation.getLongitude();
-        }
+
 
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
         googleMap.moveCamera(cameraUpdate);
-
-         myLocation = new Location("내위치");
-        myLocation.setLatitude(myLat);
-        myLocation.setLongitude(myLog);
 
         MapsInitializer.initialize(this.getActivity());
 
@@ -179,18 +226,8 @@ public class MapFragment extends Fragment
         mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
         mGoogleMap.getUiSettings().setMapToolbarEnabled(true);
         mGoogleMap.setOnMarkerClickListener(this);
-        mGoogleMap.setOnCameraMoveListener(new GoogleMap.OnCameraMoveListener() {
-            @Override
-            public void onCameraMove() {
-                CameraPosition cameraPosition = mGoogleMap.getCameraPosition();
-                Log.d(TAG,"현재 카메라 줌레벨:"+cameraPosition.zoom);
-                if(cameraPosition.zoom <16.0) {
-                    //카메라 줌이 16이하로 바뀌지 않게 설정
-                   mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                           new LatLng(mGoogleMap.getCameraPosition().target.latitude,mGoogleMap.getCameraPosition().target.longitude),16));
-                }
-            }
-        });
+        mGoogleMap.setOnCameraMoveListener(this);
+        mGoogleMap.setOnCameraIdleListener(this);
 
         if(((MainActivity)getActivity()).isUserLocationHasResult()){ //카나리 서비스가 실행중이라면
 
@@ -200,14 +237,61 @@ public class MapFragment extends Fragment
 
     private void addALLMarker(GoogleMap googleMap){
         Log.d(TAG,"addMarker");
-        markerSetting(googleMap);
-        cwDataSetting(googleMap);
+        //markerSetting(googleMap);
+        //cwDataSetting(googleMap);
         deadDataSetting(googleMap);
         rptDataSetting(googleMap);
+        tmacsDataSetting(googleMap);
+    }
+
+    public void tmacsDataSetting(GoogleMap googleMap){
+
+        Log.d(TAG,tmacsList.size()+"개의 다발지 데이터 보유중");
+
+        if(tmacsList != null){
+            for(int i=0;i<tmacsList.size();i++){
+                tmacsData tData = tmacsList.get(i);
+                float dLat = tData.getLatitude();
+                float dLog = tData.getLongitude();
+                Location t = new Location("T");
+
+                t.setLatitude(dLat);
+                t.setLongitude(dLog);
+
+                //자신의 반경 이내 마커만 표시하세용
+                if(myLocation.distanceTo(t) <  DISTANCETO_PARAMETER){
+                    //순서대로 1. 데이타 타입,2 제보자 이름, 3. 제보 사유를 전달합니다.
+                    MarkerOptions marker = new MarkerOptions()
+                            .position(new LatLng(dLat, dLog))
+                            .title("보행자사고다발지역")
+                            .snippet("2018"+"@"
+                                    +tData.getPlaceName()+"@" + tData.getAccidentCount()+"@"
+                                    +"사상자수"+"@"
+                                    +tData.getDeadCount() + "@" + tData.getSeriousCount()+"@"
+                                    +tData.getSlightlyCount()+"@"+tData.getInjuredCount()+"@"
+                                    +"보행자"
+                            )
+                            .icon(BitmapDescriptorFactory.fromBitmap( makeBitmap(R.drawable.canary,200,200)))
+                            ;
+                    //아이콘 설정
+                    markers.add( googleMap.addMarker(marker));
+
+                    circles.add(googleMap.addCircle(new CircleOptions()
+                                    .center(new LatLng(dLat,dLog))
+                                    .fillColor(0x22eb4034)
+                                    .strokeWidth(0)
+                                    .radius(GEOFENCE_RADIUS)
+                            )
+                    );
+                }
+
+            }
+        }
+
     }
 
     public void rptDataSetting(GoogleMap googleMap){
-        rptDataList = ((CanaryService)CanaryService.mContext).getRptDataList();
+
         if(rptDataList != null){
             for(int i=0;i<rptDataList.size();i++){
 
@@ -215,27 +299,33 @@ public class MapFragment extends Fragment
                 float dLat = rptData.getLatitude();
                 float dLog = rptData.getLongitude();
 
-                //순서대로 1. 데이타 타입,2 제보자 이름, 3. 제보 사유를 전달합니다.
-                MarkerOptions marker = new MarkerOptions()
-                        .position(new LatLng(dLat, dLog))
-                        .title("제보위험지역")
-                        .snippet(rptData.getAccidentType()+"@"+
-                                rptData.getSenderName()+"@"+
-                                rptData.getReasonSelected()+"@"+
-                                rptData.getGeofenceid()+"@"+
-                                rptData.getNumId())
-                        .icon(BitmapDescriptorFactory.fromBitmap( makeBitmap(R.drawable.canary,200,200)))
-                        ;
-                //아이콘 설정
-                markers.add( googleMap.addMarker(marker));
+                Location r = new Location("r");
+                r.setLatitude(dLat);
+                r.setLongitude(dLog);
 
-                circles.add(googleMap.addCircle(new CircleOptions()
-                        .center(new LatLng(dLat,dLog))
-                        .fillColor(0x22eb4034)
-                        .strokeWidth(0)
-                        .radius(GEOFENCE_RADIUS)
-                        )
-                );
+                if(myLocation.distanceTo(r) <= DISTANCETO_PARAMETER){
+                    //순서대로 1. 데이타 타입,2 제보자 이름, 3. 제보 사유를 전달합니다.
+                    MarkerOptions marker = new MarkerOptions()
+                            .position(new LatLng(dLat, dLog))
+                            .title("제보위험지역")
+                            .snippet(rptData.getAccidentType()+"@"+
+                                    rptData.getSenderName()+"@"+
+                                    rptData.getReasonSelected()+"@"+
+                                    rptData.getGeofenceid()+"@"+
+                                    rptData.getNumId())
+                            .icon(BitmapDescriptorFactory.fromBitmap( makeBitmap(R.drawable.canary,200,200)))
+                            ;
+                    //아이콘 설정
+                    markers.add( googleMap.addMarker(marker));
+
+                    circles.add(googleMap.addCircle(new CircleOptions()
+                                    .center(new LatLng(dLat,dLog))
+                                    .fillColor(0x22eb4034)
+                                    .strokeWidth(0)
+                                    .radius(GEOFENCE_RADIUS)
+                            )
+                    );
+                }
 
             }
         }
@@ -243,64 +333,71 @@ public class MapFragment extends Fragment
     }
 
     public void deadDataSetting(GoogleMap googleMap){
-        deadDataList  = ((CanaryService)CanaryService.mContext).getDeadDataList();
+
         Log.d(TAG,"deaddataListSize: "+deadDataList.size());
 
         if(deadDataList != null){
-            for(int i=0; i<deadDataList.size();i++){
-                DeadData deadData =deadDataList.get(i);
+            for(int i=0; i<deadDataList.size();i++) {
+                DeadData deadData = deadDataList.get(i);
                 float dLat = deadData.getLa_crd();
                 float dLog = deadData.getLo_crd();
 
-                String deadType = deadData.getAcc_ty_cd();
-                BitmapDescriptor micon = BitmapDescriptorFactory.fromBitmap(null_marker);
-                switch (deadType){
-                    case "횡단중":
-                        micon = BitmapDescriptorFactory.fromBitmap(deadCrossroad);
-                        break;
-                    case "차도통행중":
-                        micon = BitmapDescriptorFactory.fromBitmap(deadDriveWay);
-                        break;
-                    case "보도통행중":
-                        micon = BitmapDescriptorFactory.fromBitmap(deadWalkerWay);
-                        break;
-                    case "길가장자리구역통행중":
-                        micon = BitmapDescriptorFactory.fromBitmap(deadWayEdge);
-                        break;
-                    case "기타":
-                        micon = BitmapDescriptorFactory.fromBitmap(dead);
-                        break;
+                Location r = new Location("r");
+                r.setLatitude(dLat);
+                r.setLongitude(dLog);
+
+                if (myLocation.distanceTo(r) <= DISTANCETO_PARAMETER) {
+                    String deadType = deadData.getAcc_ty_cd();
+                    BitmapDescriptor micon = BitmapDescriptorFactory.fromBitmap(null_marker);
+                    switch (deadType) {
+                        case "횡단중":
+                            micon = BitmapDescriptorFactory.fromBitmap(deadCrossroad);
+                            break;
+                        case "차도통행중":
+                            micon = BitmapDescriptorFactory.fromBitmap(deadDriveWay);
+                            break;
+                        case "보도통행중":
+                            micon = BitmapDescriptorFactory.fromBitmap(deadWalkerWay);
+                            break;
+                        case "길가장자리구역통행중":
+                            micon = BitmapDescriptorFactory.fromBitmap(deadWayEdge);
+                            break;
+                        case "기타":
+                            micon = BitmapDescriptorFactory.fromBitmap(dead);
+                            break;
+                    }
+
+                    //사망자 정보로 넣을 것은 1. 사망자사고 종류 / 2 장소정보 / 3.도로형태 대분류 4.사망자 수/ 5.가해차량종류 6. 세부종류
+                    MarkerOptions marker = new MarkerOptions()
+                            .position(new LatLng(dLat, dLog))
+                            .title("사망자")
+                            .snippet(deadData.getAcc_ty_cd() + "@" +
+                                    deadData.getOccrrnc_lc_sgg_cd() + "@" +
+                                    deadData.getRoad_frm_cd() + "@" +
+                                    deadData.getDth_dnv_cnt() + "@" +
+                                    deadData.getWrngdo_isrty_vhcty_lclas_cd() + "@" +
+                                    deadData.getWrngdo_isrty_vhcty_cd())
+                            .icon(micon);
+                    //아이콘 설정
+                    googleMap.addMarker(marker);
+
+                    CircleOptions circleOptions = new CircleOptions()
+                            .center(new LatLng(dLat, dLog))
+                            .fillColor(0x22eb4034)
+                            .strokeWidth(0)
+                            .radius(GEOFENCE_RADIUS);
+                    googleMap.addCircle(circleOptions);
+
                 }
-
-                //사망자 정보로 넣을 것은 1. 사망자사고 종류 / 2 장소정보 / 3.도로형태 대분류 4.사망자 수/ 5.가해차량종류 6. 세부종류
-                MarkerOptions marker = new MarkerOptions()
-                        .position(new LatLng(dLat, dLog))
-                        .title("사망자")
-                        .snippet(deadData.getAcc_ty_cd()+"@"+
-                                deadData.getOccrrnc_lc_sgg_cd()+"@"+
-                                deadData.getRoad_frm_cd()+"@"+
-                                deadData.getDth_dnv_cnt()+"@"+
-                                deadData.getWrngdo_isrty_vhcty_lclas_cd()+"@"+
-                                deadData.getWrngdo_isrty_vhcty_cd())
-                        .icon(micon);
-                //아이콘 설정
-                googleMap.addMarker(marker);
-
-                CircleOptions circleOptions = new CircleOptions()
-                        .center(new LatLng(dLat,dLog))
-                        .fillColor(0x22eb4034)
-                        .strokeWidth(0)
-                        .radius(GEOFENCE_RADIUS);
-                googleMap.addCircle(circleOptions);
-
             }
-
         }
 
     }
 
     public void cwDataSetting(GoogleMap googleMap){
-
+       if(cwdataList != null){
+           cwdataList.clear();
+       }
         cwdataList = ((CanaryService)CanaryService.mContext).getCwDataList();
         Log.d(TAG,"cwdataListSize: "+cwdataList.size());
 
@@ -374,6 +471,9 @@ public class MapFragment extends Fragment
     }
 
     public void markerSetting(GoogleMap googleMap){
+        if(userDataList!= null){
+            userDataList.clear();
+        }
         userDataList = ((CanaryService)CanaryService.mContext).getUserDataList();
 
         if(userDataList != null) {
@@ -431,19 +531,6 @@ public class MapFragment extends Fragment
     }
 
 
-    @Override
-    public void onLocationChanged(Location location) {
-
-        if(myLocation.distanceTo(location) >= 300){
-            if(mGoogleMap != null){ //prevent crashing if the map doesn't exist yet (eg. on starting activity)
-                Log.d(TAG,"사용자가 초기 위치보다 500m 멀어지면 갱신 갱신");
-                myLocation = location;
-                mGoogleMap.clear();
-                addALLMarker(mGoogleMap);
-                // add markers from database to the map
-            }
-        }
-    }
     private Bitmap makeBitmap(int drawable,int width, int height){
         BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(drawable);
         Bitmap b = bitmapdraw.getBitmap();
@@ -667,4 +754,72 @@ public class MapFragment extends Fragment
         return root;
     }
 
-}
+           @Override
+           public void onCameraMove() {
+               CameraPosition cameraPosition = mGoogleMap.getCameraPosition();
+               //Log.d(TAG,"현재 카메라 줌레벨:"+cameraPosition.zoom);
+               if(cameraPosition.zoom <16.0) {
+                   //카메라 줌이 16이하로 바뀌지 않게 설정
+                   mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                           new LatLng(mGoogleMap.getCameraPosition().target.latitude,mGoogleMap.getCameraPosition().target.longitude),16));
+               }
+           }
+
+           @Override
+           public void onCameraIdle() {
+            Location cameraLocation = new Location("googleMap");
+            cameraLocation.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
+            cameraLocation.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
+            if(myLocation.distanceTo(cameraLocation) > 200){
+                Log.d(TAG,"카메라 옮겨짐:");
+                if(mGoogleMap != null){
+                    mGoogleMap.clear();
+                    markers.clear();
+                }
+
+                myLocation.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
+                myLocation.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        addALLMarker(mGoogleMap);
+                        MarkerOptions myPosition = new MarkerOptions()
+                                .position(mGoogleMap.getCameraPosition().target)
+                                .title("지도 중앙")
+                                .snippet("@")
+                                .icon(BitmapDescriptorFactory.fromBitmap(eyeIcon));
+                        markers.add(mGoogleMap.addMarker(myPosition));
+
+                    }
+                },200);
+            }
+           }
+
+
+
+           public String userLocationGeocode(double d1, double d2){
+               List<Address> list = null;
+               String lo = "위치정보 없음";;
+               try {
+                   list = geocoder.getFromLocation(
+                           d1, // 위도
+                           d2, // 경도
+                           10); // 얻어올 값의 개수
+               } catch (IOException e) {
+                   e.printStackTrace();
+                   Log.e("test", "입출력 오류 - 서버에서 주소변환시 에러발생");
+               }
+               if (list != null) {
+                   if (list.size()==0) {
+                       lo = "위치정보 없음";
+                   } else {
+                       lo = list.get(1).getAdminArea()+"@"+list.get(1).getLocality();
+                       Log.d(TAG,"사용자 위치: " +lo);
+                   }
+               }
+
+               return lo;
+
+           }
+       }

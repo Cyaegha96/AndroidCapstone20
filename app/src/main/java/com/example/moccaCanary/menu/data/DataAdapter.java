@@ -80,8 +80,8 @@ public class DataAdapter
 
             // TODO : 모델 선언
             Data data = null;
-
-            Cursor mCur = mDb.rawQuery("SELECT * FROM "+TABLE_NAME, null);
+            Cursor mCur = mDb.rawQuery("SELECT * FROM sample_table WHERE accidentYear = ? AND accidentCount > ?", new String[]{"2014", "3"});
+            //Cursor mCur = mDb.rawQuery("SELECT * FROM sample_table WHERE accidentYear = ? AND accidentCount > ?", new String[]{"2015", "3"});
             if (mCur!=null)
             {
                 // 칼럼의 마지막까지
