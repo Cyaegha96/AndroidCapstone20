@@ -164,6 +164,10 @@ public class MapFragment extends Fragment
             myLocation =  ((CanaryService)CanaryService.mContext).getLocationOUT();
             myLat = myLocation.getLatitude();
             myLog = myLocation.getLongitude();
+        }else{
+            myLocation = new Location("p");
+            myLocation.setLatitude(myLog);
+            myLocation.setLongitude(myLat);
         }
         geocoder= new Geocoder(getContext());
         initDB();

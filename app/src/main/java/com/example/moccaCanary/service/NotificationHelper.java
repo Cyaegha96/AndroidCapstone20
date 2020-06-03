@@ -102,10 +102,8 @@ public class NotificationHelper extends ContextWrapper {
         AudioHelper audioHelper = new AudioHelper(getApplicationContext());
         audioHelper.requestaudiofocus();
         NotificationManagerCompat.from(this).notify(new Random().nextInt(), notification);
-        if(audioHelper.headsetCheck() == true){
-            MediaPlayer player1 = MediaPlayer.create(this, R.raw.pling);
-            player1.start();
-        }
+        MediaPlayer player1 = MediaPlayer.create(this, R.raw.pling);
+        player1.start();
         audioHelper.removeFocusAudioManager();
     }
 
