@@ -567,8 +567,8 @@ public class CanaryService extends Service implements LocationListener {
 
         //지원하는 지역일 경우에만 해당 DB를 열람합니다...
         if(userLocationRegion.equals("서울특별시") || userLocationRegion.equals("경기도")){
-            TmacsDataAdapter tmacsDataAdapter = new TmacsDataAdapter(getApplicationContext());
 
+            TmacsDataAdapter tmacsDataAdapter = new TmacsDataAdapter(getApplicationContext());
 
             tmacsDataAdapter.createDatabase();
             tmacsDataAdapter.open();

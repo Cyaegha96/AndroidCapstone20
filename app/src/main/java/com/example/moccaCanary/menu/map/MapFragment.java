@@ -204,12 +204,14 @@ public class MapFragment extends Fragment
         mReportAdapter.close();
 
 
-        String userLocationGeocodeString = userLocationGeocode(myLocation.getLatitude(),myLocation.getLongitude());
-        String userLocationRegion = userLocationGeocodeString.split("@")[0];
+        String userLocationGeocodeString = geoCoderLocation(myLocation.getLatitude(),myLocation.getLongitude());
+        String userLocationRegion = userLocationGeocodeString.split(" ")[1];
+        Log.d(TAG, "geocoding" + userLocationRegion);
+
 
         if(userLocationRegion.equals("서울특별시") || userLocationRegion.equals("경기도")){
+            Log.d(TAG, "맞으니까 데이터 가져와!");
             TmacsDataAdapter tmacsDataAdapter = new TmacsDataAdapter(getContext());
-
 
             tmacsDataAdapter.createDatabase();
             tmacsDataAdapter.open();
@@ -271,6 +273,8 @@ public class MapFragment extends Fragment
                 //자신의 반경 이내 마커만 표시하세용
                 if(myLocation.distanceTo(t) <  DISTANCETO_PARAMETER){
                     //순서대로 1. 데이타 타입,2 제보자 이름, 3. 제보 사유를 전달합니다.
+
+
                     MarkerOptions marker = new MarkerOptions()
                             .position(new LatLng(dLat, dLog))
                             .title("보행자사고다발지역")
@@ -357,6 +361,7 @@ public class MapFragment extends Fragment
                 r.setLongitude(dLog);
 
                 if (myLocation.distanceTo(r) <= DISTANCETO_PARAMETER) {
+
                     String deadType = deadData.getAcc_ty_cd();
                     BitmapDescriptor micon = BitmapDescriptorFactory.fromBitmap(null_marker);
                     switch (deadType) {
@@ -688,7 +693,12 @@ public class MapFragment extends Fragment
 
         }
         deadType.setText(marker.getSnippet().split("@")[0] +"사망자 발생지역");
-        deadPlace.setText(marker.getSnippet().split("@")[1]);
+        String Occrrnc_lc_sgg_cd = "위치정보없음";
+        if(marker.getSnippet().split("@")[1].equals("위치정보없음")) {
+            Occrrnc_lc_sgg_cd = geoCoderLocation(marker.getPosition().latitude,marker.getPosition().longitude);
+        }
+
+        deadPlace.setText(Occrrnc_lc_sgg_cd.split(" ",2)[1] );
         deadRoad.setText(marker.getSnippet().split("@")[2]);
         deadCount.setText("사망자수:" + marker.getSnippet().split("@")[3]);
         deadCar.setText("가해차량:" +marker.getSnippet().split("@")[4] + "["+ marker.getSnippet().split("@")[5]+"]");
@@ -792,27 +802,25 @@ public class MapFragment extends Fragment
 
                 myLocation.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
                 myLocation.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
+
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
                         addALLMarker(mGoogleMap);
-                        MarkerOptions myPosition = new MarkerOptions()
+                        /* MarkerOptions myPosition = new MarkerOptions()
                                 .position(mGoogleMap.getCameraPosition().target)
                                 .title("지도 중앙")
                                 .snippet("@")
                                 .icon(BitmapDescriptorFactory.fromBitmap(eyeIcon))
                                 .draggable(false);
                         markers.add(mGoogleMap.addMarker(myPosition));
-
+                        * */
                     }
                 },200);
             }
            }
-
-
-
-           public String userLocationGeocode(double d1, double d2){
+           public String geoCoderLocation(double d1, double d2){
                List<Address> list = null;
                String lo = "위치정보 없음";;
                try {
@@ -826,14 +834,12 @@ public class MapFragment extends Fragment
                }
                if (list != null) {
                    if (list.size()==0) {
-                       lo = "위치정보 없음";
+                       lo = "위치정보없음";
                    } else {
-                       lo = list.get(1).getAdminArea()+"@"+list.get(1).getLocality();
-                       Log.d(TAG,"사용자 위치: " +lo);
+                       lo = list.get(0).getAddressLine(0);
                    }
                }
-
                return lo;
-
            }
+
        }

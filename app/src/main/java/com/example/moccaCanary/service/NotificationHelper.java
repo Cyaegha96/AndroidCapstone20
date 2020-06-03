@@ -27,7 +27,7 @@ import java.util.Random;
 public class NotificationHelper extends ContextWrapper {
 
     private static final String TAG = "NotificationHelper";
-
+    private  NotificationManager notificationManager;
     public NotificationHelper(Context base) {
         super(base);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -40,7 +40,9 @@ public class NotificationHelper extends ContextWrapper {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void createChannels() {
-        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+
+        //원래 알림음 설정으로 쓸 애였는데 이걸로 하면 무음모드시에 소리가 안남
+       AudioAttributes audioAttributes = new AudioAttributes.Builder()
                 .setUsage(AudioAttributes.USAGE_NOTIFICATION)
                 .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                 .build();
@@ -52,8 +54,9 @@ public class NotificationHelper extends ContextWrapper {
         notificationChannel.setLightColor(Color.RED);
         notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
        notificationChannel.setSound(null, null);
-        NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.createNotificationChannel(notificationChannel);
+
+        notificationManager= (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(notificationChannel);
 
     }
 
@@ -95,16 +98,22 @@ public class NotificationHelper extends ContextWrapper {
                 .setStyle(new NotificationCompat.BigTextStyle().setSummaryText(summaryText).setBigContentTitle(title).bigText(body))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
-                .setDefaults( Notification.DEFAULT_LIGHTS)
-                .setVibrate(pattern)
+                .setDefaults( Notification.DEFAULT_LIGHTS)  //default로 사용하는 설정입니다.
+                .setVibrate(pattern)    //위에서 설정된 패턴으로 진동합니다.
+                .setTimeoutAfter(500)   //5초후 자동으로 닫힙니다.
                 .build();
 
         AudioHelper audioHelper = new AudioHelper(getApplicationContext());
         audioHelper.requestaudiofocus();
-        NotificationManagerCompat.from(this).notify(new Random().nextInt(), notification);
+        int notifyId = new Random().nextInt();
+        //알림 보내주기
+        NotificationManagerCompat.from(this).notify(notifyId, notification);
+
+        //음악 실행
         MediaPlayer player1 = MediaPlayer.create(this, R.raw.pling);
         player1.start();
         audioHelper.removeFocusAudioManager();
+
     }
 
 }

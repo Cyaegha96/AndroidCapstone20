@@ -93,16 +93,16 @@ public class DeadAdapter {
                     deaddata.setSe_dnv_cnt(mCur.getInt(5));
                     deaddata.setSl_dnv_cnt(mCur.getInt(6));
                     deaddata.setWnd_dnv_cnt(mCur.getInt(7));
-                    deaddata.setOccrrnc_lc_sgg_cd(mCur.getString(8));
-                    deaddata.setAcc_ty_cd(mCur.getString(9));
-                    deaddata.setAslt_vtr_lclas_cd(mCur.getString(10));
-                    deaddata.setAslt_vtr_mlsfc_cd(mCur.getString(11));
-                    deaddata.setRoad_frm_lclas_cd(mCur.getString(12));
-                    deaddata.setRoad_frm_cd(mCur.getString(13));
-                    deaddata.setWrngdo_isrty_vhcty_lclas_cd(mCur.getString(14));
-                    deaddata.setWrngdo_isrty_vhcty_cd(mCur.getString(15));
-                    deaddata.setLa_crd(mCur.getFloat(16));
-                    deaddata.setLo_crd(mCur.getFloat(17));
+                    deaddata.setOccrrnc_lc_sgg_cd("위치정보없음");
+                    deaddata.setAcc_ty_cd(mCur.getString(8));
+                    deaddata.setAslt_vtr_lclas_cd(mCur.getString(9));
+                    deaddata.setAslt_vtr_mlsfc_cd(mCur.getString(10));
+                    deaddata.setRoad_frm_lclas_cd(mCur.getString(11));
+                    deaddata.setRoad_frm_cd(mCur.getString(12));
+                    deaddata.setWrngdo_isrty_vhcty_lclas_cd(mCur.getString(13));
+                    deaddata.setWrngdo_isrty_vhcty_cd(mCur.getString(14));
+                    deaddata.setLa_crd(mCur.getFloat(15));
+                    deaddata.setLo_crd(mCur.getFloat(16));
 
 
                     // 리스트에 넣기
