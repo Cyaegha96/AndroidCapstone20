@@ -21,7 +21,11 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.selectorColor" parent="Widget.MaterialComponents.NavigationView" >
+        <item name="itemShapeFillColor">@color/black</item>
+        <item name="itemIconTint">@color/black</item>
+        <item name="itemTextColor">@color/black</item>
+    </style>
 
 
 

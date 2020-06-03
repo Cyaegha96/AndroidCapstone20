@@ -198,6 +198,7 @@ public class CanaryService extends Service implements LocationListener {
         createNotification();
         startTracking();
         initLoadDBReturn();
+
         geofencingClient = LocationServices.getGeofencingClient(this);
         geofenceHelper = new GeofenceHelper(this);
         mContext = this;

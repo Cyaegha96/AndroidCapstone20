@@ -11,12 +11,12 @@
     <string name="cancel">취소</string>
     <string name="confirm">확인</string>
 
-    <string name="menu_home">Home 홈</string>
-    <string name="menu_map">Map 지도보기</string>
-    <string name="menu_data">Data 데이타보기</string>
-    <string name="menu_graph">Graph 그래프보기</string>
-    <string name="menu_webview">Webview 웹뷰보기</string>
-    <string name="menu_report">Report 제보하기</string>
+    <string name="menu_home">홈</string>
+    <string name="menu_map">지도</string>
+    <string name="menu_data">데이터</string>
+    <string name="menu_graph">그래프</string>
+    <string name="menu_webview">웹뷰</string>
+    <string name="menu_report">제보</string>
     <string name="home_second">Home Second</string>
     <string name="request_updates">Request updates</string>
     <string name="remove_updates">Remove updates</string>

@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
         if(choice_city.equals("없음")){
             subtitle=choice_do;
         }else{
-            subtitle= choice_do+"시 "+choice_city;
+            subtitle= choice_do+ " " + choice_city;
         }
         if(year != -1){
             subtitle = year+" 년생 " + subtitle+" 거주";
