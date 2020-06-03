@@ -27,7 +27,7 @@
             android:title="@string/menu_webview" />
         <item
             android:id="@+id/report"
-            android:icon="@drawable/ic_menu_send"
+            android:icon="@drawable/report"
             android:title="@string/menu_report" />
     </group>
 </menu>
