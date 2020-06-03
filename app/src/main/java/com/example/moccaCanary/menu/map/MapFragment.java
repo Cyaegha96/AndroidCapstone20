@@ -127,7 +127,7 @@ public class MapFragment extends Fragment
         crosswalkMarker = makeBitmap(R.drawable.crosswalk,200,200);
         old_manMarker = makeBitmap(R.drawable.old_man,200,200);
         school_zoneMarker = makeBitmap(R.drawable.school_zone,200,200);
-        null_marker = makeBitmap(R.drawable.canary,200,200);
+        null_marker = makeBitmap(R.drawable.canary_shadow,200,200);
 
         crossRoad1 = makeBitmap(R.drawable.crossroad1,150,150);
         crossRoad2 = makeBitmap(R.drawable.crossroad2,150,150);
@@ -154,7 +154,8 @@ public class MapFragment extends Fragment
         mapViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                textView.setText(s);
+                textView.setText(s.split("@")[0]);
+                InfoText.setText(s.split("@")[1]);
             }
         });
         myLat =  ((MainActivity)getActivity()).myLat;
@@ -198,15 +199,20 @@ public class MapFragment extends Fragment
 
         mReportAdapter.close();
 
-        TmacsDataAdapter tmacsDataAdapter = new TmacsDataAdapter(getContext());
+
         String userLocationGeocodeString = userLocationGeocode(myLocation.getLatitude(),myLocation.getLongitude());
         String userLocationRegion = userLocationGeocodeString.split("@")[0];
 
-        tmacsDataAdapter.createDatabase();
-        tmacsDataAdapter.open();
+        if(userLocationRegion.equals("서울특별시") || userLocationRegion.equals("경기도")){
+            TmacsDataAdapter tmacsDataAdapter = new TmacsDataAdapter(getContext());
 
-        tmacsList = tmacsDataAdapter.getTableData(userLocationRegion);
-        tmacsDataAdapter.close();
+
+            tmacsDataAdapter.createDatabase();
+            tmacsDataAdapter.open();
+
+            tmacsList  = tmacsDataAdapter.getTableData(userLocationRegion);
+            tmacsDataAdapter.close();
+        }
     }
 
     @Override
@@ -246,9 +252,9 @@ public class MapFragment extends Fragment
 
     public void tmacsDataSetting(GoogleMap googleMap){
 
-        Log.d(TAG,tmacsList.size()+"개의 다발지 데이터 보유중");
 
         if(tmacsList != null){
+            Log.d(TAG,tmacsList.size()+"개의 다발지 데이터 보유중");
             for(int i=0;i<tmacsList.size();i++){
                 tmacsData tData = tmacsList.get(i);
                 float dLat = tData.getLatitude();
@@ -271,7 +277,7 @@ public class MapFragment extends Fragment
                                     +tData.getSlightlyCount()+"@"+tData.getInjuredCount()+"@"
                                     +"보행자"
                             )
-                            .icon(BitmapDescriptorFactory.fromBitmap( makeBitmap(R.drawable.canary,200,200)))
+                            .icon(BitmapDescriptorFactory.fromBitmap( makeBitmap(R.drawable.canary_shadow,200,200)))
                             ;
                     //아이콘 설정
                     markers.add( googleMap.addMarker(marker));
@@ -313,7 +319,7 @@ public class MapFragment extends Fragment
                                     rptData.getReasonSelected()+"@"+
                                     rptData.getGeofenceid()+"@"+
                                     rptData.getNumId())
-                            .icon(BitmapDescriptorFactory.fromBitmap( makeBitmap(R.drawable.canary,200,200)))
+                            .icon(BitmapDescriptorFactory.fromBitmap( makeBitmap(R.drawable.canary_shadow,200,200)))
                             ;
                     //아이콘 설정
                     markers.add( googleMap.addMarker(marker));
@@ -525,9 +531,6 @@ public class MapFragment extends Fragment
             }
 
         }
-
-        String s = InfoText.getText().toString();
-        InfoText.setText(s+"현재 사용자 근처 보행자 다발구역 갯수는 "+userDataList.size()+"개");
     }
 
 
@@ -700,6 +703,7 @@ public class MapFragment extends Fragment
         reportReason.setText(marker.getSnippet().split("@")[2]);
         final String geofenceid = marker.getSnippet().split("@")[3]+"@"+marker.getSnippet().split("@")[4];
 
+        Log.d(TAG,"snippet에 어떻게 들어가있는지 좀 보자."+marker.getSnippet());
         reportDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -726,7 +730,12 @@ public class MapFragment extends Fragment
                         SQLiteDatabase db;
                         DataBaseHelper dataBaseHelper =  new DataBaseHelper(getContext(),"data_all.db", 1);
                         db = dataBaseHelper.getWritableDatabase();
-                        db.execSQL("DELETE FROM report_table WHERE numId = " +marker.getSnippet().split("@")[5]+";");
+                        if((marker.getSnippet().split("@")[3]+"").equals("null")){
+                            db.execSQL("DELETE FROM report_table WHERE numId = " +marker.getSnippet().split("@")[4]+";");
+                        }else{
+                            db.execSQL("DELETE FROM report_table WHERE numId = " +marker.getSnippet().split("@")[5]+";");
+                        }
+
 
                         db.close();
 
@@ -788,7 +797,8 @@ public class MapFragment extends Fragment
                                 .position(mGoogleMap.getCameraPosition().target)
                                 .title("지도 중앙")
                                 .snippet("@")
-                                .icon(BitmapDescriptorFactory.fromBitmap(eyeIcon));
+                                .icon(BitmapDescriptorFactory.fromBitmap(eyeIcon))
+                                .draggable(false);
                         markers.add(mGoogleMap.addMarker(myPosition));
 
                     }

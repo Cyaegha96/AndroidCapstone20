@@ -19,6 +19,8 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
+
+
         //일단 간단하게, Geofence 접근에 관해서, Toast 메시지를 띄워주고, Notification 접근 표현을 하는 내용으로 구현.
         NotificationHelper notificationHelper = new NotificationHelper(context);
 

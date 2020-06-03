@@ -8,7 +8,13 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Color;
+import android.media.AudioAttributes;
+import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
@@ -34,12 +40,18 @@ public class NotificationHelper extends ContextWrapper {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void createChannels() {
+        AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .build();
+
         NotificationChannel notificationChannel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
         notificationChannel.enableLights(true);
         notificationChannel.enableVibration(true);
         notificationChannel.setDescription("this is the description of the channel.");
         notificationChannel.setLightColor(Color.RED);
         notificationChannel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+       notificationChannel.setSound(null, null);
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.createNotificationChannel(notificationChannel);
 
@@ -74,6 +86,7 @@ public class NotificationHelper extends ContextWrapper {
             summaryText="";
         }
 
+
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
              .setContentTitle(title)
               .setContentText(body)
@@ -82,12 +95,18 @@ public class NotificationHelper extends ContextWrapper {
                 .setStyle(new NotificationCompat.BigTextStyle().setSummaryText(summaryText).setBigContentTitle(title).bigText(body))
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
+                .setDefaults( Notification.DEFAULT_LIGHTS)
                 .setVibrate(pattern)
                 .build();
 
-
+        AudioHelper audioHelper = new AudioHelper(getApplicationContext());
+        audioHelper.requestaudiofocus();
         NotificationManagerCompat.from(this).notify(new Random().nextInt(), notification);
-
+        if(audioHelper.headsetCheck() == true){
+            MediaPlayer player1 = MediaPlayer.create(this, R.raw.pling);
+            player1.start();
+        }
+        audioHelper.removeFocusAudioManager();
     }
 
 }

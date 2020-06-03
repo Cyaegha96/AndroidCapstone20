@@ -7,11 +7,12 @@ import androidx.lifecycle.ViewModel;
 public class MapViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
-
+    private float DISTANCETO_PARAMETER = 500;
     public MapViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("여러분의 위치를 지도상에 표시합니다\n" +
-                "다발지역 위험도는 해당 장소가 얼마나 많은 보행자 다발지역의 반경 내에 걸쳐있는지를 표시합니다.");
+        mText.setValue("주변의 다발지역, 사고 정보를 살펴보세요\n" +
+                "눈 아이콘은 지도의 중앙을 가리키며, 중앙으로부터 반경 " + DISTANCETO_PARAMETER+"m 만큼의 데이터가 보여집니다.\n"+"@"
+        +"*지원지역이 아닌 경우 사망자 데이터만 표기됩니다.");
     }
 
     public LiveData<String> getText() {

@@ -1,11 +1,14 @@
 package com.example.moccaCanary.service;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -117,7 +120,7 @@ public class CanaryService extends Service implements LocationListener {
     private int locationChangeCount =0;
 
     private Vibrator vibrator;
-    private AudioHelper audioHelper;
+   // private AudioHelper audioHelper;
     CanaryBroadcastReceiver canaryBroadcastReceiver = new CanaryBroadcastReceiver();
 
     @Override
@@ -192,8 +195,8 @@ public class CanaryService extends Service implements LocationListener {
     public int onStartCommand(Intent intent, int flags, int startId) {
         geocoder= new Geocoder(this);
 
-        audioHelper = new AudioHelper(this);
-        audioHelper.requestaudiofocus();
+       // audioHelper = new AudioHelper(this);
+      //  audioHelper.requestaudiofocus();
         updatedLocation = getLocation();
         createNotification();
         startTracking();
@@ -410,25 +413,26 @@ public class CanaryService extends Service implements LocationListener {
         for(int i=0;i<rptDataList.size();i++){
             addRptList(rptDataList.get(i));
         }
+        if (tmacsDataList != null) {
+            for(int i=0;i<tmacsDataList.size();i++){
+                tmacsData tmacs = tmacsDataList.get(i);
+                Location t = new Location("T");
+                t.setLatitude(tmacs.getLatitude());
+                t.setLongitude(tmacs.getLongitude());
 
-        for(int i=0;i<tmacsDataList.size();i++){
-            tmacsData tmacs = tmacsDataList.get(i);
-            Location t = new Location("T");
-            t.setLatitude(tmacs.getLatitude());
-            t.setLongitude(tmacs.getLongitude());
+                if(location.distanceTo(t) <= DISTANCETO_PARAMETER){
+                    LatLng latLng = new LatLng(t.getLatitude(),t.getLongitude());
+                    //알림에 표시할 내용은 //사고 발생건수+ 사고 장소 +위험도
+                    String geofenceId = tmacs.getAccidentCount()+"@"+"("+tmacs.getPlaceName() +")" +
 
-            if(location.distanceTo(t) <= DISTANCETO_PARAMETER){
-                LatLng latLng = new LatLng(t.getLatitude(),t.getLongitude());
-                //알림에 표시할 내용은 //사고 발생건수+ 사고 장소 +위험도
-                String geofenceId = tmacs.getAccidentCount()+"@"+"("+tmacs.getPlaceName() +")" +
-
-                        " 위험도: "+tmacs.getTotalScore();
-                if(addGeofenceToList(geofenceId,latLng, GEOFENCE_RADIUS)){
-                    userTmacsDataList.add(tmacs);
+                            " 위험도: "+tmacs.getTotalScore();
+                    if(addGeofenceToList(geofenceId,latLng, GEOFENCE_RADIUS)){
+                        userTmacsDataList.add(tmacs);
+                    }
                 }
             }
+            Log.d(TAG,"결국 내가 갖게된 tmac 보행자 다발지 개수는?"+userTmacsDataList.size());
         }
-        Log.d(TAG,"결국 내가 갖게된 tmac 보행자 다발지 개수는?"+userTmacsDataList.size());
     }
 
     public void addRptList(RptData rptData){
@@ -473,6 +477,7 @@ public class CanaryService extends Service implements LocationListener {
 
     private boolean addGeofenceToList(String geofenceId, LatLng latLng, float radius){
 
+        Log.d(TAG,"등록된 geofenceId."+geofenceId);
         if(userGeofenceList.size() < 100){
             userGeofenceList.add(geofenceHelper.getGeofence(geofenceId, latLng, radius,
                     Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT));
@@ -557,18 +562,22 @@ public class CanaryService extends Service implements LocationListener {
 
         mReportAdapter.close();
 
-        TmacsDataAdapter tmacsDataAdapter = new TmacsDataAdapter(getApplicationContext());
         String userLocationGeocodeString = userLocationGeocode(location.getLatitude(),location.getLongitude());
         String userLocationRegion = userLocationGeocodeString.split("@")[0];
 
-        tmacsDataAdapter.createDatabase();
-        tmacsDataAdapter.open();
+        //지원하는 지역일 경우에만 해당 DB를 열람합니다...
+        if(userLocationRegion.equals("서울특별시") || userLocationRegion.equals("경기도")){
+            TmacsDataAdapter tmacsDataAdapter = new TmacsDataAdapter(getApplicationContext());
 
-        tmacsDataList = tmacsDataAdapter.getTableData(userLocationRegion);
-        Log.d(TAG,tmacsDataList.size()+"개의 데이터가 들어왔습니다.");
-        Log.d(TAG,tmacsDataList.get(1).getPlaceName()+tmacsDataList.get(1).getTotalScore());
-        tmacsDataAdapter.close();
 
+            tmacsDataAdapter.createDatabase();
+            tmacsDataAdapter.open();
+
+            tmacsDataList = tmacsDataAdapter.getTableData(userLocationRegion);
+            Log.d(TAG,tmacsDataList.size()+"개의 데이터가 들어왔습니다.");
+            Log.d(TAG,tmacsDataList.get(1).getPlaceName()+tmacsDataList.get(1).getTotalScore());
+            tmacsDataAdapter.close();
+        }
     }
 
     private void createNotification() {
@@ -606,12 +615,13 @@ public class CanaryService extends Service implements LocationListener {
         builder.setSmallIcon(R.drawable.carlary_app_logo3);
         builder.setLargeIcon(iconview);
         builder.addAction(R.drawable.ic_launcher_foreground, "stop", hide);
+        /*
         if(audioHelper.headsetCheck() == true){
             vibrator.vibrate(50);
         }
         MediaPlayer player1 = MediaPlayer.create(this, R.raw.pling);
         player1.start();
-
+        */
         //알림을 해줄 builder 선언
         builder = new NotificationCompat.Builder(this, "default");
         builder.setSmallIcon(R.mipmap.ic_launcher);
@@ -645,7 +655,7 @@ public class CanaryService extends Service implements LocationListener {
         Log.d(TAG,"removeNotification()");
         // Notification 제거
         NotificationManagerCompat.from(this).cancel(1);
-        audioHelper.removeFocusAudioManager();
+     //   audioHelper.removeFocusAudioManager();
     }
 
     @Nullable
@@ -659,12 +669,31 @@ public class CanaryService extends Service implements LocationListener {
         ProgressDialog asyncDialog = new ProgressDialog(getApplicationContext());
 
         @Override
+        protected void onPreExecute() {
+            ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+            List<ActivityManager.RunningTaskInfo> info;
+            info = activityManager.getRunningTasks(1);
+            if(info.get(0).topActivity.getClassName().equals(MainActivity.class.getClass().getName())) {
+                asyncDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                asyncDialog.setMessage("위치 변경에 따라 geofence 재설정 중입니다...");
+                asyncDialog.show();
+            } else {
+
+            }
+
+            super.onPreExecute();
+        }
+        @Override
         protected Void doInBackground(Void... voids) {
-            Log.d(TAG,"Location Changed: rebatch");
-            removeGeofence();
-            setUserDataList();
-            dataInputGeofence(userDataList);
-            addGeofences();
+            try{
+                removeGeofence();
+                setUserDataList();
+                dataInputGeofence(userDataList);
+                addGeofences();
+                Thread.sleep(200);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
             return null;
         }
     }
@@ -685,9 +714,7 @@ public class CanaryService extends Service implements LocationListener {
         if(updatedLocation.distanceTo(location) >= 300){
             updatedLocation = location;
             locationChangeCount++;
-
-            Log.d(TAG,"사용자가 초기 위치보다 300m 멀어지면 갱신 갱신/ locationChangeCount"+locationChangeCount);
-            Toast.makeText(getApplicationContext(),"사용자가 초기 위치보다 300m 멀어지면 갱신 갱신",Toast.LENGTH_SHORT);
+            Log.d(TAG,"사용자가 초기 위치보다 300m 멀어지면 갱신/ locationChangeCount"+locationChangeCount);
             backgroundLocationUpcate task = new backgroundLocationUpcate();
             task.execute();
         }

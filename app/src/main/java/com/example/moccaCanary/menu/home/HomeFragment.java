@@ -177,7 +177,7 @@ public class HomeFragment extends Fragment {
         protected Void doInBackground(Void... voids) {
            try{
                ((MainActivity)getActivity()).startCanaryService();
-               Thread.sleep(300);
+               Thread.sleep(200);
            }catch(InterruptedException e){
                e.printStackTrace();
            }
