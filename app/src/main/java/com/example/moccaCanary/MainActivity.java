@@ -50,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private AppBarConfiguration mAppBarConfiguration;
 
-    //초기위치 (서울한복판)
-    public double myLat =37.56;
-    public double myLog = 126.97;
+    //초기위치 (경기대 한복판)
+    public double myLat =37.300513;
+    public double myLog = 127.035848;
     private Location userLocation;
 
     List<Data> dataList;

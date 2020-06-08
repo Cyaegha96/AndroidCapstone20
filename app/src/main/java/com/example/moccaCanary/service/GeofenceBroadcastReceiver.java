@@ -46,15 +46,15 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
         switch (transitionType) {
             case Geofence.GEOFENCE_TRANSITION_ENTER:
-                Toast.makeText(context, "GEOFENCE_TRANSITION_ENTER", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "사고 다발지역 안에 들어왔습니다!", Toast.LENGTH_SHORT).show();
                 notificationHelper.sendHighPriorityNotification("사고 다발지역 안에 들어왔습니다!", showingData,accidnetCount, MainActivity.class);
                 break;
             case Geofence.GEOFENCE_TRANSITION_DWELL:
-                Toast.makeText(context, "GEOFENCE_TRANSITION_DWELL", Toast.LENGTH_SHORT).show();
-                notificationHelper.sendHighPriorityNotification("사고 다발지역 안을 지나고 있습니다!", showingData,accidnetCount, MainActivity.class);
+                Toast.makeText(context, "사고 다발지역 안을 지나고 있습니다!", Toast.LENGTH_SHORT).show();
+                //notificationHelper.sendHighPriorityNotification("사고 다발지역 안을 지나고 있습니다!", showingData,accidnetCount, MainActivity.class);
                 break;
             case Geofence.GEOFENCE_TRANSITION_EXIT:
-                Toast.makeText(context, "GEOFENCE_TRANSITION_EXIT", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "사고 다발지역 안에서 나왔습니다!", Toast.LENGTH_SHORT).show();
                 notificationHelper.sendHighPriorityNotification("사고 다발지역 안에서 나왔습니다!", showingData,accidnetCount, MainActivity.class);
                 break;
         }

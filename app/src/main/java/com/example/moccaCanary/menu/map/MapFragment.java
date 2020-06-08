@@ -42,6 +42,7 @@ import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.LocationSource;
+
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -98,7 +99,6 @@ public class MapFragment extends Fragment
     private Bitmap deadWayEdge;
 
 
-    private TextView InfoText;
     private double myLat;
     private double myLog;
     private Location myLocation;
@@ -114,7 +114,6 @@ public class MapFragment extends Fragment
     private List<Circle> circles = new ArrayList<>();
     private List<RptData> rptDataList;
     private List<tmacsData> tmacsList;
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -150,12 +149,12 @@ public class MapFragment extends Fragment
                 ViewModelProviders.of(this).get(MapViewModel.class);
         View root = inflater.inflate(R.layout.fragment_map, container, false);
         final TextView textView = root.findViewById(R.id.text_map);
-        InfoText = root.findViewById(R.id.text_map_info);
+
         mapViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
-                textView.setText(s.split("@")[0]);
-                InfoText.setText(s.split("@")[1]);
+                textView.setText(s);
+
             }
         });
         myLat =  ((MainActivity)getActivity()).myLat;
@@ -166,8 +165,9 @@ public class MapFragment extends Fragment
             myLog = myLocation.getLongitude();
         }else{
             myLocation = new Location("p");
-            myLocation.setLatitude(myLog);
-            myLocation.setLongitude(myLat);
+            myLocation.setLatitude(myLat);
+            myLocation.setLongitude(myLog);
+
         }
         geocoder= new Geocoder(getContext());
         initDB();
@@ -242,7 +242,6 @@ public class MapFragment extends Fragment
         mGoogleMap.setOnCameraIdleListener(this);
 
         if(((MainActivity)getActivity()).isUserLocationHasResult()){ //카나리 서비스가 실행중이라면
-
             addALLMarker(mGoogleMap);
         }
     }

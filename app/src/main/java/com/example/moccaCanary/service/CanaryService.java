@@ -19,6 +19,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.location.Address;
+import android.location.Criteria;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
@@ -55,6 +56,7 @@ import com.example.moccaCanary.menu.data.RptData;
 import com.example.moccaCanary.menu.data.TmacsDataAdapter;
 import com.example.moccaCanary.menu.data.tmacsData;
 import com.google.android.gms.location.DetectedActivity;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingRequest;
@@ -62,6 +64,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -197,6 +201,7 @@ public class CanaryService extends Service implements LocationListener {
 
        // audioHelper = new AudioHelper(this);
       //  audioHelper.requestaudiofocus();
+
         updatedLocation = getLocation();
         createNotification();
         startTracking();
@@ -283,6 +288,8 @@ public class CanaryService extends Service implements LocationListener {
                         }
                     }
                 }
+
+
             }
         } catch (Exception e) {
             Log.d("@@@", "" + e.toString());

@@ -100,7 +100,7 @@ public class NotificationHelper extends ContextWrapper {
                 .setAutoCancel(true)
                 .setDefaults( Notification.DEFAULT_LIGHTS)  //default로 사용하는 설정입니다.
                 .setVibrate(pattern)    //위에서 설정된 패턴으로 진동합니다.
-                .setTimeoutAfter(500)   //5초후 자동으로 닫힙니다.
+                .setTimeoutAfter(5000)   //5초후 자동으로 닫힙니다.
                 .build();
 
         AudioHelper audioHelper = new AudioHelper(getApplicationContext());
