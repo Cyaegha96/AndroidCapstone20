@@ -92,11 +92,11 @@ public class MapFragment extends Fragment
 
     private Bitmap eyeIcon;
 
-    private Bitmap dead;
-    private Bitmap deadCrossroad;
-    private Bitmap deadDriveWay;
-    private Bitmap deadWalkerWay;
-    private Bitmap deadWayEdge;
+    private Bitmap deadPing;
+    private Bitmap deadCrossroadPing;
+    private Bitmap deadDriveWayPing;
+    private Bitmap deadWalkerWayPing;
+    private Bitmap deadWayEdgePing;
 
 
     private double myLat;
@@ -119,28 +119,12 @@ public class MapFragment extends Fragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //bitmap settings
 
-        bicycleMarker =  makeBitmap(R.drawable.bicycle,200,200);
-        childMarker =  makeBitmap(R.drawable.child,200,200);
-        crosswalkMarker = makeBitmap(R.drawable.crosswalk,200,200);
-        old_manMarker = makeBitmap(R.drawable.old_man,200,200);
-        school_zoneMarker = makeBitmap(R.drawable.school_zone,200,200);
-        null_marker = makeBitmap(R.drawable.canary_shadow,200,200);
-
-        crossRoad1 = makeBitmap(R.drawable.crossroad1,150,150);
-        crossRoad2 = makeBitmap(R.drawable.crossroad2,150,150);
-        crossRoad3 = makeBitmap(R.drawable.crossroad3,150,200);
-        crossRoad4 = makeBitmap(R.drawable.crossroad4,150,200);
-
-        crossRoadnull = makeBitmap(R.drawable.crossroadnull,150,150);
-
-        dead = makeBitmap(R.drawable.dead,250,250);
-        deadCrossroad = makeBitmap(R.drawable.dead_crossroad,250,250);
-        deadDriveWay = makeBitmap(R.drawable.dead_driveway,250,250);
-        deadWalkerWay = makeBitmap(R.drawable.dead_walkerway,250,250);
-        deadWayEdge = makeBitmap(R.drawable.dead_wayedge,250,250);
-        eyeIcon = makeBitmap(R.drawable.eye_icon, 150,150);
+        deadPing = makeBitmap(R.drawable.dead,250,250);
+        deadCrossroadPing = makeBitmap(R.drawable.dead_crossroad,250,250);
+        deadDriveWayPing = makeBitmap(R.drawable.dead_driveway,250,250);
+        deadWalkerWayPing = makeBitmap(R.drawable.dead_walkerway,250,250);
+        deadWayEdgePing = makeBitmap(R.drawable.dead_wayedge,250,250);
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -271,8 +255,26 @@ public class MapFragment extends Fragment
 
                 //자신의 반경 이내 마커만 표시하세용
                 if(myLocation.distanceTo(t) <  DISTANCETO_PARAMETER){
-                    //순서대로 1. 데이타 타입,2 제보자 이름, 3. 제보 사유를 전달합니다.
 
+                    //1. 사고년도 , 2. 사건장소, 3. 발생건수 , 4. 사상자수,5.사망자수,6,중상자수,7,경상자수,8,부상자수 9.사고 타입.
+                    BitmapDescriptor micon = BitmapDescriptorFactory.fromBitmap(null_marker);
+                    switch (tData.getAccidentType()) {
+                        case "횡단중":
+                            micon = BitmapDescriptorFactory.fromBitmap(deadCrossroadPing);
+                            break;
+                        case "차도통행중":
+                            micon = BitmapDescriptorFactory.fromBitmap(deadDriveWayPing);
+                            break;
+                        case "보도통행중":
+                            micon = BitmapDescriptorFactory.fromBitmap(deadWalkerWayPing);
+                            break;
+                        case "길가장자리구역통행중":
+                            micon = BitmapDescriptorFactory.fromBitmap(deadWayEdgePing);
+                            break;
+                        default:
+                            micon = BitmapDescriptorFactory.fromBitmap(deadPing);
+                            break;
+                    }
 
                     MarkerOptions marker = new MarkerOptions()
                             .position(new LatLng(dLat, dLog))
@@ -282,9 +284,9 @@ public class MapFragment extends Fragment
                                     +"사상자수"+"@"
                                     +tData.getDeadCount() + "@" + tData.getSeriousCount()+"@"
                                     +tData.getSlightlyCount()+"@"+tData.getInjuredCount()+"@"
-                                    +"보행자"
+                                    +tData.getAccidentType()
                             )
-                            .icon(BitmapDescriptorFactory.fromBitmap( makeBitmap(R.drawable.canary_shadow,200,200)))
+                            .icon(micon)
                             ;
                     //아이콘 설정
                     markers.add( googleMap.addMarker(marker));
@@ -365,19 +367,19 @@ public class MapFragment extends Fragment
                     BitmapDescriptor micon = BitmapDescriptorFactory.fromBitmap(null_marker);
                     switch (deadType) {
                         case "횡단중":
-                            micon = BitmapDescriptorFactory.fromBitmap(deadCrossroad);
+                            micon = BitmapDescriptorFactory.fromBitmap(deadCrossroadPing);
                             break;
                         case "차도통행중":
-                            micon = BitmapDescriptorFactory.fromBitmap(deadDriveWay);
+                            micon = BitmapDescriptorFactory.fromBitmap(deadDriveWayPing);
                             break;
                         case "보도통행중":
-                            micon = BitmapDescriptorFactory.fromBitmap(deadWalkerWay);
+                            micon = BitmapDescriptorFactory.fromBitmap(deadWalkerWayPing);
                             break;
                         case "길가장자리구역통행중":
-                            micon = BitmapDescriptorFactory.fromBitmap(deadWayEdge);
+                            micon = BitmapDescriptorFactory.fromBitmap(deadWayEdgePing);
                             break;
                         case "기타":
-                            micon = BitmapDescriptorFactory.fromBitmap(dead);
+                            micon = BitmapDescriptorFactory.fromBitmap(deadPing);
                             break;
                     }
 
@@ -408,140 +410,6 @@ public class MapFragment extends Fragment
 
     }
 
-    public void cwDataSetting(GoogleMap googleMap){
-       if(cwdataList != null){
-           cwdataList.clear();
-       }
-        cwdataList = ((CanaryService)CanaryService.mContext).getCwDataList();
-        Log.d(TAG,"cwdataListSize: "+cwdataList.size());
-
-        if(cwdataList!= null){
-
-            for(int i=0;i<cwdataList.size();i++) {
-
-                CwData cwData = cwdataList.get(i);
-                float dLat = cwData.getLatitude();
-                float dLog = cwData.getLongitude();
-
-                int crossType = cwData.getCrslkKnd();
-                String crossStringType;
-                BitmapDescriptor mIcon = BitmapDescriptorFactory.fromBitmap(null_marker);
-
-                switch (crossType) {
-                    case 1:
-                        crossStringType = "일반형";
-                        mIcon = BitmapDescriptorFactory.fromBitmap(crossRoad1);
-                        break;
-                    case 2:
-                        crossStringType = "대각선";
-                        mIcon = BitmapDescriptorFactory.fromBitmap(crossRoad2);
-                        break;
-                    case 3:
-                        crossStringType = "스테거드";
-                        mIcon = BitmapDescriptorFactory.fromBitmap(crossRoad3);
-                        break;
-                    case 4:
-                        crossStringType = "도류화";
-                        mIcon = BitmapDescriptorFactory.fromBitmap(crossRoad4);
-                        break;
-                    case 99:
-                        crossStringType = "기타";
-                        mIcon = BitmapDescriptorFactory.fromBitmap(crossRoadnull);
-                        break;
-                    default:
-                        crossStringType = "분류정보 없는";
-                        mIcon = BitmapDescriptorFactory.fromBitmap(crossRoadnull);
-                        break;
-                }
-                String pname = cwdataList.get(i).getRoadNm();
-                String lnmadr = cwdataList.get(i).getLnmadr();
-                if(lnmadr == null){
-                    double d1 =cwdataList.get(i).getLatitude();
-                    double d2 = cwdataList.get(i).getLongitude();
-                    lnmadr = ((MainActivity)getActivity()).geocoderLocation(d1,d2,cwdataList.get(i).getIndex());
-                }
-                if(pname == null){
-                    pname = "도로정보 없음";
-                }
-                //marker 추가사항: 횡단보도 타입, 장소+도로 위치() 다발지역 얼마나 겹치는지+ 인덱스
-                MarkerOptions marker = new MarkerOptions()
-                        .position(new LatLng(dLat, dLog))
-                        .title("횡단보도")
-                        .snippet(crossStringType+ "@"+lnmadr+"@"+pname+"@"+cwdataList.get(i).getAccidentCount()+"@"+cwdataList.get(i).getIndex())
-                        .icon(mIcon);
-
-                //아이콘 설정
-                googleMap.addMarker(marker);
-
-                googleMap.addCircle(new CircleOptions()
-                        .center(new LatLng(dLat,dLog))
-                        .fillColor(0x22eb4034)
-                        .strokeWidth(0)
-                        .radius(GEOFENCE_RADIUS));
-
-            }
-        }
-
-    }
-
-    public void markerSetting(GoogleMap googleMap){
-        if(userDataList!= null){
-            userDataList.clear();
-        }
-        userDataList = ((CanaryService)CanaryService.mContext).getUserDataList();
-
-        if(userDataList != null) {
-            for (int i = 0; i < userDataList.size(); i++) {
-                Data data = userDataList.get(i);
-                float dLat = data.getLatitude();
-                float dLog = data.getLongitude();
-
-                String dAccidentType = data.getAccidentType();
-
-
-                googleMap.addCircle(new CircleOptions()
-                        .center(new LatLng(dLat, dLog))
-                        .fillColor(0x2248f7ef) //투명한 원 그리려면 색상값 앞에 0x22 가 붙어야 함!
-                        .radius(ACCIDENT_RADIUS)
-                        .strokeColor(Color.BLACK)
-                        .strokeWidth(2));
-
-                //sniffer에 담길 내용은 순서대로
-                //1. 사고년도 , 2. 사건장소, 3. 발생건수 , 4. 사상자수,5.사망자수,6,중상자수,7,경상자수,8,부상자수 9.사고타입
-                MarkerOptions marker = new MarkerOptions()
-                        .position(new LatLng(dLat, dLog))
-                        .title("보행자사고다발지역")
-                        .snippet( data.getAccidentYear()+"@"
-                        +data.getPlaceName()+"@" + data.getAccidentCount()+"@"
-                                +data.getCasualtiesCount()+"@"
-                                +data.getDeadCount() + "@" + data.getSeriousCount()+"@"
-                                +data.getSlightlyCount()+"@"+data.getInjuredCount()+"@"
-                                +data.getAccidentType()
-                        );
-
-                if (dAccidentType.equals("자전거")) {
-                    marker.icon(BitmapDescriptorFactory.fromBitmap(bicycleMarker));
-
-                } else if (dAccidentType.equals("보행어린이")) {
-                   marker.icon(BitmapDescriptorFactory.fromBitmap(childMarker));
-                } else if (dAccidentType.equals("보행노인")) {
-                    marker.icon(BitmapDescriptorFactory.fromBitmap(old_manMarker));
-                } else if (dAccidentType.equals("스쿨존어린이")) {
-                    marker.icon(BitmapDescriptorFactory.fromBitmap(school_zoneMarker));
-                } else if (dAccidentType.equals("무단횡단")) {
-                    marker.icon(BitmapDescriptorFactory.fromBitmap(crosswalkMarker));
-                }
-
-                //지정된 마커를 추가.
-                googleMap.addMarker(marker);
-
-
-            }
-
-        }
-    }
-
-
     private Bitmap makeBitmap(int drawable,int width, int height){
         BitmapDrawable bitmapdraw = (BitmapDrawable) getResources().getDrawable(drawable);
         Bitmap b = bitmapdraw.getBitmap();
@@ -555,9 +423,7 @@ public class MapFragment extends Fragment
         if(marker.getTitle().equals("보행자사고다발지역")){
             bottomSheetDialog.setContentView(AccidentDataView(marker));
         }
-        else if(marker.getTitle().equals("횡단보도")){
-            bottomSheetDialog.setContentView(CrossroadDataView(marker));
-        }else if(marker.getTitle().equals("사망자")){
+        else if(marker.getTitle().equals("사망자")){
             bottomSheetDialog.setContentView(DeadDataView(marker));
         }else if(marker.getTitle().equals("제보위험지역")){
             bottomSheetDialog.setContentView(ReportDataView(marker));
@@ -578,7 +444,6 @@ public class MapFragment extends Fragment
         TextView bottomSheetYear  = root.findViewById(R.id.bottomSheet_accident_year);
         TextView bottomSheetPlacename = root.findViewById(R.id.bottomSheet_place_name);
         TextView bottomSheetAccidentCount = root.findViewById(R.id.bottomSheet_accident_count);
-        TextView bottomSheetCasualtiesCount = root.findViewById(R.id.bottomSheet_casualties_count);
         TextView bottomSheetDeadCount = root.findViewById(R.id.bottomSheet_dead_count);
         TextView bottomSheetSlightCount = root.findViewById(R.id.bottomSheet_slight_count);
         TextView bottomSheetInjuredCount = root.findViewById(R.id.bottomSheet_injured_count);
@@ -589,74 +454,48 @@ public class MapFragment extends Fragment
 
         String accidentType = marker.getSnippet().split("@")[8];
 
-        if(accidentType.equals("자전거")){
-            bottomSheetImageView.setImageResource(R.drawable.bicycle);
-        }else if(accidentType.equals("보행어린이")){
-            bottomSheetImageView.setImageResource(R.drawable.child);
-        }else if(accidentType.equals("스쿨존어린이")){
-            bottomSheetImageView.setImageResource(R.drawable.school_zone);
-        }else if(accidentType.equals("보행노인")){
-            Log.d(TAG,"보행노인");
-            bottomSheetImageView.setImageResource(R.drawable.old_man);
-        }else if(accidentType.equals("무단횡단")){
-            bottomSheetImageView.setImageResource(R.drawable.crosswalk);
-        }else {bottomSheetImageView.setImageResource(R.drawable.carlary_app_logo3);}
+        switch (accidentType){
+            case "자전거":
+                bottomSheetImageView.setImageResource(R.drawable.bicycle);
+                break;
+            case "보행어린이":
+                bottomSheetImageView.setImageResource(R.drawable.child);
+                break;
+            case "스쿨존어린이":
+                bottomSheetImageView.setImageResource(R.drawable.school_zone);
+                break;
+            case "보행노인":
+                bottomSheetImageView.setImageResource(R.drawable.old_man);
+                break;
+            case "무단횡단":
+                bottomSheetImageView.setImageResource(R.drawable.crosswalk);
+                break;
+            case "횡단중":
+                bottomSheetImageView.setImageResource(R.drawable.crossroad);
+                break;
+            case "차도통행중":
+                bottomSheetImageView.setImageResource(R.drawable.driveway);
+                break;
+            case "보도통행중":
+                bottomSheetImageView.setImageResource(R.drawable.walkerway);
+                break;
+            case "길가장자리구역통행중":
+                bottomSheetImageView.setImageResource(R.drawable.wayedge);
+                break;
+            default:
+                bottomSheetImageView.setImageResource(R.drawable.others);
+                break;
+        }
 
-        bottomSheetAccidentType.setText(accidentType+"사고 다발지역");
+        bottomSheetAccidentType.setText(accidentType+" 사고 다발지역");
         bottomSheetYear.setText(marker.getSnippet().split("@")[0]);
         bottomSheetPlacename.setText(marker.getSnippet().split("@")[1]);
         bottomSheetAccidentCount.setText(marker.getSnippet().split("@")[2]);
-        bottomSheetCasualtiesCount.setText(marker.getSnippet().split("@")[3]);
         bottomSheetDeadCount.setText(marker.getSnippet().split("@")[4]);
         bottomSheetSeriousCount.setText(marker.getSnippet().split("@")[5]);
         bottomSheetSlightCount.setText(marker.getSnippet().split("@")[6]);
         bottomSheetInjuredCount.setText(marker.getSnippet().split("@")[7]);
 
-        return root;
-    }
-    private View CrossroadDataView(final Marker marker){
-        final View root= getLayoutInflater().inflate(R.layout.bottom_sheet_crossroad, null);
-        //marker 추가사항: 횡단보도 타입, 장소 위치() 다발지역 얼마나 겹치는지
-
-        final String crossRoadType = marker.getSnippet().split("@")[0];
-        final TextView bottomSheetcrossroadType = root.findViewById(R.id.bottomSheet_crossroad_type);
-        final ImageView bottomSheetCrossroadImageView = root.findViewById(R.id.crossroad_data_imageView);
-        TextView bottomSheetLnmadr = root.findViewById(R.id.bottomSheet_lnmadr);
-        final TextView bottomSheetPlacename = root.findViewById(R.id.bottomSheet_pname);
-        TextView bottomSheetCrossroadAccidentCount = root.findViewById(R.id.bottomSheet_crossroad_accident_count);
-        Button updateButton = root.findViewById(R.id.bottomSheetreport_update_button);
-        updateButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // 커스텀 다이얼로그를 생성한다. 사용자가 만든 클래스이다.
-                UpdateCrossRoad customDialog = new UpdateCrossRoad (getActivity());
-
-                // 커스텀 다이얼로그를 호출한다.
-                customDialog.callFunction(marker,
-                        bottomSheetCrossroadImageView,bottomSheetcrossroadType,
-                        bottomSheetPlacename,
-                        cwdataList);
-            }
-        });
-
-        if(crossRoadType.equals("일반형")){
-            bottomSheetCrossroadImageView.setImageResource(R.drawable.crossroad1);
-        }else if(crossRoadType.equals("대각선")){
-            bottomSheetCrossroadImageView.setImageResource(R.drawable.crossroad2);
-        }else if(crossRoadType.equals("스테거드")){
-            bottomSheetCrossroadImageView.setImageResource(R.drawable.crossroad3);
-        }else if(crossRoadType.equals("도류화")){
-            bottomSheetCrossroadImageView.setImageResource(R.drawable.crossroad4);
-        }else if(crossRoadType.equals("기타")){
-            bottomSheetCrossroadImageView.setImageResource(R.drawable.crossroadnull);
-        }else{
-            bottomSheetCrossroadImageView.setImageResource(R.drawable.crossroadnull);
-        }
-
-        bottomSheetcrossroadType.setText(crossRoadType+" 횡단보도");
-        bottomSheetLnmadr.setText(marker.getSnippet().split("@")[1]);
-        bottomSheetPlacename.setText(marker.getSnippet().split("@")[2]);
-        bottomSheetCrossroadAccidentCount.setText("다발지역 위험도: "+marker.getSnippet().split("@")[3]);
         return root;
     }
 
@@ -675,19 +514,19 @@ public class MapFragment extends Fragment
 
         switch (marker.getSnippet().split("@")[0]) {
             case "횡단중":
-                deadImage.setImageResource(R.drawable.dead_crossroad);
+                deadImage.setImageResource(R.drawable.crossroad);
                 break;
             case "차도통행중":
-                deadImage.setImageResource(R.drawable.dead_driveway);
+                deadImage.setImageResource(R.drawable.driveway);
                 break;
             case "보도통행중":
-                deadImage.setImageResource(R.drawable.dead_walkerway);
+                deadImage.setImageResource(R.drawable.walkerway);
                 break;
             case "길가장자리구역통행중":
-                deadImage.setImageResource(R.drawable.dead_wayedge);
+                deadImage.setImageResource(R.drawable.wayedge);
                 break;
             case "기타":
-                deadImage.setImageResource(R.drawable.dead);
+                deadImage.setImageResource(R.drawable.others);
                 break;
 
         }

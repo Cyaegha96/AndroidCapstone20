@@ -289,7 +289,6 @@ public class CanaryService extends Service implements LocationListener {
                     }
                 }
 
-
             }
         } catch (Exception e) {
             Log.d("@@@", "" + e.toString());
@@ -622,13 +621,7 @@ public class CanaryService extends Service implements LocationListener {
         builder.setSmallIcon(R.drawable.carlary_app_logo3);
         builder.setLargeIcon(iconview);
         builder.addAction(R.drawable.ic_launcher_foreground, "stop", hide);
-        /*
-        if(audioHelper.headsetCheck() == true){
-            vibrator.vibrate(50);
-        }
-        MediaPlayer player1 = MediaPlayer.create(this, R.raw.pling);
-        player1.start();
-        */
+
         //알림을 해줄 builder 선언
         builder = new NotificationCompat.Builder(this, "default");
         builder.setSmallIcon(R.mipmap.ic_launcher);
@@ -694,6 +687,7 @@ public class CanaryService extends Service implements LocationListener {
         protected Void doInBackground(Void... voids) {
             try{
                 removeGeofence();
+                userGeofenceList.clear();
                 setUserDataList();
                 dataInputGeofence(userDataList);
                 addGeofences();
