@@ -1,28 +1,36 @@
 package com.example.moccaCanary;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.navigation.NavController;
@@ -41,6 +49,8 @@ import com.example.moccaCanary.user.IntroActivity;
 import com.example.moccaCanary.user.UserActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import com.muddzdev.styleabletoast.StyleableToast;
 
 import java.io.IOException;
 import java.util.List;
@@ -49,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private AppBarConfiguration mAppBarConfiguration;
-
+    private final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
+    private final int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
     //초기위치 (경기대 한복판)
     public double myLat =37.300513;
     public double myLog = 127.035848;
@@ -298,6 +309,5 @@ public class MainActivity extends AppCompatActivity {
         }
         return  false;
     }
-
-
+    
 }

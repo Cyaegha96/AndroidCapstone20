@@ -202,7 +202,7 @@ public class CanaryService extends Service implements LocationListener {
        // audioHelper = new AudioHelper(this);
       //  audioHelper.requestaudiofocus();
 
-        updatedLocation = getLocation();
+        location = getLocation();
         createNotification();
         startTracking();
         initLoadDBReturn();
@@ -288,7 +288,7 @@ public class CanaryService extends Service implements LocationListener {
                         }
                     }
                 }
-
+                updatedLocation =location;
             }
         } catch (Exception e) {
             Log.d("@@@", "" + e.toString());
