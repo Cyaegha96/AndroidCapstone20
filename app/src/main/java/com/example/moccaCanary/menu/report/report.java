@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -169,6 +170,11 @@ public class report extends Fragment
         mGoogleMap = googleMap;
         myLat =  ((MainActivity)getActivity()).myLat;
         myLog = ((MainActivity)getActivity()).myLog;
+        if(((MainActivity) getActivity()).isLaunchingService(getContext()) ) { //카나리 서비스가 실행중이라면
+            Location myLocation =  ((CanaryService)CanaryService.mContext).getLocationOUT();
+            myLat = myLocation.getLatitude();
+            myLog = myLocation.getLongitude();
+        }
         mGoogleMap.setMyLocationEnabled(true);
         MapsInitializer.initialize(this.getActivity());
 

@@ -70,27 +70,15 @@ public class MapFragment extends Fragment
     private static final String TAG = "MapFragment";
     private MapViewModel mapViewModel;
     private MapView mapView;
-    private float ACCIDENT_RADIUS = 200;
+
     private float GEOFENCE_RADIUS = 50;
     private float DISTANCETO_PARAMETER = 500;
+
+    private static final String KEY_CAMERA_POSITION = "camera_position";
+    private static final String KEY_LOCATION = "location";
 ////-------------------------------
 ///bitmap layer
 
-    private Bitmap bicycleMarker;
-    private Bitmap childMarker;
-    private Bitmap crosswalkMarker;
-    private Bitmap old_manMarker;
-    private Bitmap school_zoneMarker;
-    private Bitmap null_marker;
-
-    private Bitmap crossRoad1;
-    private Bitmap crossRoad2;
-    private Bitmap crossRoad3;
-    private Bitmap crossRoad4;
-    private Bitmap crossRoad99;
-    private Bitmap crossRoadnull;
-
-    private Bitmap eyeIcon;
 
     private Bitmap deadPing;
     private Bitmap deadCrossroadPing;
@@ -119,6 +107,11 @@ public class MapFragment extends Fragment
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if(savedInstanceState != null){
+            myLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            myLat = myLocation.getLatitude();
+            myLog = myLocation.getLongitude();
+        }
 
         deadPing = makeBitmap(R.drawable.dead,250,250);
         deadCrossroadPing = makeBitmap(R.drawable.dead_crossroad,250,250);
@@ -143,7 +136,7 @@ public class MapFragment extends Fragment
         });
         myLat =  ((MainActivity)getActivity()).myLat;
         myLog = ((MainActivity)getActivity()).myLog;
-        if(((MainActivity)getActivity()).isUserLocationHasResult()) { //카나리 서비스가 실행중이라면
+        if(((MainActivity) getActivity()).isLaunchingService(getContext()) ) { //카나리 서비스가 실행중이라면
             myLocation =  ((CanaryService)CanaryService.mContext).getLocationOUT();
             myLat = myLocation.getLatitude();
             myLog = myLocation.getLongitude();
@@ -167,6 +160,17 @@ public class MapFragment extends Fragment
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
     }
+
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+
+        if(mGoogleMap != null){
+            outState.putParcelable(KEY_LOCATION,myLocation);
+            super.onSaveInstanceState(outState);
+        }
+    }
+
 
     public void initDB(){
         DeadAdapter mDeadDbHelper = new DeadAdapter(getContext());
@@ -232,8 +236,7 @@ public class MapFragment extends Fragment
 
     private void addALLMarker(GoogleMap googleMap){
         Log.d(TAG,"addMarker");
-        //markerSetting(googleMap);
-        //cwDataSetting(googleMap);
+
         deadDataSetting(googleMap);
         rptDataSetting(googleMap);
         tmacsDataSetting(googleMap);
@@ -257,7 +260,7 @@ public class MapFragment extends Fragment
                 if(myLocation.distanceTo(t) <  DISTANCETO_PARAMETER){
 
                     //1. 사고년도 , 2. 사건장소, 3. 발생건수 , 4. 사상자수,5.사망자수,6,중상자수,7,경상자수,8,부상자수 9.사고 타입.
-                    BitmapDescriptor micon = BitmapDescriptorFactory.fromBitmap(null_marker);
+                    BitmapDescriptor micon;
                     switch (tData.getAccidentType()) {
                         case "횡단중":
                             micon = BitmapDescriptorFactory.fromBitmap(deadCrossroadPing);
@@ -364,7 +367,7 @@ public class MapFragment extends Fragment
                 if (myLocation.distanceTo(r) <= DISTANCETO_PARAMETER) {
 
                     String deadType = deadData.getAcc_ty_cd();
-                    BitmapDescriptor micon = BitmapDescriptorFactory.fromBitmap(null_marker);
+                    BitmapDescriptor micon = BitmapDescriptorFactory.fromBitmap(deadPing);
                     switch (deadType) {
                         case "횡단중":
                             micon = BitmapDescriptorFactory.fromBitmap(deadCrossroadPing);

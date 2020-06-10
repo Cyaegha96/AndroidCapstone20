@@ -1,16 +1,21 @@
 package com.example.moccaCanary.menu.settings;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.widget.BaseAdapter;
 
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceManager;
 
 import com.example.moccaCanary.R;
 import com.example.moccaCanary.user.UserActivity;
+
+import java.util.List;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -38,8 +43,10 @@ public class SettingsActivity extends AppCompatActivity {
     }
 
     public static class SettingsFragment extends PreferenceFragmentCompat {
+
+        SharedPreferences prefs;
         Preference userSettingsPreference;
-        ListPreference geofencePreference;
+        ListPreference userParameterPreference;
         @Override
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
@@ -48,18 +55,27 @@ public class SettingsActivity extends AppCompatActivity {
             userSettingsPreference.setIntent(new Intent(getContext(),UserActivity.class));
 
 
-            geofencePreference = findPreference("geofence_radius");
-            geofencePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                @Override
-                public boolean onPreferenceChange(Preference preference, Object newValue) {
-                    int value = (int) newValue;
 
+            prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            userParameterPreference = (ListPreference) findPreference("distanceTo_parameter");
+            if(!prefs.getString("distanceTo_parameter"," ").equals(" ")){
+                userParameterPreference.setSummary(prefs.getString("distanceTo_parameter","500"));
+            }
 
-                    return false;
-                }
-            });
-
+            prefs.registerOnSharedPreferenceChangeListener(preListener);
 
         }
+
+        SharedPreferences.OnSharedPreferenceChangeListener preListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            @Override
+            public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+                if(key.equals("distanceTo_parameter")){
+                    userParameterPreference.setSummary(prefs.getString("distanceTo_parameter","500"));
+                }
+            }
+
+        };
     }
+
+
 }

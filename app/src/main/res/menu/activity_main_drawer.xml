@@ -12,10 +12,7 @@
             android:id="@+id/nav_map"
             android:icon="@android:drawable/ic_dialog_map"
             android:title="@string/menu_map" />
-        <item
-            android:id="@+id/nav_data"
-            android:icon="@android:drawable/ic_dialog_info"
-            android:title="@string/menu_data" />
+       
         <item
             android:id="@+id/nav_graph"
             android:icon="@drawable/ic_dialog_graph"

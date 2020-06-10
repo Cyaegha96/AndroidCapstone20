@@ -23,15 +23,7 @@
             android:title="@string/distanceTo_parameter"
             android:showDefault = "true"
             />
-        <ListPreference
 
-            android:defaultValue="30"
-            android:entries="@array/geofence_radius_entries"
-            android:entryValues="@array/geofence_radius_values"
-            android:key="geofence_radius"
-            android:summary="지오펜스 알림 반경을 설정합니다."
-            android:title="@string/geofence_radius_title"
-            android:showDefault = "true"/>
 
 
     </PreferenceCategory>

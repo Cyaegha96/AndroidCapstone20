@@ -83,7 +83,7 @@ public class CanaryService extends Service implements LocationListener {
     double latitude; // Latitude
     double longitude; // Longitude
 
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // 1 meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 1 meters
     private static final long MIN_TIME_BW_UPDATES = 1000 * 1; // 1 second
 
     SharedPreferences pref;
@@ -288,7 +288,22 @@ public class CanaryService extends Service implements LocationListener {
                         }
                     }
                 }
+
+                //정확도가 0.0 이하이거나, 50.0m 이상인 경우엔 criteria도 활용해봅시다.
+                if(location.getAccuracy() <=0.0 || location.getAccuracy() > 50.0){
+                    Criteria criteria = new Criteria();
+                    criteria.setAccuracy(Criteria.ACCURACY_FINE); // 높은 정확도
+                    criteria.setPowerRequirement(Criteria.POWER_HIGH); // 높은 전원소비
+                    if(locationManager.getBestProvider(criteria, true) !=null){
+                        locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true),
+                                MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                        location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
+                    }
+                }
+
                 updatedLocation =location;
+                sendLocation(location);
             }
         } catch (Exception e) {
             Log.d("@@@", "" + e.toString());

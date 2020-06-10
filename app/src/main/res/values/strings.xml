@@ -43,14 +43,7 @@
 
 
     <!-- Messages Preferences -->
-    <string name="geofence_radius_title">위험지역 반경 설정</string>
     <string name="distanceTo_parameter">사용자 반경 설정</string>
-
-    <!-- Sync Preferences -->
-    <string name="attachment_title">Download incoming attachments</string>
-    <string name="attachment_summary_on">Automatically download attachments for incoming emails
-    </string>
-    <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
 
     <string name="activity_in_vehicle">In Vehicle</string>

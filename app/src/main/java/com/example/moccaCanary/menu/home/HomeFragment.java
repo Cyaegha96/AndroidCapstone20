@@ -119,7 +119,8 @@ public class HomeFragment extends Fragment {
                     CanaryStartRequest();
                     button.setText("카나리아 서비스 실행중~~");
                     canaryImage.setImageResource(R.drawable.canary);
-
+                    StyleableToast.makeText(getActivity().getApplicationContext(),
+                            "서비스 실행", Toast.LENGTH_SHORT, R.style.mytoast).show();
 
                 } else {
                     //버튼을 다시 한번 눌렀을 때->꺼짐.
@@ -171,21 +172,21 @@ public class HomeFragment extends Fragment {
     public void LocationPermissionRequest(){
         if (Build.VERSION.SDK_INT >= 23) {
             //We need background permission
-            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 //만약 background location 권한 거부를 한 적이 있다면
-                if (shouldShowRequestPermissionRationale( Manifest.permission.ACCESS_FINE_LOCATION)) {
+                if (shouldShowRequestPermissionRationale( Manifest.permission.ACCESS_FINE_LOCATION) || shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)) {
                     Snackbar.make(root, "이 앱을 실행하려면 기본적인 위치 권한이 필요합니다.",
                             Snackbar.LENGTH_INDEFINITE).setAction("확인", new View.OnClickListener() {
 
                         @Override
                         public void onClick(View view) {
                             // 3-3. 사용자게에 퍼미션 요청을 합니다. 요청 결과는 onRequestPermissionResult에서 수신됩니다.
-                            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+                            requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
                         }
                     }).setTextColor(Color.WHITE)
                             .show();
                 } else {
-                    requestPermissions( new String[] {Manifest.permission.ACCESS_FINE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
+                    requestPermissions( new String[] {Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION}, FINE_LOCATION_ACCESS_REQUEST_CODE);
                 }
             }
 

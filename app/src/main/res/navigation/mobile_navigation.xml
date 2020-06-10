@@ -34,13 +34,6 @@
         android:name="com.example.moccaCanary.menu.map.MapFragment"
         android:label="@string/menu_map"
         tools:layout="@layout/fragment_map"/>
-
-    <fragment
-        android:id="@+id/nav_data"
-        android:name="com.example.moccaCanary.menu.data.DataFragment"
-        android:label="@string/menu_data"
-        tools:layout="@layout/fragment_data" />
-
     <fragment
         android:id="@+id/nav_graph"
         android:name="com.example.moccaCanary.menu.data.GraphFragment"
