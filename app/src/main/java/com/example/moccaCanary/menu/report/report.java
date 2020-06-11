@@ -142,7 +142,7 @@ public class report extends Fragment
                     public void onClick(DialogInterface dialog, int which) {
                         Toast.makeText(getActivity().getApplicationContext(),"DB의 적용은 바로 이어지지 않습니다. 이메일 제보를 뒤이어 해주세요!",Toast.LENGTH_SHORT);
 
-                        String emailText = "["+selectedAccidentType+"]\n"+"경도:"+ sendingLatLng.latitude+ "\n 위도:" +sendingLatLng.longitude;
+                        String emailText = "["+selectedAccidentType+"]\n"+"경도:"+ sendingLatLng.latitude+ "\n 위도:" +sendingLatLng.longitude + "\n 지정 사유 : " + reasonSelected.getText().toString();
                         Intent email = new Intent(Intent.ACTION_SEND);
                         email.setType("plain/text");
                         String[] address = {"wldnd1102@naver.com"};
