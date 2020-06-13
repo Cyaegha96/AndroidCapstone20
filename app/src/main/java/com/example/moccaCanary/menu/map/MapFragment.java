@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,6 +32,8 @@ import androidx.preference.PreferenceManager;
 
 import com.example.moccaCanary.MainActivity;
 import com.example.moccaCanary.R;
+import com.example.moccaCanary.menu.data.CommentData;
+import com.example.moccaCanary.menu.data.CommentDataAdapter;
 import com.example.moccaCanary.menu.data.DeadAdapter;
 import com.example.moccaCanary.menu.data.ReportAdapter;
 import com.example.moccaCanary.menu.data.TmacsDataAdapter;
@@ -302,10 +305,10 @@ public class MapFragment extends Fragment
                             .title("보행자사고다발지역")
                             .snippet("2018"+"@"
                                     +tData.getPlaceName()+"@" + tData.getAccidentCount()+"@"
-                                    +"사상자수"+"@"
+                                    +tData.getRegion()+"@"
                                     +tData.getDeadCount() + "@" + tData.getSeriousCount()+"@"
                                     +tData.getSlightlyCount()+"@"+tData.getInjuredCount()+"@"
-                                    +tData.getAccidentType()
+                                    +tData.getAccidentType()+"@"+tData.getIndex()
                             )
                             .icon(micon)
                             ;
@@ -458,7 +461,25 @@ public class MapFragment extends Fragment
     //만약 보행자 다발지역 마커를 클릭했을 시
     private View AccidentDataView(Marker marker){
 
-        View  root= getLayoutInflater().inflate(R.layout.bottom_sheet_data, null);
+        View  root;
+        if(marker.getSnippet().split("@")[3].equals("서울특별시") && Integer.parseInt(marker.getSnippet().split("@")[9]) < 213){
+            root= getLayoutInflater().inflate(R.layout.bottom_sheet_data_addcomment, null);
+            CommentDataAdapter commentDataAdapter = new CommentDataAdapter(getContext());
+
+            commentDataAdapter.createDatabase();
+            commentDataAdapter.open();
+
+            CommentData commentData = commentDataAdapter.getTableData("서울특별시",Integer.parseInt(marker.getSnippet().split("@")[9]));
+            commentDataAdapter.close();
+
+            TextView bottomSheetAddText = root.findViewById(R.id.addText);
+            bottomSheetAddText.setText(commentData.getComment());
+        }
+       else{
+            root= getLayoutInflater().inflate(R.layout.bottom_sheet_data, null);
+
+
+        }
 
         TextView bottomSheetAccidentType = root.findViewById(R.id.bottomSheet_accident_type);
         ImageView bottomSheetImageView = root.findViewById(R.id.accident_data_imageView);
@@ -470,27 +491,13 @@ public class MapFragment extends Fragment
         TextView bottomSheetInjuredCount = root.findViewById(R.id.bottomSheet_injured_count);
         TextView bottomSheetSeriousCount = root.findViewById(R.id.bottomSheet_serious_count);
 
+
         //sniffer에 담길 내용은 순서대로
         //1. 사고년도 , 2. 사건장소, 3. 발생건수 , 4. 사상자수,5.사망자수,6,중상자수,7,경상자수,8,부상자수 9.사고 타입.
 
         String accidentType = marker.getSnippet().split("@")[8];
 
         switch (accidentType){
-            case "자전거":
-                bottomSheetImageView.setImageResource(R.drawable.bicycle);
-                break;
-            case "보행어린이":
-                bottomSheetImageView.setImageResource(R.drawable.child);
-                break;
-            case "스쿨존어린이":
-                bottomSheetImageView.setImageResource(R.drawable.school_zone);
-                break;
-            case "보행노인":
-                bottomSheetImageView.setImageResource(R.drawable.old_man);
-                break;
-            case "무단횡단":
-                bottomSheetImageView.setImageResource(R.drawable.crosswalk);
-                break;
             case "횡단중":
                 bottomSheetImageView.setImageResource(R.drawable.crossroad);
                 break;

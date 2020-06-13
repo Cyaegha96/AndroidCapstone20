@@ -227,7 +227,7 @@ public class CanaryService extends Service implements LocationListener {
 
         Log.d(TAG, "onStartCommand ");
         setUserDataList();
-        dataInputGeofence(userDataList);
+        dataInputGeofence();
         if(userGeofenceList.size() >0){
             addGeofences();
             Log.d(TAG, "geofence 개수:"+userGeofenceList.size());
@@ -363,67 +363,8 @@ public class CanaryService extends Service implements LocationListener {
     }
 
     //데이터 리스트를, Geofenc에 적용시켜 넣습니다! 물론, DISTANCETO_PARAMETER 내의 데이터만 골라서 말이죠!
-    private void dataInputGeofence(List<Data> dList){
+    private void dataInputGeofence(){
 
-        /*
-        * for(int i=0; i<cwDataList.size();i++){
-
-            CwData cw = cwDataList.get(i);
-                Location c = new Location("p");
-                c.setLatitude(cw.getLatitude());
-                c.setLongitude(cw.getLongitude());
-
-            int dataCount = 0;
-            int accidentMagnitude = 0;
-
-            Data data = null;
-
-            for(int j=0;j<dList.size();j++){
-                Location l = new Location("p");
-                l.setLatitude(dList.get(j).getLatitude());
-                l.setLongitude(dList.get(j).getLongitude());
-
-                //만약 보행자 다발 구역 내에 있는 횡단보도라면 표시
-                if(l.distanceTo(c) <= ACCIDENT_RADIUS){
-
-                    if(data != null){
-                        //일단 다발지 데이터를 받아옵니다.
-                        //사고 규모는 발생횟수+사상자수로 판단합니다.
-                        data = dList.get(j);
-                        dataCount = dataCount+1;
-                        accidentMagnitude = dList.get(j).getAccidentCount() + dList.get(j).getCasualtiesCount();
-                    }
-                    else{
-                       //만약 데이터를 이미 받아왔다면
-                        dataCount = dataCount+1;
-
-                        //사고 규모가 더 큰게 들어왓다면  그데이터를 씁니다.
-                        if(accidentMagnitude < (dList.get(j).getAccidentCount() + dList.get(j).getCasualtiesCount()) ){
-                            data = dList.get(j);
-                            accidentMagnitude = (dList.get(j).getAccidentCount() + dList.get(j).getCasualtiesCount());
-                        }
-                    }
-
-                }
-            }
-            //최종적으로 결정된 데이터를 이용해 geofence를 추가합니다.
-            if(data !=null){
-                cw.setAccidentType(data.getAccidentType());
-                cw.setAccidentCount(dataCount);
-
-                //횡단보도의 좌표를 넣는다.
-                LatLng latLng = new LatLng(c.getLatitude(),c.getLongitude());
-                //알림에 표시할 내용은 //사고 발생건수+  (년도) 사고종류 사상자수: x명
-                String geofenceId = data.getAccidentCount()+"@"+"("+data.getAccidentYear() +")" +
-                        data.getAccidentType()+
-                        " 사상자수: "+data.getCasualtiesCount()+"명";
-               if( addGeofenceToList(geofenceId,latLng, GEOFENCE_RADIUS)){
-                   userCwDataList.add(cw);
-               }
-            }
-        }
-        *
-        * */
         for(int i=0;i<deadDataList.size();i++){
             DeadData deadData = deadDataList.get(i);
             Location d = new Location("d");
@@ -464,7 +405,6 @@ public class CanaryService extends Service implements LocationListener {
                     }
                 }
             }
-            Log.d(TAG,"결국 내가 갖게된 tmac 보행자 다발지 개수는?"+userTmacsDataList.size());
         }
     }
 
@@ -741,7 +681,7 @@ public class CanaryService extends Service implements LocationListener {
                 removeNotification();
                 userGeofenceList.clear();
                 setUserDataList();
-                dataInputGeofence(userDataList);
+                dataInputGeofence();
                 if(userGeofenceList.size() > 0){
                     addGeofences();
                 }

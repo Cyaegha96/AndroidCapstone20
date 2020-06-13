@@ -114,11 +114,11 @@ public class report extends Fragment
                                 dataBaseHelper = new DataBaseHelper(getContext(),"data_all.db", 1);
                                 // db에 추가하는 코드
                                 String senderNameText = senderName.getText().toString();
-                                if(senderNameText == null){
+                                if(senderNameText.equals("")){
                                     senderNameText = "사용자 이름없음";
                                 }
                                 String reasonText = reasonSelected.getText().toString();
-                                if(reasonText ==null){
+                                if(reasonText.equals("")){
                                     reasonText = "사용자 제보 지역입니다.";
                                 }
 

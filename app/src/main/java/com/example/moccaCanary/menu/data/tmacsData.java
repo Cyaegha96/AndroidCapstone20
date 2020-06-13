@@ -16,6 +16,9 @@ public class tmacsData {
     private String accidentType;
     private float latitude;
     private float longitude;
+    private int oldCount;
+    private int childCount;
+    private int index;
 
     public String getRegion() {
         return region;
@@ -127,5 +130,29 @@ public class tmacsData {
 
     public void setLongitude(float longitude) {
         this.longitude = longitude;
+    }
+
+    public int getOldCount() {
+        return oldCount;
+    }
+
+    public void setOldCount(int oldCount) {
+        this.oldCount = oldCount;
+    }
+
+    public int getChildCount() {
+        return childCount;
+    }
+
+    public void setChildCount(int childCount) {
+        this.childCount = childCount;
+    }
+
+    public int getIndex() {
+        return index;
+    }
+
+    public void setIndex(int index) {
+        this.index = index;
     }
 }
