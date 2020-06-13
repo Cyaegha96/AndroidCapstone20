@@ -24,9 +24,6 @@
             android:showDefault = "true"
             />
 
-
-
     </PreferenceCategory>
-
 
 </PreferenceScreen>

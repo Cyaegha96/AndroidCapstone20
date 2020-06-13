@@ -42,6 +42,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.preference.PreferenceManager;
+
 import com.example.moccaCanary.MainActivity;
 import com.example.moccaCanary.R;
 import com.example.moccaCanary.menu.data.CwData;
@@ -127,10 +129,19 @@ public class CanaryService extends Service implements LocationListener {
    // private AudioHelper audioHelper;
     CanaryBroadcastReceiver canaryBroadcastReceiver = new CanaryBroadcastReceiver();
 
+    private SharedPreferences prefs;
+
+
+
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate ");
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if(!prefs.getString("distanceTo_parameter"," ").equals(" ")){
+            DISTANCETO_PARAMETER = Integer.parseInt(prefs.getString("distanceTo_parameter","500"));
+        }
+
     }
 
     public void handleUserActivity(int type, int confidence) {
@@ -702,10 +713,14 @@ public class CanaryService extends Service implements LocationListener {
         protected Void doInBackground(Void... voids) {
             try{
                 removeGeofence();
+                removeNotification();
                 userGeofenceList.clear();
                 setUserDataList();
                 dataInputGeofence(userDataList);
-                addGeofences();
+                if(userGeofenceList.size() > 0){
+                    addGeofences();
+                }
+                createNotification();
                 Thread.sleep(200);
             }catch(InterruptedException e){
                 e.printStackTrace();
@@ -736,6 +751,15 @@ public class CanaryService extends Service implements LocationListener {
         }
 
     }
+
+    public void restartLocationService(){
+        if(!prefs.getString("distanceTo_parameter"," ").equals(" ")){
+            DISTANCETO_PARAMETER = Integer.parseInt(prefs.getString("distanceTo_parameter","500"));
+        }
+        backgroundLocationUpcate task = new backgroundLocationUpcate();
+        task.execute();
+    }
+
 
     private void sendLocation(Location location) {
         //intent를 활용해 Location 정보 전송

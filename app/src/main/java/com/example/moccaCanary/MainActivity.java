@@ -32,6 +32,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.PreferenceManager;
 
 import com.example.moccaCanary.service.BackgroundDetectedActivitiesService;
 import com.example.moccaCanary.service.CanaryService;
@@ -76,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences firstStartCheck = getSharedPreferences("checkFirst",MODE_PRIVATE);
         boolean checkFirst = firstStartCheck.getBoolean("checkFirst",false);
         if(!checkFirst){
+
+
+
             SharedPreferences.Editor editor = firstStartCheck.edit();
             editor.putBoolean("checkFirst", true);
             editor.commit();
@@ -85,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
             finish();
 
         }
+
+
         geocoder= new Geocoder(this);
         Intent i = getIntent();
         int title = i.getIntExtra("sign", -1);
@@ -136,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
         nav_sub_view.setText(subtitle);
 
     }
+
 
     public String geocoderLocation(double d1, double d2, int cwindex){
         List<Address> list = null;

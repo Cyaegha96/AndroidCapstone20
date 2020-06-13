@@ -2,6 +2,7 @@ package com.example.moccaCanary.menu.map;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -19,12 +20,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
 
 import com.example.moccaCanary.MainActivity;
 import com.example.moccaCanary.R;
@@ -64,7 +67,8 @@ public class MapFragment extends Fragment
         implements OnMapReadyCallback,
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnCameraMoveListener,
-        GoogleMap.OnCameraIdleListener
+        GoogleMap.OnCameraIdleListener,
+        GoogleMap.OnMyLocationChangeListener
        {
 
     private static final String TAG = "MapFragment";
@@ -90,8 +94,10 @@ public class MapFragment extends Fragment
     private double myLat;
     private double myLog;
     private Location myLocation;
+    private Location cameraLocation;
     GoogleMap mGoogleMap;
 
+    private boolean FREE_DRAG = true;
     private Geocoder geocoder;
 
     //HAVE
@@ -103,12 +109,15 @@ public class MapFragment extends Fragment
     private List<RptData> rptDataList;
     private List<tmacsData> tmacsList;
 
+    private SharedPreferences prefs;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         if(savedInstanceState != null){
             myLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            cameraLocation= myLocation;
             myLat = myLocation.getLatitude();
             myLog = myLocation.getLongitude();
         }
@@ -138,12 +147,14 @@ public class MapFragment extends Fragment
         myLog = ((MainActivity)getActivity()).myLog;
         if(((MainActivity) getActivity()).isLaunchingService(getContext()) ) { //카나리 서비스가 실행중이라면
             myLocation =  ((CanaryService)CanaryService.mContext).getLocationOUT();
+            cameraLocation = myLocation;
             myLat = myLocation.getLatitude();
             myLog = myLocation.getLongitude();
         }else{
             myLocation = new Location("p");
             myLocation.setLatitude(myLat);
             myLocation.setLongitude(myLog);
+            cameraLocation= myLocation;
 
         }
         geocoder= new Geocoder(getContext());
@@ -159,6 +170,11 @@ public class MapFragment extends Fragment
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        if(!prefs.getString("distanceTo_parameter"," ").equals(" ")){
+            DISTANCETO_PARAMETER = Integer.parseInt(prefs.getString("distanceTo_parameter","500"));
+        }
     }
 
 
@@ -198,7 +214,7 @@ public class MapFragment extends Fragment
 
 
         if(userLocationRegion.equals("서울특별시") || userLocationRegion.equals("경기도")){
-            Log.d(TAG, "맞으니까 데이터 가져와!");
+
             TmacsDataAdapter tmacsDataAdapter = new TmacsDataAdapter(getContext());
 
             tmacsDataAdapter.createDatabase();
@@ -321,7 +337,7 @@ public class MapFragment extends Fragment
                 r.setLatitude(dLat);
                 r.setLongitude(dLog);
 
-                if(myLocation.distanceTo(r) <= DISTANCETO_PARAMETER){
+                if(cameraLocation.distanceTo(r) <= DISTANCETO_PARAMETER){
                     //순서대로 1. 데이타 타입,2 제보자 이름, 3. 제보 사유를 전달합니다.
                     MarkerOptions marker = new MarkerOptions()
                             .position(new LatLng(dLat, dLog))
@@ -364,7 +380,7 @@ public class MapFragment extends Fragment
                 r.setLatitude(dLat);
                 r.setLongitude(dLog);
 
-                if (myLocation.distanceTo(r) <= DISTANCETO_PARAMETER) {
+                if (cameraLocation.distanceTo(r) <= DISTANCETO_PARAMETER) {
 
                     String deadType = deadData.getAcc_ty_cd();
                     BitmapDescriptor micon = BitmapDescriptorFactory.fromBitmap(deadPing);
@@ -631,18 +647,18 @@ public class MapFragment extends Fragment
 
            @Override
            public void onCameraIdle() {
-            Location cameraLocation = new Location("googleMap");
-            cameraLocation.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
-            cameraLocation.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
-            if(myLocation.distanceTo(cameraLocation) > 200){
+            Location cameraLocationReal = new Location("googleMap");
+               cameraLocationReal.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
+               cameraLocationReal.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
+            if(cameraLocation.distanceTo(cameraLocationReal) > 200){
                 Log.d(TAG,"카메라 옮겨짐:");
                 if(mGoogleMap != null){
                     mGoogleMap.clear();
                     markers.clear();
                 }
 
-                myLocation.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
-                myLocation.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
+                cameraLocation.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
+                cameraLocation.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
 
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
@@ -683,4 +699,17 @@ public class MapFragment extends Fragment
                return lo;
            }
 
+
+           @Override
+           public void onMyLocationChange(Location location) {
+
+               myLocation = location;
+               cameraLocation = myLocation;
+               LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
+               CameraPosition cameraPosition = new CameraPosition.Builder()
+                       .target(latLng)
+                       .build();
+               mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+           }
        }

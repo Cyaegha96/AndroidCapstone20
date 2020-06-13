@@ -19,7 +19,7 @@ public class StopServiceReceiver extends BroadcastReceiver {
 
         Intent activity = new Intent(context, MainActivity.class);
         activity.putExtra("sign", 2);
-        context.startActivity(activity);
+        context.startActivity(activity.addFlags(intent.FLAG_ACTIVITY_NEW_TASK));
 
 
     }
