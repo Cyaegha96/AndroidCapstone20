@@ -86,7 +86,7 @@ public class CanaryService extends Service implements LocationListener {
     double longitude; // Longitude
 
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 1 meters
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 1; // 1 second
+    private static final long MIN_TIME_BW_UPDATES = 1; // 1 second
 
     SharedPreferences pref;
 
@@ -275,6 +275,7 @@ public class CanaryService extends Service implements LocationListener {
 
                 } else return null;
                 if (isNetworkEnabled) {
+                    //네트워크 provider 사용 가능
                     locationManager.requestLocationUpdates(LocationManager.
                             NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
@@ -483,11 +484,35 @@ public class CanaryService extends Service implements LocationListener {
                 if(addGeofenceToList(geofenceId,latLng, GEOFENCE_RADIUS)){
                     rptData.setGeofenceid(geofenceId);
                     userRptDataList.add(rptData);
+                    addGeofenceOnlyOne(geofenceId, latLng, GEOFENCE_RADIUS);
                 }
 
             }
         }
     }
+
+    public void addGeofenceOnlyOne(String geofenceId, LatLng latLng, float radius){
+       if( addGeofenceToList(geofenceId,latLng,radius) ){
+           Geofence geofence = userGeofenceList.get(userGeofenceList.size()-1);
+           GeofencingRequest geofencingRequest = geofenceHelper.getGeofencingRequest(geofence);
+
+           geofencingClient.addGeofences(geofencingRequest, geofenceHelper.getPendingIntent())
+                   .addOnSuccessListener(new OnSuccessListener<Void>() {
+                       @Override
+                       public void onSuccess(Void aVoid) {
+                           Log.d(TAG, "onSuccess: Geofence Added...");
+                       }
+                   })
+                   .addOnFailureListener(new OnFailureListener() {
+                       @Override
+                       public void onFailure(@NonNull Exception e) {
+                           String errorMessage = geofenceHelper.getErrorString(e);
+                           Log.d(TAG, "onFailure: " + errorMessage);
+                       }
+                   });
+       }
+    }
+
 
     public void removeGeofenceOnlyOne(String geofenceId){
 

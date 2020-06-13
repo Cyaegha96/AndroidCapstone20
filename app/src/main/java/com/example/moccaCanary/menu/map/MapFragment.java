@@ -68,6 +68,7 @@ public class MapFragment extends Fragment
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnCameraMoveListener,
         GoogleMap.OnCameraIdleListener,
+        GoogleMap.OnMyLocationButtonClickListener,
         GoogleMap.OnMyLocationChangeListener
        {
 
@@ -238,6 +239,7 @@ public class MapFragment extends Fragment
         MapsInitializer.initialize(this.getActivity());
 
         mGoogleMap.setMyLocationEnabled(true);
+        mGoogleMap.setOnMyLocationButtonClickListener(this);
         mGoogleMap.getUiSettings().setMyLocationButtonEnabled(true);
         mGoogleMap.getUiSettings().setZoomControlsEnabled(true);
         mGoogleMap.getUiSettings().setMapToolbarEnabled(true);
@@ -638,44 +640,40 @@ public class MapFragment extends Fragment
            public void onCameraMove() {
                CameraPosition cameraPosition = mGoogleMap.getCameraPosition();
                //Log.d(TAG,"현재 카메라 줌레벨:"+cameraPosition.zoom);
-               if(cameraPosition.zoom <16.0) {
+               if(cameraPosition.zoom <15.0) {
                    //카메라 줌이 16이하로 바뀌지 않게 설정
                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                           new LatLng(mGoogleMap.getCameraPosition().target.latitude,mGoogleMap.getCameraPosition().target.longitude),16));
+                           new LatLng(mGoogleMap.getCameraPosition().target.latitude,mGoogleMap.getCameraPosition().target.longitude),15));
                }
            }
 
            @Override
            public void onCameraIdle() {
-            Location cameraLocationReal = new Location("googleMap");
-               cameraLocationReal.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
-               cameraLocationReal.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
-            if(cameraLocation.distanceTo(cameraLocationReal) > 200){
-                Log.d(TAG,"카메라 옮겨짐:");
-                if(mGoogleMap != null){
-                    mGoogleMap.clear();
-                    markers.clear();
-                }
 
-                cameraLocation.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
-                cameraLocation.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
+               if(FREE_DRAG){
 
-                final Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        addALLMarker(mGoogleMap);
-                        /* MarkerOptions myPosition = new MarkerOptions()
-                                .position(mGoogleMap.getCameraPosition().target)
-                                .title("지도 중앙")
-                                .snippet("@")
-                                .icon(BitmapDescriptorFactory.fromBitmap(eyeIcon))
-                                .draggable(false);
-                        markers.add(mGoogleMap.addMarker(myPosition));
-                        * */
-                    }
-                },200);
-            }
+                   Location cameraLocationReal = new Location("googleMap");
+                   cameraLocationReal.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
+                   cameraLocationReal.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
+                   if(cameraLocation.distanceTo(cameraLocationReal) > 200){
+                       Log.d(TAG,"카메라 옮겨짐:");
+                       if(mGoogleMap != null){
+                           mGoogleMap.clear();
+                           markers.clear();
+                       }
+
+                       cameraLocation.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
+                       cameraLocation.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
+
+                       final Handler handler = new Handler();
+                       handler.postDelayed(new Runnable() {
+                           @Override
+                           public void run() {
+                               addALLMarker(mGoogleMap);
+                           }
+                       },200);
+                   }
+               }
            }
            public String geoCoderLocation(double d1, double d2){
                List<Address> list = null;
@@ -701,15 +699,30 @@ public class MapFragment extends Fragment
 
 
            @Override
+           public boolean onMyLocationButtonClick() {
+               FREE_DRAG = !FREE_DRAG;
+               if(FREE_DRAG){
+                   Toast.makeText(getContext(),"자유탐방모드",Toast.LENGTH_SHORT).show();
+                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
+                   mGoogleMap.moveCamera(cameraUpdate);
+                   return false;
+               }else{
+                   Toast.makeText(getContext(),"사용자 추적모드",Toast.LENGTH_SHORT).show();
+                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
+                   mGoogleMap.moveCamera(cameraUpdate);
+                   return false;
+               }
+           }
+
+           @Override
            public void onMyLocationChange(Location location) {
-
-               myLocation = location;
-               cameraLocation = myLocation;
-               LatLng latLng = new LatLng(location.getLatitude(),location.getLongitude());
-               CameraPosition cameraPosition = new CameraPosition.Builder()
-                       .target(latLng)
-                       .build();
-               mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
+               if(!FREE_DRAG){
+                   myLat = location.getLatitude();
+                   myLog = location.getLongitude();
+                   myLocation = location;
+                   cameraLocation = location;
+                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
+                   mGoogleMap.moveCamera(cameraUpdate);
+               }
            }
        }
