@@ -113,13 +113,22 @@ public class report extends Fragment
                             public void onClick(DialogInterface dialog, int which) {
                                 dataBaseHelper = new DataBaseHelper(getContext(),"data_all.db", 1);
                                 // db에 추가하는 코드
-                                int numId = dbinsert(senderName.getText().toString(), selectedAccidentType, sendingLatLng.latitude, sendingLatLng.longitude, reasonSelected.getText().toString());
+                                String senderNameText = senderName.getText().toString();
+                                if(senderNameText == null){
+                                    senderNameText = "사용자 이름없음";
+                                }
+                                String reasonText = reasonSelected.getText().toString();
+                                if(reasonText ==null){
+                                    reasonText = "사용자 제보 지역입니다.";
+                                }
+
+                                int numId = dbinsert(senderNameText, selectedAccidentType, sendingLatLng.latitude, sendingLatLng.longitude, reasonText );
                                 //이제 이걸 카나리 서비스에 추가하자고.
                                 if(((MainActivity)getActivity()).isLaunchingService(getContext())){
                                     RptData rptData = new RptData();
                                     rptData.setAccidentType(selectedAccidentType);
-                                    rptData.setSenderName(senderName.getText().toString());
-                                    rptData.setReasonSelected(reasonSelected.getText().toString());
+                                    rptData.setSenderName(senderNameText);
+                                    rptData.setReasonSelected(reasonText );
                                     rptData.setLatitude((float) sendingLatLng.latitude);
                                     rptData.setLongitude((float) sendingLatLng.longitude);
                                     rptData.setNumId(numId);

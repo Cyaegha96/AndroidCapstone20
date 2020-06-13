@@ -576,11 +576,12 @@ public class MapFragment extends Fragment
         reportReason.setText(marker.getSnippet().split("@")[2]);
         final String geofenceid = marker.getSnippet().split("@")[3]+"@"+marker.getSnippet().split("@")[4];
 
-        Log.d(TAG,"snippet에 어떻게 들어가있는지 좀 보자."+marker.getSnippet());
+
         reportDelete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setIcon(R.drawable.eye_icon);
                 builder.setTitle("삭제");
                 builder.setMessage("정말로 해당 내용을 삭제하시겠습니까?");
                 builder.setPositiveButton("네", new DialogInterface.OnClickListener() {
