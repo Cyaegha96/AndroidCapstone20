@@ -132,25 +132,32 @@
         </LinearLayout>
     </LinearLayout>
 
-    <Button
-        android:id="@+id/SaveUserInfoButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:text="확인"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.839"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/CancelUserInfoButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
+        android:layout_marginRight="100dp"
         android:layout_marginBottom="32dp"
-        android:text="안할래요"
+        android:text="취소"
+        android:background="@drawable/button_back"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="52dp" />
+        app:layout_constraintRight_toLeftOf="@+id/SaveUserInfoButton"
+        tools:ignore="MissingConstraints" />
+
+    <Button
+        android:id="@+id/SaveUserInfoButton"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_marginBottom="32dp"
+        android:text="확인"
+        android:background="@drawable/button_back"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.767"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/CancelUserInfoButton"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
