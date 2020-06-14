@@ -216,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
               //  StyleableToast.makeText(getApplicationContext(),text,Toast.LENGTH_LONG, R.style.mytoast2).show();
             }
 
+
         }
     };
 

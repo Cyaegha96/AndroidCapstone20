@@ -23,7 +23,26 @@
             android:title="@string/distanceTo_parameter"
             android:showDefault = "true"
             />
-
     </PreferenceCategory>
-
+    <PreferenceCategory android:title="@string/provider"
+        android:summary="어떤 방식으로 위치서비스를 제공받을지 설정합니다.">
+        <SwitchPreference
+        android:title="GPS"
+            android:summary="GPS를 이용해 위치를 추적합니다.\n야외에서 추적이 잘되고 배터리 소모가 큽니다."
+            android:defaultValue="true"
+            android:key="useGPS"
+        />
+        <SwitchPreference
+            android:title="Network"
+            android:summary="WiFi, 3G,4G 등을 이용해 위치를 추적합니다.\n배터리 소모가 적습니다."
+            android:defaultValue="true"
+            android:key="useNetwork"
+            />
+        <SwitchPreference
+            android:title="Criteria"
+            android:summary="최적의 provider를 분석해 추가 설정된 상태의 위치공급자를 제공받습니다."
+            android:defaultValue="false"
+            android:key="useCriteria"
+            />
+    </PreferenceCategory>
 </PreferenceScreen>

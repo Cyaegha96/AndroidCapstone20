@@ -10,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationListener;
 import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,6 +39,7 @@ import com.example.moccaCanary.menu.data.DeadAdapter;
 import com.example.moccaCanary.menu.data.ReportAdapter;
 import com.example.moccaCanary.menu.data.TmacsDataAdapter;
 import com.example.moccaCanary.menu.data.tmacsData;
+import com.example.moccaCanary.service.CanaryLocationListener;
 import com.example.moccaCanary.service.CanaryService;
 import com.example.moccaCanary.menu.data.CwData;
 import com.example.moccaCanary.menu.data.Data;
@@ -71,8 +73,7 @@ public class MapFragment extends Fragment
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnCameraMoveListener,
         GoogleMap.OnCameraIdleListener,
-        GoogleMap.OnMyLocationButtonClickListener,
-        GoogleMap.OnMyLocationChangeListener
+        GoogleMap.OnMyLocationButtonClickListener
        {
 
     private static final String TAG = "MapFragment";
@@ -95,6 +96,7 @@ public class MapFragment extends Fragment
     private Bitmap deadWayEdgePing;
 
 
+    private float ZOOM_LEVEL = 17;
     private double myLat;
     private double myLog;
     private Location myLocation;
@@ -114,6 +116,8 @@ public class MapFragment extends Fragment
     private List<tmacsData> tmacsList;
 
     private SharedPreferences prefs;
+
+    private CanaryLocationListener canaryLocationListener = CanaryLocationListener.getInstance();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -236,7 +240,7 @@ public class MapFragment extends Fragment
         mGoogleMap = googleMap;
 
 
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), ZOOM_LEVEL);
         googleMap.moveCamera(cameraUpdate);
 
         MapsInitializer.initialize(this.getActivity());
@@ -648,6 +652,7 @@ public class MapFragment extends Fragment
            public void onCameraMove() {
                CameraPosition cameraPosition = mGoogleMap.getCameraPosition();
                //Log.d(TAG,"현재 카메라 줌레벨:"+cameraPosition.zoom);
+               ZOOM_LEVEL = cameraPosition.zoom;
                if(cameraPosition.zoom <15.0) {
                    //카메라 줌이 16이하로 바뀌지 않게 설정
                    mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -657,8 +662,6 @@ public class MapFragment extends Fragment
 
            @Override
            public void onCameraIdle() {
-
-               if(FREE_DRAG){
 
                    Location cameraLocationReal = new Location("googleMap");
                    cameraLocationReal.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
@@ -681,7 +684,7 @@ public class MapFragment extends Fragment
                            }
                        },200);
                    }
-               }
+
            }
            public String geoCoderLocation(double d1, double d2){
                List<Address> list = null;
@@ -705,32 +708,39 @@ public class MapFragment extends Fragment
                return lo;
            }
 
+           public GoogleMap getmGoogleMap(){
+                return mGoogleMap;
+           }
 
            @Override
            public boolean onMyLocationButtonClick() {
                FREE_DRAG = !FREE_DRAG;
                if(FREE_DRAG){
                    Toast.makeText(getContext(),"자유탐방모드",Toast.LENGTH_SHORT).show();
-                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
+                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), ZOOM_LEVEL);
                    mGoogleMap.moveCamera(cameraUpdate);
                    return false;
                }else{
                    Toast.makeText(getContext(),"사용자 추적모드",Toast.LENGTH_SHORT).show();
-                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
+                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), ZOOM_LEVEL);
                    mGoogleMap.moveCamera(cameraUpdate);
                    return false;
                }
            }
 
-           @Override
-           public void onMyLocationChange(Location location) {
-               if(!FREE_DRAG){
+
+           /*
+            if(!FREE_DRAG){
                    myLat = location.getLatitude();
+
+
                    myLog = location.getLongitude();
                    myLocation = location;
-                   cameraLocation = location;
-                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), 17);
+
+                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), ZOOM_LEVEL);
                    mGoogleMap.moveCamera(cameraUpdate);
                }
-           }
+            */
+
+
        }
