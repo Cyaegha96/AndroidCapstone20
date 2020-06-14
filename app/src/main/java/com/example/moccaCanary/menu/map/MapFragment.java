@@ -639,7 +639,7 @@ public class MapFragment extends Fragment
         deadPlace.setText(Occrrnc_lc_sgg_cd.split(" ",2)[1] );
         deadRoad.setText(marker.getSnippet().split("@")[2]);
         deadCount.setText("사망자수:" + marker.getSnippet().split("@")[3]);
-        deadCar.setText("가해차량:" +marker.getSnippet().split("@")[4] + "["+ marker.getSnippet().split("@")[5]+"]");
+        deadCar.setText("가해차량:\n" +marker.getSnippet().split("@")[4] + "["+ marker.getSnippet().split("@")[5]+"]");
         return root;
     }
     //유저 커스텀 마커 클릭시

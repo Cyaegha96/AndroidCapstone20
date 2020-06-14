@@ -13,13 +13,13 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <LinearLayout
             android:layout_margin="3dp"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="5"
             android:gravity="center"
             android:orientation="vertical">
@@ -45,7 +45,7 @@
                 <TextView
                     android:id="@+id/bottomSheet_dead_place_name"
                     android:layout_width="112dp"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content"
                     android:text="위치정보없음"
                     android:textColor="#FFFFFF"
                     android:textSize="12sp"
@@ -56,7 +56,7 @@
                 <TextView
                     android:id="@+id/bottomSheet_roadType"
                     android:layout_width="112dp"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:text="도로형태 대분류"
                     android:textColor="#FFFFFF"
@@ -75,7 +75,7 @@
                 <TextView
                     android:id="@+id/bottomSheet_dead_pcount"
                     android:layout_width="112dp"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content"
                     android:text="사망자 정보"
                     android:textColor="#FFFFFF"
                     android:textAlignment="center"
@@ -86,7 +86,7 @@
                 <TextView
                     android:id="@+id/bottomSheet_carType"
                     android:layout_width="112dp"
-                    android:layout_height="50dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
                     android:gravity="center_vertical"
                     android:text="가해 차량 종류"
