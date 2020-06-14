@@ -247,6 +247,7 @@ public class MapFragment extends Fragment
         mGoogleMap.setOnMarkerClickListener(this);
         mGoogleMap.setOnCameraMoveListener(this);
         mGoogleMap.setOnCameraIdleListener(this);
+        mGoogleMap.setOnMyLocationChangeListener(this);
 
         if(((MainActivity)getActivity()).isUserLocationHasResult()){ //카나리 서비스가 실행중이라면
             addALLMarker(mGoogleMap);
@@ -656,6 +657,7 @@ public class MapFragment extends Fragment
 
            @Override
            public void onCameraIdle() {
+
 
                    Location cameraLocationReal = new Location("googleMap");
                    cameraLocationReal.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
