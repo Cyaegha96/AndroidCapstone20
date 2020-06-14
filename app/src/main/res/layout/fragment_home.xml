@@ -42,7 +42,7 @@
         android:id="@+id/button"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/radius"
+        android:background="@drawable/button_back"
         android:text="내 위치 요청하기"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
