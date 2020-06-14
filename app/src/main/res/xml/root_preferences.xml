@@ -31,6 +31,7 @@
             android:summary="GPS를 이용해 위치를 추적합니다.\n야외에서 추적이 잘되고 배터리 소모가 큽니다."
             android:defaultValue="true"
             android:key="useGPS"
+
         />
         <SwitchPreference
             android:title="Network"

@@ -21,7 +21,6 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
 
-
         //일단 간단하게, Geofence 접근에 관해서, Toast 메시지를 띄워주고, Notification 접근 표현을 하는 내용으로 구현.
         NotificationHelper notificationHelper = new NotificationHelper(context);
 
@@ -62,7 +61,7 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
                 break;
             case Geofence.GEOFENCE_TRANSITION_DWELL:
                 Toast.makeText(context, "사고 다발지역 안을 지나고 있습니다!", Toast.LENGTH_SHORT).show();
-                //notificationHelper.sendHighPriorityNotification("사고 다발지역 안을 지나고 있습니다!", showingData,accidnetCount, MainActivity.class);
+                //지나고 있을 경우는 toast 메시지만 띄워집니다.
                 break;
             case Geofence.GEOFENCE_TRANSITION_EXIT:
                 Toast.makeText(context, "사고 다발지역 안에서 나왔습니다!", Toast.LENGTH_SHORT).show();

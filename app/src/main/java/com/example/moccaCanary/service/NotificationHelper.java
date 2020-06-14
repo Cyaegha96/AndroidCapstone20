@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.AudioAttributes;
 import android.media.AudioDeviceInfo;
@@ -22,9 +23,14 @@ import android.util.Log;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.preference.PreferenceManager;
 
 import com.example.moccaCanary.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 public class NotificationHelper extends ContextWrapper {
@@ -32,7 +38,8 @@ public class NotificationHelper extends ContextWrapper {
     public static Context mContext;
     final Vibrator vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
     int currentVolume;
-
+    private SharedPreferences prefs;
+    private int userAge;
     private static final String TAG = "NotificationHelper";
     private  NotificationManager notificationManager;
     public NotificationHelper(Context base) {
@@ -68,7 +75,14 @@ public class NotificationHelper extends ContextWrapper {
     }
 
     public void sendHighPriorityNotification(String title, String body, int accidnetCount, Class activityName ) {
-
+        prefs= PreferenceManager.getDefaultSharedPreferences(this);
+        int year = prefs.getInt("year",-1);
+        if(year != -1){
+            Date currentTime = Calendar.getInstance().getTime();
+            SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
+            int thisyear = Integer.parseInt(yearFormat.format(currentTime));
+            userAge = thisyear - year + 1; //이렇게 해서 현재 나이가 계산됨!
+        }
 
         long[] pattern;
 
@@ -97,6 +111,10 @@ public class NotificationHelper extends ContextWrapper {
         }
 
 
+        int Timeout = 5000;
+        if(userAge >= 65 || (userAge <=13 && userAge >= 1)) {
+           Timeout = 7000;
+        }
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
              .setContentTitle(title)
               .setContentText(body)
@@ -107,8 +125,10 @@ public class NotificationHelper extends ContextWrapper {
                 .setAutoCancel(true)
                 .setDefaults( Notification.DEFAULT_LIGHTS)  //default로 사용하는 설정입니다.
                 .setVibrate(pattern)    //위에서 설정된 패턴으로 진동합니다.
-                .setTimeoutAfter(5000)   //5초후 자동으로 닫힙니다.
+                .setTimeoutAfter(Timeout)   //5~7초후 자동으로 닫힙니다.
                 .build();
+
+
 
         int notifyId = new Random().nextInt();
         requestaudiofocus();

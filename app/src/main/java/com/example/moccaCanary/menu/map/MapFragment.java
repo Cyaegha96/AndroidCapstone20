@@ -59,8 +59,12 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MapFragment extends Fragment
         implements OnMapReadyCallback,
@@ -110,6 +114,7 @@ public class MapFragment extends Fragment
     private List<RptData> rptDataList;
     private List<tmacsData> tmacsList;
 
+    private int userAge;
     private SharedPreferences prefs;
 
 
@@ -176,6 +181,15 @@ public class MapFragment extends Fragment
         prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if(!prefs.getString("distanceTo_parameter"," ").equals(" ")){
             DISTANCETO_PARAMETER = Integer.parseInt(prefs.getString("distanceTo_parameter","500"));
+        }
+
+        prefs= PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        int year = prefs.getInt("year",-1);
+        if(year != -1){
+            Date currentTime = Calendar.getInstance().getTime();
+            SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
+            int thisyear = Integer.parseInt(yearFormat.format(currentTime));
+            userAge = thisyear - year + 1; //이렇게 해서 현재 나이가 계산됨!
         }
     }
 
@@ -249,6 +263,16 @@ public class MapFragment extends Fragment
         mGoogleMap.setOnCameraIdleListener(this);
         mGoogleMap.setOnMyLocationChangeListener(this);
 
+        prefs= PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        int year = prefs.getInt("year",-1);
+        if(year != -1){
+            Date currentTime = Calendar.getInstance().getTime();
+            SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
+            int thisyear = Integer.parseInt(yearFormat.format(currentTime));
+            userAge = thisyear - year + 1; //이렇게 해서 현재 나이가 계산됨!
+        }
+
+
         if(((MainActivity)getActivity()).isUserLocationHasResult()){ //카나리 서비스가 실행중이라면
             addALLMarker(mGoogleMap);
         }
@@ -307,20 +331,64 @@ public class MapFragment extends Fragment
                                     +tData.getRegion()+"@"
                                     +tData.getDeadCount() + "@" + tData.getSeriousCount()+"@"
                                     +tData.getSlightlyCount()+"@"+tData.getInjuredCount()+"@"
-                                    +tData.getAccidentType()+"@"+tData.getIndex()
+                                    +tData.getAccidentType()+"@"+tData.getIndex()+"@"
+                                    +tData.getOldCount()+"@"+tData.getChildCount()
                             )
                             .icon(micon)
                             ;
-                    //아이콘 설정
+
                     markers.add( googleMap.addMarker(marker));
 
-                    circles.add(googleMap.addCircle(new CircleOptions()
-                                    .center(new LatLng(dLat,dLog))
-                                    .fillColor(0x22eb4034)
-                                    .strokeWidth(0)
-                                    .radius(GEOFENCE_RADIUS)
-                            )
-                    );
+                    if(userAge >= 65) {
+
+                        if(tData.getOldCount() > 0){
+                            circles.add(googleMap.addCircle(new CircleOptions()
+                                            .center(new LatLng(dLat,dLog))
+                                            .fillColor(0x22b30f04)
+                                            .strokeWidth(0)
+                                            .radius(GEOFENCE_RADIUS)
+                                    )
+                            );
+                        }else{
+                            circles.add(googleMap.addCircle(new CircleOptions()
+                                            .center(new LatLng(dLat,dLog))
+                                            .fillColor(0x22eb4034)
+                                            .strokeWidth(0)
+                                            .radius(GEOFENCE_RADIUS)
+                                    )
+                            );
+                        }
+
+                    }else if((userAge <=13 && userAge >= 1)){
+
+                        if(tData.getChildCount() > 0){
+                            circles.add(googleMap.addCircle(new CircleOptions()
+                                            .center(new LatLng(dLat,dLog))
+                                            .fillColor(0x22b30f04)
+                                            .strokeWidth(0)
+                                            .radius(GEOFENCE_RADIUS)
+                                    )
+                            );
+                        }else{
+                            circles.add(googleMap.addCircle(new CircleOptions()
+                                            .center(new LatLng(dLat,dLog))
+                                            .fillColor(0x22eb4034)
+                                            .strokeWidth(0)
+                                            .radius(GEOFENCE_RADIUS)
+                                    )
+                            );
+                        }
+                    }else{
+                        circles.add(googleMap.addCircle(new CircleOptions()
+                                        .center(new LatLng(dLat,dLog))
+                                        .fillColor(0x22eb4034)
+                                        .strokeWidth(0)
+                                        .radius(GEOFENCE_RADIUS)
+                                )
+                        );
+                    }
+
+                    //아이콘 설정
                 }
 
             }
@@ -476,8 +544,6 @@ public class MapFragment extends Fragment
         }
        else{
             root= getLayoutInflater().inflate(R.layout.bottom_sheet_data, null);
-
-
         }
 
         TextView bottomSheetAccidentType = root.findViewById(R.id.bottomSheet_accident_type);
@@ -489,10 +555,13 @@ public class MapFragment extends Fragment
         TextView bottomSheetSlightCount = root.findViewById(R.id.bottomSheet_slight_count);
         TextView bottomSheetInjuredCount = root.findViewById(R.id.bottomSheet_injured_count);
         TextView bottomSheetSeriousCount = root.findViewById(R.id.bottomSheet_serious_count);
+        TextView bottemSheetOldCount = root.findViewById(R.id.bottomSheet_old_count);
+        TextView bottomSheetChildCount = root.findViewById(R.id.bottomSheet_child_count);
 
 
         //sniffer에 담길 내용은 순서대로
-        //1. 사고년도 , 2. 사건장소, 3. 발생건수 , 4. 사상자수,5.사망자수,6,중상자수,7,경상자수,8,부상자수 9.사고 타입.
+        //1. 사고년도 , 2. 사건장소, 3. 발생건수 , 4. 사상자건수,5.사망자수,6,중상자수,7,경상자수,8,부상자수 9.사고 타입. 10.인덱스
+        //11. 고령자사고수 12. 어린이 사고수
 
         String accidentType = marker.getSnippet().split("@")[8];
 
@@ -514,6 +583,8 @@ public class MapFragment extends Fragment
                 break;
         }
 
+        Log.d(TAG,""+marker.getSnippet());
+
         bottomSheetAccidentType.setText(accidentType+" 사고 다발지역");
         bottomSheetYear.setText(marker.getSnippet().split("@")[0]);
         bottomSheetPlacename.setText(marker.getSnippet().split("@")[1]);
@@ -522,6 +593,8 @@ public class MapFragment extends Fragment
         bottomSheetSeriousCount.setText(marker.getSnippet().split("@")[5]);
         bottomSheetSlightCount.setText(marker.getSnippet().split("@")[6]);
         bottomSheetInjuredCount.setText(marker.getSnippet().split("@")[7]);
+        bottemSheetOldCount.setText(marker.getSnippet().split("@")[10]);
+        bottomSheetChildCount.setText(marker.getSnippet().split("@")[11]);
 
         return root;
     }
@@ -736,21 +809,5 @@ public class MapFragment extends Fragment
             }
 
            }
-
-
-
-           /*
-            if(!FREE_DRAG){
-                   myLat = location.getLatitude();
-
-
-                   myLog = location.getLongitude();
-                   myLocation = location;
-
-                   CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), ZOOM_LEVEL);
-                   mGoogleMap.moveCamera(cameraUpdate);
-               }
-            */
-
 
        }

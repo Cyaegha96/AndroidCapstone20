@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -30,6 +31,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.PreferenceManager;
 
 import com.example.moccaCanary.MainActivity;
 import com.example.moccaCanary.R;
@@ -39,7 +41,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.snackbar.Snackbar;
 import com.muddzdev.styleabletoast.StyleableToast;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
@@ -49,8 +55,10 @@ public class HomeFragment extends Fragment {
     private Button button;
     private TextView txt_activity;
     private View root;
+    private SharedPreferences prefs;
     private final int FINE_LOCATION_ACCESS_REQUEST_CODE = 10001;
     private final int BACKGROUND_LOCATION_ACCESS_REQUEST_CODE = 10002;
+    private int userAge;
     LatLng currPosition;
     Location userLocation;
 

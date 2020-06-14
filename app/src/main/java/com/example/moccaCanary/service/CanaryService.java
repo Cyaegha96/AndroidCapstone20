@@ -70,9 +70,13 @@ import com.google.android.gms.tasks.OnSuccessListener;
 
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 
 public class CanaryService extends Service implements LocationListener{
@@ -90,7 +94,6 @@ public class CanaryService extends Service implements LocationListener{
 
     SharedPreferences pref;
 
-    private float ACCIDENT_RADIUS = 200;
     private float GEOFENCE_RADIUS = 50;
     private float DISTANCETO_PARAMETER = 500;
     protected LocationManager locationManager;
@@ -134,7 +137,7 @@ public class CanaryService extends Service implements LocationListener{
    // private AudioHelper audioHelper;
 
     private SharedPreferences prefs;
-
+    private int userAge=0;
 
 
     @Override
@@ -216,6 +219,14 @@ public class CanaryService extends Service implements LocationListener{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         geocoder= new Geocoder(this);
+
+        int year = prefs.getInt("year",-1);
+        if(year != -1){
+            Date currentTime = Calendar.getInstance().getTime();
+            SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
+            int thisyear = Integer.parseInt(yearFormat.format(currentTime));
+            userAge = thisyear - year + 1; //이렇게 해서 현재 나이가 계산됨!
+        }
 
        // audioHelper = new AudioHelper(this);
       //  audioHelper.requestaudiofocus();
@@ -400,9 +411,7 @@ public class CanaryService extends Service implements LocationListener{
         }
     }
 
-
-
-    //데이터 리스트를, Geofenc에 적용시켜 넣습니다! 물론, DISTANCETO_PARAMETER 내의 데이터만 골라서 말이죠!
+    //데이터 리스트를, Geofence에 적용시켜 넣습니다! 물론, DISTANCETO_PARAMETER 내의 데이터만 골라서 말이죠!
     private void dataInputGeofence(){
 
         for(int i=0;i<deadDataList.size();i++){

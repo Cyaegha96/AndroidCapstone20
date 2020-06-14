@@ -63,7 +63,8 @@
                 android:orientation="horizontal"
                 android:layout_gravity="center"
                 android:gravity="center_horizontal"
-                android:textAlignment="center">
+                android:textAlignment="center"
+                >
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -71,15 +72,15 @@
                     android:text="발생건수"
                     android:textStyle="bold"
                     android:textColor="@color/design_default_color_error"
-                    android:textSize="12sp"/>
+                    android:textSize="14sp"/>
 
                 <TextView
                     android:id="@+id/bottomSheet_accident_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="발생건수"
-                    android:textSize="12sp"/>
+                    android:text="0"
+                    android:textSize="14sp"/>
 
 
 
@@ -87,18 +88,18 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="사망자수"
+                    android:text="사망건수"
                     android:textStyle="bold"
                     android:textColor="@color/design_default_color_error"
-                    android:textSize="12sp"/>
+                    android:textSize="14sp"/>
 
                 <TextView
                     android:id="@+id/bottomSheet_dead_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="사망자수"
-                    android:textSize="12sp"/>
+                    android:text="0"
+                    android:textSize="14sp"/>
 
 
             </LinearLayout>
@@ -108,59 +109,106 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
                 >
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="중상자수"
+                    android:text="중상건수"
                     android:textStyle="bold"
-                    android:textColor="#f5b042"
-                    android:textSize="12sp"/>
+                    android:textColor="#F19400"
+                    android:textSize="14sp"/>
 
                 <TextView
                     android:id="@+id/bottomSheet_serious_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="중상자수"
-                    android:textSize="12sp"/>
+                    android:text="0"
+                    android:textSize="14sp"/>
 
                 <TextView
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="경상자수"
+                    android:text="경상건수"
                     android:textStyle="bold"
                     android:textColor="#4d9456"
-                    android:textSize="12sp"/>
+                    android:textSize="14sp"/>
 
                 <TextView
                     android:id="@+id/bottomSheet_slight_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="경상자수"
-                    android:textSize="12sp"/>
+                    android:text="0"
+                    android:textSize="14sp"/>
 
                 <TextView
 
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="부상자수"
+                    android:text="부상건수"
                     android:textColor="#42c5f5"
                     android:textStyle="bold"
-                    android:textSize="12sp"/>
+                    android:textSize="14sp"/>
 
                 <TextView
                     android:id="@+id/bottomSheet_injured_count"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="부상자수"
-                    android:textSize="12sp"/>
+                    android:text="0"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_marginLeft="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:textAlignment="center"
+                >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="고령자 사고수"
+                    android:textStyle="bold"
+                    android:textColor="#00628F"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/bottomSheet_old_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="0"
+                    android:textSize="14sp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="어린이 사고수"
+                    android:textStyle="bold"
+                    android:textColor="#721EF1"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/bottomSheet_child_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="0"
+                    android:textSize="14sp"/>
+
 
             </LinearLayout>
         </LinearLayout>

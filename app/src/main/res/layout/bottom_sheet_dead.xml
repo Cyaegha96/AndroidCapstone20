@@ -17,6 +17,7 @@
         android:orientation="horizontal">
 
         <LinearLayout
+            android:layout_margin="3dp"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="5"
@@ -56,7 +57,7 @@
                     android:id="@+id/bottomSheet_roadType"
                     android:layout_width="112dp"
                     android:layout_height="50dp"
-                    android:layout_marginLeft="30dp"
+                    android:layout_marginLeft="10dp"
                     android:text="도로형태 대분류"
                     android:textColor="#FFFFFF"
                     android:textAlignment="center"
@@ -81,17 +82,18 @@
                     android:gravity="center_vertical"
                     tools:ignore="RtlCompat"
                     />
+
                 <TextView
-                    android:layout_marginLeft="30dp"
                     android:id="@+id/bottomSheet_carType"
                     android:layout_width="112dp"
                     android:layout_height="50dp"
-                    android:text="가해 차량 종류"
-                    android:textColor="#FFFFFF"
-                    android:textAlignment="center"
+                    android:layout_marginLeft="10dp"
                     android:gravity="center_vertical"
-                    tools:ignore="RtlCompat"
-                    />
+                    android:text="가해 차량 종류"
+                    android:textAlignment="center"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    tools:ignore="RtlCompat" />
             </LinearLayout>
         </LinearLayout>
         <ImageView

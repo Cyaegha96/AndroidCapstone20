@@ -116,9 +116,28 @@ public class SettingsActivity extends AppCompatActivity {
                         restartLocationService();
                     }
                     else if(prefs.getBoolean("useCriteria",true) == false){
-                        Toast.makeText(getActivity().getApplicationContext(),"NCriteria 사용이 중지되었습니다.",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity().getApplicationContext(),"Criteria 사용이 중지되었습니다.",Toast.LENGTH_SHORT).show();
                         restartLocationService();
                     }
+                }
+
+                //만약 gps스위치와 criteria 스위치가 false인 경우
+                if(!gpsSwitch.isChecked() && !criteriaSwitch.isChecked()){
+                    networkSwitch.setEnabled(false);
+                }
+                //만약 network 스위치와 criteria 스위치가 false 인경우
+                else if(!networkSwitch.isChecked() && !criteriaSwitch.isChecked()){
+                    gpsSwitch.setEnabled(false);
+
+                }
+                //만약 gps 스위치와 network 스위치가 false인 경우
+                else if(!gpsSwitch.isChecked() && !networkSwitch.isChecked()){
+                    criteriaSwitch.setEnabled(false);
+                }
+                else{
+                    gpsSwitch.setEnabled(true);
+                    networkSwitch.setEnabled(true);
+                    criteriaSwitch.setEnabled(true);
                 }
             }
 
