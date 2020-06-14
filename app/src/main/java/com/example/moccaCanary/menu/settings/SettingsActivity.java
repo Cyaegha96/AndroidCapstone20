@@ -92,38 +92,46 @@ public class SettingsActivity extends AppCompatActivity {
                 if(key.equals("useGPS")){
                     if(prefs.getBoolean("useGPS",true) == true){
                         Toast.makeText(getActivity().getApplicationContext(),"GPS Provider 사용 설정이 완료되었습니다.",Toast.LENGTH_SHORT).show();
-                        ((CanaryService)CanaryService.mContext).restartLocationService();
+                        restartLocationService();
                     }
                     else if(prefs.getBoolean("useGPS",true) == false){
                         Toast.makeText(getActivity().getApplicationContext(),"GPS Provider 사용이 중지되었습니다.",Toast.LENGTH_SHORT).show();
-                        ((CanaryService)CanaryService.mContext).restartLocationService();
+                        restartLocationService();
                     }
                 }
 
                 if(key.equals("useNetwork")){
                     if(prefs.getBoolean("useNetwork",true) == true){
                         Toast.makeText(getActivity().getApplicationContext(),"Network Provider 사용 설정이 완료되었습니다.",Toast.LENGTH_SHORT).show();
-                        ((CanaryService)CanaryService.mContext).restartLocationService();
+                        restartLocationService();
                     }
                     else if(prefs.getBoolean("useNetwork",true) == false){
                         Toast.makeText(getActivity().getApplicationContext(),"Network Provider 사용이 중지되었습니다.",Toast.LENGTH_SHORT).show();
-                        ((CanaryService)CanaryService.mContext).restartLocationService();
+                        restartLocationService();
                     }
                 }
                 if(key.equals("useCriteria")){
                     if(prefs.getBoolean("useCriteria",true) == true){
                         Toast.makeText(getActivity().getApplicationContext(),"Criteria 사용 설정이 완료되었습니다.",Toast.LENGTH_SHORT).show();
-                        ((CanaryService)CanaryService.mContext).restartLocationService();
+                        restartLocationService();
                     }
                     else if(prefs.getBoolean("useCriteria",true) == false){
                         Toast.makeText(getActivity().getApplicationContext(),"NCriteria 사용이 중지되었습니다.",Toast.LENGTH_SHORT).show();
-                        ((CanaryService)CanaryService.mContext).restartLocationService();
+                        restartLocationService();
                     }
                 }
             }
 
         };
+        public void restartLocationService(){
+            if(isServiceRunning(getContext())) {
+                ((CanaryService)CanaryService.mContext).restartLocationService();
+            }
+        }
     }
+
+
+
     public static boolean isServiceRunning(Context context) {
         ActivityManager am = (ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE);
     for (ActivityManager.RunningServiceInfo rsi :

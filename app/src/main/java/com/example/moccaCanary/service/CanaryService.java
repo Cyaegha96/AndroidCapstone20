@@ -75,7 +75,7 @@ import java.util.Collections;
 import java.util.List;
 
 
-public class CanaryService extends Service{
+public class CanaryService extends Service implements LocationListener{
 
     private static final String TAG = "CanaryService";
     public static Context mContext;
@@ -133,7 +133,7 @@ public class CanaryService extends Service{
     private Vibrator vibrator;
    // private AudioHelper audioHelper;
     CanaryBroadcastReceiver canaryBroadcastReceiver = new CanaryBroadcastReceiver();
-    CanaryLocationListener canaryLocationListener = CanaryLocationListener.getInstance();
+
     private SharedPreferences prefs;
 
 
@@ -285,7 +285,7 @@ public class CanaryService extends Service{
                 if (isNetworkEnabled && useNetwork) {
                     //네트워크 provider 사용 가능
                     locationManager.requestLocationUpdates(LocationManager.
-                            NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, canaryLocationListener);
+                            NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES,this);
 
                     if (locationManager != null) {
                         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -298,7 +298,7 @@ public class CanaryService extends Service{
                 if (isGPSEnabled && useGPS) {
                     if (location == null) {
                         locationManager.requestLocationUpdates(LocationManager.
-                                GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, canaryLocationListener);
+                                GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
                         if (locationManager != null) {
                             location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
                             if (location != null) {
@@ -314,7 +314,7 @@ public class CanaryService extends Service{
                     criteria.setPowerRequirement(Criteria.POWER_HIGH); // 높은 전원소비
                     if(locationManager.getBestProvider(criteria, true) !=null){
                         locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true),
-                                MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, canaryLocationListener);
+                                MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
                         location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
                     }
@@ -331,7 +331,7 @@ public class CanaryService extends Service{
 
     public void stopUsingUpdate() {
         if (locationManager != null) {
-            locationManager.removeUpdates(canaryLocationListener);
+            locationManager.removeUpdates(this);
         }
     }
 
@@ -696,6 +696,26 @@ public class CanaryService extends Service{
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        CanaryLocationUpdate(location);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 
 

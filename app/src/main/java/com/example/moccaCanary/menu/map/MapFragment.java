@@ -5,13 +5,10 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.media.Image;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -20,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,7 +35,6 @@ import com.example.moccaCanary.menu.data.DeadAdapter;
 import com.example.moccaCanary.menu.data.ReportAdapter;
 import com.example.moccaCanary.menu.data.TmacsDataAdapter;
 import com.example.moccaCanary.menu.data.tmacsData;
-import com.example.moccaCanary.service.CanaryLocationListener;
 import com.example.moccaCanary.service.CanaryService;
 import com.example.moccaCanary.menu.data.CwData;
 import com.example.moccaCanary.menu.data.Data;
@@ -49,7 +44,6 @@ import com.example.moccaCanary.menu.data.RptData;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.LocationSource;
 
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
@@ -73,7 +67,8 @@ public class MapFragment extends Fragment
         GoogleMap.OnMarkerClickListener,
         GoogleMap.OnCameraMoveListener,
         GoogleMap.OnCameraIdleListener,
-        GoogleMap.OnMyLocationButtonClickListener
+        GoogleMap.OnMyLocationButtonClickListener,
+        GoogleMap.OnMyLocationChangeListener
        {
 
     private static final String TAG = "MapFragment";
@@ -117,7 +112,6 @@ public class MapFragment extends Fragment
 
     private SharedPreferences prefs;
 
-    private CanaryLocationListener canaryLocationListener = CanaryLocationListener.getInstance();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -727,6 +721,20 @@ public class MapFragment extends Fragment
                    return false;
                }
            }
+
+           @Override
+           public void onMyLocationChange(Location location) {
+            if(!FREE_DRAG){
+                myLat = location.getLatitude();
+                myLog = location.getLongitude();
+                myLocation = location;
+
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(myLat, myLog), ZOOM_LEVEL);
+                mGoogleMap.moveCamera(cameraUpdate);
+            }
+
+           }
+
 
 
            /*
