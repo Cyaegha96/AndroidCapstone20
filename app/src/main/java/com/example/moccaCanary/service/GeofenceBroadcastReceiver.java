@@ -15,7 +15,8 @@ import java.util.List;
 public class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
     private static final String TAG = "GeofenceBroadcastReceiv";
-
+    boolean Ntype = true;
+    BroadcastReceiver broadcastReceiver;
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -43,7 +44,17 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
             showingData += geofence.getRequestId().split("@")[1];
         }
         int transitionType = geofencingEvent.getGeofenceTransition();
+        //차를 타고 있으면 false 알림이 안가고 아니면 true 알림을 해주고
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals("Ntype")) {
+                    Ntype = intent.getBooleanExtra("Ntype", true);
+                }
+            }
+        };
 
+        if(Ntype) {
         switch (transitionType) {
             case Geofence.GEOFENCE_TRANSITION_ENTER:
                 Toast.makeText(context, "사고 다발지역 안에 들어왔습니다!", Toast.LENGTH_SHORT).show();
@@ -56,7 +67,9 @@ public class GeofenceBroadcastReceiver extends BroadcastReceiver {
             case Geofence.GEOFENCE_TRANSITION_EXIT:
                 Toast.makeText(context, "사고 다발지역 안에서 나왔습니다!", Toast.LENGTH_SHORT).show();
                 notificationHelper.sendHighPriorityNotification("사고 다발지역 안에서 나왔습니다!", showingData,accidnetCount, MainActivity.class);
+                notificationHelper.abandonAudiofocus();
                 break;
+            }
         }
     }
 }

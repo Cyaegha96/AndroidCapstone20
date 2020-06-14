@@ -21,11 +21,10 @@ public class IntroActivity extends AppIntro {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //slide 1
+        //slide
         addSlide(AppIntroFragment.newInstance("안녕하세요", "보행자용 위험지역 알리미 카나리아 입니다"
                 , R.raw.c1, ContextCompat.getColor(getApplication(),
                         R.color.color1)));
-        //slide 2
         addSlide(AppIntroFragment.newInstance("앱을 활성화 해주세요", "활성시 위치정보를 받아옵니다"
                 , R.raw.c2, ContextCompat.getColor(getApplication(),
                         R.color.color1)));
@@ -38,17 +37,17 @@ public class IntroActivity extends AppIntro {
         addSlide(AppIntroFragment.newInstance("지도보기", "지도에서 위험 지역, 사고유형등 확인이 가능합니다"
                 , R.raw.c4, ContextCompat.getColor(getApplication(),
                         R.color.color1)));
-        addSlide(AppIntroFragment.newInstance("데이터보기", "실제 통계 데이터 열람이 가능합니다"
-                , R.raw.c5, ContextCompat.getColor(getApplication(),
-                        R.color.color1)));
         addSlide(AppIntroFragment.newInstance("그래프 보기", "보기 쉽게 그래프로 확인도 가능해요"
                 , R.raw.gr, ContextCompat.getColor(getApplication(),
                         R.color.color1)));
         addSlide(AppIntroFragment.newInstance("웹뷰보기", "교통사고분석사이트를 바로 열람 할 수 있습니다"
                 , R.raw.c7, ContextCompat.getColor(getApplication(),
                         R.color.color1)));
-        addSlide(AppIntroFragment.newInstance("제보하기", "위험지역을 제보해서 위험 정보를 알려주세요! 함께 만들어 갑시다"
-                , R.raw.c8, ContextCompat.getColor(getApplication(),
+        addSlide(AppIntroFragment.newInstance("제보하기", "위험지역을 제보해서 위험 정보를 알려주세요! 위치를 꾹 눌러 위치 지정 후"
+                , R.raw.c81, ContextCompat.getColor(getApplication(),
+                        R.color.color1)));
+        addSlide(AppIntroFragment.newInstance("제보하기", "유형을 정해서 보내주세요. 함께 만들어 갑시다!"
+                , R.raw.c82, ContextCompat.getColor(getApplication(),
                         R.color.color1)));
         addSlide(AppIntroFragment.newInstance("카나리아", "시작 해보세요!"
                 , R.raw.c9, ContextCompat.getColor(getApplication(),
@@ -58,8 +57,8 @@ public class IntroActivity extends AppIntro {
     @Override
     public void onSkipPressed(Fragment currentFragment) {
         super.onSkipPressed(currentFragment);
-        SharedPreferences tipfirst = getSharedPreferences("tip",MODE_PRIVATE);
-        boolean checkFirst = tipfirst.getBoolean("tip",false);
+        SharedPreferences tipfirst = getSharedPreferences("checkFirst",MODE_PRIVATE);
+        boolean checkFirst = tipfirst.getBoolean("checkFirst",false);
         if(!checkFirst) {
             SharedPreferences.Editor editor = tipfirst.edit();
             editor.putBoolean("checkFirst", true);
@@ -74,8 +73,8 @@ public class IntroActivity extends AppIntro {
     @Override
     public void onDonePressed(Fragment currentFragment) {
         super.onDonePressed(currentFragment);
-        SharedPreferences tipfirst = getSharedPreferences("tip",MODE_PRIVATE);
-        boolean checkFirst = tipfirst.getBoolean("tip",false);
+        SharedPreferences tipfirst = getSharedPreferences("checkFirst",MODE_PRIVATE);
+        boolean checkFirst = tipfirst.getBoolean("checkFirst",false);
         if(!checkFirst) {
             SharedPreferences.Editor editor = tipfirst.edit();
             editor.putBoolean("checkFirst", true);

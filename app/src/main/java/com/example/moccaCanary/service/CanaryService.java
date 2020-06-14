@@ -132,7 +132,6 @@ public class CanaryService extends Service implements LocationListener{
 
     private Vibrator vibrator;
    // private AudioHelper audioHelper;
-    CanaryBroadcastReceiver canaryBroadcastReceiver = new CanaryBroadcastReceiver();
 
     private SharedPreferences prefs;
 
@@ -231,7 +230,6 @@ public class CanaryService extends Service implements LocationListener{
         mContext = this;
 
         IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
-        registerReceiver(canaryBroadcastReceiver, filter);
 
         Log.d(TAG, "onStartCommand ");
         setUserDataList();
@@ -252,7 +250,6 @@ public class CanaryService extends Service implements LocationListener{
         super.onDestroy();
         removeGeofence();
         stopUsingUpdate();
-        unregisterReceiver(canaryBroadcastReceiver);
         stopTracking();
         removeNotification();
 
@@ -451,6 +448,29 @@ public class CanaryService extends Service implements LocationListener{
         }
     }
 
+    public void addRptListOnlyOne(RptData rptData){
+        Location r = new Location("r");
+
+        r.setLatitude(rptData.getLatitude());
+        r.setLongitude(rptData.getLongitude());
+        if(location.distanceTo(r) <= DISTANCETO_PARAMETER){
+            if(!userRptDataList.contains(rptData)){
+                LatLng latLng = new LatLng(r.getLatitude(),r.getLongitude());
+                //알림에 표시할 내용은 사용자 알림에 관한 내용
+                String geofenceId = "0"+"@"+"(제보:"+rptData.getSenderName() +") [" +
+                        rptData.getAccidentType()+
+                        "] 알림 이유 : "+rptData.getReasonSelected();
+                if(addGeofenceToList(geofenceId,latLng, GEOFENCE_RADIUS)){
+                    rptData.setGeofenceid(geofenceId);
+                    userRptDataList.add(rptData);
+                    addGeofenceOnlyOne(geofenceId, latLng, GEOFENCE_RADIUS);
+                }
+
+            }
+        }
+    }
+
+
     public void addRptList(RptData rptData){
 
         Location r = new Location("r");
@@ -467,7 +487,6 @@ public class CanaryService extends Service implements LocationListener{
                 if(addGeofenceToList(geofenceId,latLng, GEOFENCE_RADIUS)){
                     rptData.setGeofenceid(geofenceId);
                     userRptDataList.add(rptData);
-                    addGeofenceOnlyOne(geofenceId, latLng, GEOFENCE_RADIUS);
                 }
 
             }

@@ -132,7 +132,7 @@ public class report extends Fragment
                                     rptData.setLatitude((float) sendingLatLng.latitude);
                                     rptData.setLongitude((float) sendingLatLng.longitude);
                                     rptData.setNumId(numId);
-                                    ((CanaryService)CanaryService.mContext).addRptList(rptData);
+                                    ((CanaryService)CanaryService.mContext).addRptListOnlyOne(rptData);
 
                                 }
                                 Log.d(TAG,"DB에 해당 내용이 저장되었습니다!");

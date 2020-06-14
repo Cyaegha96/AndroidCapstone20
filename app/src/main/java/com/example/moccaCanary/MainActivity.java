@@ -41,8 +41,10 @@ import com.example.moccaCanary.menu.data.DataAdapter;
 import com.example.moccaCanary.menu.data.DataBaseHelper;
 import com.example.moccaCanary.menu.data.DeadData;
 import com.example.moccaCanary.menu.settings.SettingsActivity;
+import com.example.moccaCanary.service.Constants;
 import com.example.moccaCanary.user.IntroActivity;
 import com.example.moccaCanary.user.UserActivity;
+import com.google.android.gms.location.DetectedActivity;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
 
@@ -54,15 +56,16 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
     private AppBarConfiguration mAppBarConfiguration;
-
+    public static Context mContext;
     //초기위치 (경기대 한복판)
     public double myLat =37.300513;
     public double myLog = 127.035848;
     private Location userLocation;
-
+    private String label;
+    public boolean Ntype = true;
     List<Data> dataList;
     List<DeadData> deadList;
-
+    BroadcastReceiver broadcastReceiver;
    Geocoder geocoder;
 
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
@@ -70,7 +73,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        Ntype = true;
+        broadcastReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                if (intent.getAction().equals(Constants.BROADCAST_DETECTED_ACTIVITY)) {
+                    int type = intent.getIntExtra("type", -1);
+                    int confidence = intent.getIntExtra("confidence", 0);
+                    handleUserActivity2(type, confidence);
+                }
+            }
+        };
         LocalBroadcastManager.getInstance(this).registerReceiver(
                 mAlertReceiver, new IntentFilter("LocationSenderReciever"));
 
@@ -140,9 +153,71 @@ public class MainActivity extends AppCompatActivity {
             subtitle = year+" 년생 " + subtitle+" 거주";
         }
         nav_sub_view.setText(subtitle);
+        handleUserActivity2(0, 0);
+    }
+    public void handleUserActivity2(int type, int confidence) {
+        label = getString(R.string.activity_unknown);
+        Ntype = true;
+
+        switch (type) {
+            case DetectedActivity.IN_VEHICLE: {
+                label = getString(R.string.activity_in_vehicle);
+                Ntype = false;
+                break;
+            }
+            case DetectedActivity.ON_BICYCLE: {
+                label = getString(R.string.activity_on_bicycle);
+                break;
+            }
+            case DetectedActivity.ON_FOOT: {
+                label = getString(R.string.activity_on_foot);
+                break;
+            }
+            case DetectedActivity.RUNNING: {
+                label = getString(R.string.activity_running);
+                break;
+            }
+            case DetectedActivity.STILL: {
+                label = getString(R.string.activity_still);
+                break;
+            }
+            case DetectedActivity.TILTING: {
+                label = getString(R.string.activity_tilting);
+                break;
+            }
+            case DetectedActivity.WALKING: {
+                label = getString(R.string.activity_walking);
+                break;
+            }
+            case DetectedActivity.UNKNOWN: {
+                label = getString(R.string.activity_unknown);
+                break;
+            }
+        }
+
+        Intent intent = new Intent("Ntype");
+        intent.putExtra("Ntype", Ntype);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        Log.e(TAG, "User activity: " + label + ", Confidence: " + confidence);
 
     }
+    public boolean checkActivity(){
+        return Ntype;
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(broadcastReceiver,
+                new IntentFilter(Constants.BROADCAST_DETECTED_ACTIVITY));
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(broadcastReceiver);
+    }
 
     public String geocoderLocation(double d1, double d2, int cwindex){
         List<Address> list = null;
@@ -244,7 +319,9 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case R.id.action_explanation:
-
+                Intent intentS = new Intent(this, IntroActivity.class);
+                startActivity(intentS);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
