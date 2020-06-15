@@ -70,10 +70,7 @@ public class BackgroundDetectedActivitiesService extends Service {
         task.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getApplicationContext(),
-                        "Requesting activity updates failed to start",
-                        Toast.LENGTH_SHORT)
-                        .show();
+
             }
         });
     }

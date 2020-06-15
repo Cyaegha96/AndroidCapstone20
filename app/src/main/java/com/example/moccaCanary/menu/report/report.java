@@ -60,7 +60,7 @@ public class report extends Fragment
     private Spinner accidentSpinner;
     private EditText reasonSelected;
     private String selectedAccidentType;
-    private double GEOFENCE_RADIUS=30;
+    private double GEOFENCE_RADIUS=50;
 
     public static final String TABLE_NAME    = "report_table";
     private DataBaseHelper dataBaseHelper;
@@ -136,7 +136,7 @@ public class report extends Fragment
 
                                 }
                                 Log.d(TAG,"DB에 해당 내용이 저장되었습니다!");
-                                String emailText = "["+selectedAccidentType+"]\n"+"경도:"+ sendingLatLng.latitude+ "\n 위도:" +sendingLatLng.longitude;
+                                String emailText = "["+selectedAccidentType+"]\n"+"경도:"+ sendingLatLng.latitude+ "\n 위도:" +sendingLatLng.longitude + "\n 지정 사유 : " + reasonSelected.getText().toString();
                                 Intent email = new Intent(Intent.ACTION_SEND);
                                 email.setType("plain/text");
                                 String[] address = {"wldnd1102@naver.com"};
