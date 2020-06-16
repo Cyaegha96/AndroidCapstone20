@@ -302,7 +302,7 @@ public class MapFragment extends Fragment
                 t.setLongitude(dLog);
 
                 //자신의 반경 이내 마커만 표시하세용
-                if(myLocation.distanceTo(t) <  DISTANCETO_PARAMETER){
+                if(cameraLocation.distanceTo(t) <  DISTANCETO_PARAMETER){
 
                     //1. 사고년도 , 2. 사건장소, 3. 발생건수 , 4. 사상자수,5.사망자수,6,중상자수,7,경상자수,8,부상자수 9.사고 타입.
                     BitmapDescriptor micon;
