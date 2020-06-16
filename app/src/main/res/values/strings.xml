@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name"></string>
+    <string name="app_name">카나리아</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">사용자 이름</string>
@@ -42,9 +42,8 @@
     <string name="user_header">사용자 설정</string>
     <string name="provider">위치 공급자 설정</string>
 
-    <!-- Messages Preferences -->
     <string name="distanceTo_parameter">사용자 반경 설정</string>
-
+    <string name="criteria_selector">Criteria 세부 설정</string>
 
     <string name="activity_in_vehicle">In Vehicle</string>
     <string name="activity_on_bicycle">On Bicycle</string>

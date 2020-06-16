@@ -9,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -158,7 +159,7 @@ public class MapFragment extends Fragment
             myLat = myLocation.getLatitude();
             myLog = myLocation.getLongitude();
         }else{
-            myLocation = new Location("p");
+            myLocation = new Location(LocationManager.GPS_PROVIDER);
             myLocation.setLatitude(myLat);
             myLocation.setLongitude(myLog);
             cameraLocation= myLocation;
@@ -732,7 +733,7 @@ public class MapFragment extends Fragment
            public void onCameraIdle() {
 
 
-                   Location cameraLocationReal = new Location("googleMap");
+                   Location cameraLocationReal = new Location(LocationManager.GPS_PROVIDER);
                    cameraLocationReal.setLatitude(mGoogleMap.getCameraPosition().target.latitude);
                    cameraLocationReal.setLongitude(mGoogleMap.getCameraPosition().target.longitude);
                    if(cameraLocation.distanceTo(cameraLocationReal) > 200){

@@ -155,6 +155,9 @@ public class MainActivity extends AppCompatActivity {
         nav_sub_view.setText(subtitle);
         handleUserActivity2(0, 0);
     }
+
+    
+
     public void handleUserActivity2(int type, int confidence) {
         label = getString(R.string.activity_unknown);
         Ntype = true;

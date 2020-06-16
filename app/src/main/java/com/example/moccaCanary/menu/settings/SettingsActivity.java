@@ -54,6 +54,7 @@ public class SettingsActivity extends AppCompatActivity {
         SharedPreferences prefs;
         Preference userSettingsPreference;
         ListPreference userParameterPreference;
+        ListPreference criteriaSelector;
         SwitchPreference gpsSwitch;
         SwitchPreference networkSwitch;
         SwitchPreference criteriaSwitch;
@@ -71,6 +72,11 @@ public class SettingsActivity extends AppCompatActivity {
                 userParameterPreference.setSummary(summary + "\n현재 탐색: "+ prefs.getString("distanceTo_parameter","500") +"m");
             }
 
+            criteriaSelector = (ListPreference) findPreference("criteria_selector");
+            if(!prefs.getString("criteria_selector"," ").equals(" ")){
+                String summary = "criteria의 세부설정을 진행합니다.";
+                criteriaSelector.setSummary(summary + "\n현재 설정: "+ prefs.getString("criteria_selector","high"));
+            }
             gpsSwitch = (SwitchPreference) findPreference("useGPS");
             networkSwitch = (SwitchPreference) findPreference("useNetwork");
             criteriaSwitch = (SwitchPreference) findPreference("useCriteria");
@@ -89,6 +95,7 @@ public class SettingsActivity extends AppCompatActivity {
                         ((CanaryService)CanaryService.mContext).restartGeofenceService();
                     }
                 }
+
                 if(key.equals("useGPS")){
                     if(prefs.getBoolean("useGPS",true) == true){
                         Toast.makeText(getActivity().getApplicationContext(),"GPS Provider 사용 설정이 완료되었습니다.",Toast.LENGTH_SHORT).show();
@@ -119,6 +126,12 @@ public class SettingsActivity extends AppCompatActivity {
                         Toast.makeText(getActivity().getApplicationContext(),"Criteria 사용이 중지되었습니다.",Toast.LENGTH_SHORT).show();
                         restartLocationService();
                     }
+                }
+
+                if(key.equals("criteria_selector")){
+                    String summary = "criteria의 세부설정을 진행합니다.";
+                    criteriaSelector.setSummary(summary + "\n현재 설정: "+ prefs.getString("criteria_selector","high"));
+                    restartLocationService();
                 }
 
                 //만약 gps스위치와 criteria 스위치가 false인 경우

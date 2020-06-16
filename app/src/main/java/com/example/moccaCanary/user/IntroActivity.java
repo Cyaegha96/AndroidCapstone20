@@ -46,7 +46,7 @@ public class IntroActivity extends AppIntro {
         addSlide(AppIntroFragment.newInstance("제보하기", "위험지역을 제보해서 위험 정보를 알려주세요! 위치를 꾹 눌러 위치 지정 후"
                 , R.raw.c81, ContextCompat.getColor(getApplication(),
                         R.color.color1)));
-        addSlide(AppIntroFragment.newInstance("제보하기", "유형을 정해서 보내주세요. 함께 만들어 갑시다!"
+        addSlide(AppIntroFragment.newInstance("제보하기", "제보유형을 정해서 보내주세요. 함께 만들어 갑시다!"
                 , R.raw.c82, ContextCompat.getColor(getApplication(),
                         R.color.color1)));
         addSlide(AppIntroFragment.newInstance("카나리아", "시작 해보세요!"

@@ -332,4 +332,14 @@
         <item>500</item>
         <item>700</item>
     </string-array>
+    <string-array name="criteria_selector_entries">
+        <item>정확도 상: 높은 정확도,높은 전원소비</item>
+        <item>정확도 중: 높은 정확도, 낮은 전원소비</item>
+        <item>정확도 하: 적당한 정확도, 낮은 전원소비</item>
+    </string-array>
+    <string-array name="criteria_selector_values">
+        <item>high</item>
+        <item>middle</item>
+        <item>low</item>
+    </string-array>
 </resources>

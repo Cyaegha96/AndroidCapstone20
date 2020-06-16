@@ -68,7 +68,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
-
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,7 +78,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class CanaryService extends Service implements LocationListener{
+public class CanaryService extends Service implements LocationListener {
 
     private static final String TAG = "CanaryService";
     public static Context mContext;
@@ -89,7 +88,7 @@ public class CanaryService extends Service implements LocationListener{
     double latitude; // Latitude
     double longitude; // Longitude
 
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // 1 meters
+    private static float MIN_DISTANCE_CHANGE_FOR_UPDATES = 1; // 1 meters
     private static final long MIN_TIME_BW_UPDATES = 1000; // 1 second
 
     SharedPreferences pref;
@@ -104,7 +103,7 @@ public class CanaryService extends Service implements LocationListener{
 
     private boolean useGPS = true;
     private boolean useNetwork = true;
-    private boolean useCriteria =false;
+    private boolean useCriteria = false;
 
     Geocoder geocoder;
 
@@ -126,18 +125,18 @@ public class CanaryService extends Service implements LocationListener{
     private List<RptData> rptDataList;
     private List<RptData> userRptDataList = new ArrayList<>();
     private List<tmacsData> tmacsDataList;
-    private List<tmacsData> userTmacsDataList  = new ArrayList<>();
+    private List<tmacsData> userTmacsDataList = new ArrayList<>();
 
 
     private List<Geofence> userGeofenceList = new ArrayList<>();
 
-    private int locationChangeCount =0;
+    private int locationChangeCount = 0;
 
     private Vibrator vibrator;
-   // private AudioHelper audioHelper;
+    // private AudioHelper audioHelper;
 
     private SharedPreferences prefs;
-    private int userAge=0;
+    private int userAge = 0;
 
 
     @Override
@@ -145,12 +144,12 @@ public class CanaryService extends Service implements LocationListener{
         super.onCreate();
         Log.d(TAG, "onCreate ");
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if(!prefs.getString("distanceTo_parameter"," ").equals(" ")){
-            DISTANCETO_PARAMETER = Integer.parseInt(prefs.getString("distanceTo_parameter","500"));
+        if (!prefs.getString("distanceTo_parameter", " ").equals(" ")) {
+            DISTANCETO_PARAMETER = Integer.parseInt(prefs.getString("distanceTo_parameter", "500"));
         }
-        useGPS = prefs.getBoolean("useGPS",true);
-        useNetwork =prefs.getBoolean("useNetwork",true);
-        useCriteria = prefs.getBoolean( "useCriteria",false);
+        useGPS = prefs.getBoolean("useGPS", true);
+        useNetwork = prefs.getBoolean("useNetwork", true);
+        useCriteria = prefs.getBoolean("useCriteria", false);
 
     }
 
@@ -218,18 +217,25 @@ public class CanaryService extends Service implements LocationListener{
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        geocoder= new Geocoder(this);
+        geocoder = new Geocoder(this);
 
-        int year = prefs.getInt("year",-1);
-        if(year != -1){
+        int year = prefs.getInt("year", -1);
+        if (year != -1) {
             Date currentTime = Calendar.getInstance().getTime();
             SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
             int thisyear = Integer.parseInt(yearFormat.format(currentTime));
             userAge = thisyear - year + 1; //이렇게 해서 현재 나이가 계산됨!
-        }
 
-       // audioHelper = new AudioHelper(this);
-      //  audioHelper.requestaudiofocus();
+            //일반 성인의 보폭을 고려한 MIN_DISTANCE_CHANGE_FOR_UPDATES
+            if (userAge <= 13 && userAge > 0) { //어린이이
+                MIN_DISTANCE_CHANGE_FOR_UPDATES = (float) 1.14;
+            }else if(userAge >= 65){ //고령자
+                MIN_DISTANCE_CHANGE_FOR_UPDATES = (float) 1.02;
+            }else{ //일반 성인
+                MIN_DISTANCE_CHANGE_FOR_UPDATES = (float) 1.27;
+            }
+
+        }
 
         location = getLocation();
         createNotification();
@@ -245,10 +251,11 @@ public class CanaryService extends Service implements LocationListener{
         Log.d(TAG, "onStartCommand ");
         setUserDataList();
         dataInputGeofence();
-        if(userGeofenceList.size() >0){
+        if (userGeofenceList.size() > 0) {
             addGeofences();
-            Log.d(TAG, "geofence 개수:"+userGeofenceList.size());
-        }else{
+            Log.d(TAG, "geofence 개수:" + userGeofenceList.size());
+        } else {
+            Toast.makeText(mContext,"주변에 geofence가 하나도 없습니다.",Toast.LENGTH_SHORT).show();
             Log.d(TAG, "주변에 geofence가 하나도 없습니다.");
         }
 
@@ -293,7 +300,7 @@ public class CanaryService extends Service implements LocationListener{
                 if (isNetworkEnabled && useNetwork) {
                     //네트워크 provider 사용 가능
                     locationManager.requestLocationUpdates(LocationManager.
-                            NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES,this);
+                            NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
                     if (locationManager != null) {
                         location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -316,19 +323,33 @@ public class CanaryService extends Service implements LocationListener{
                         }
                     }
                 }
-                if(useCriteria){
+                if (useCriteria) {
+
                     Criteria criteria = new Criteria();
-                    criteria.setAccuracy(Criteria.ACCURACY_FINE); // 높은 정확도
-                    criteria.setPowerRequirement(Criteria.POWER_HIGH); // 높은 전원소비
-                    if(locationManager.getBestProvider(criteria, true) !=null){
+                    String criteria_selector="";
+                    if (!prefs.getString("criteria_selector", " ").equals(" ")) {
+                        criteria_selector = prefs.getString("criteria_selector", "high");
+                    }
+
+                    if(criteria_selector.equals("high")){
+                        criteria.setAccuracy(Criteria.ACCURACY_FINE); // 높은 정확도
+                        criteria.setPowerRequirement(Criteria.POWER_HIGH); // 높은 전원소비
+                    }else if(criteria_selector.equals("middle")){
+                        criteria.setAccuracy(Criteria.ACCURACY_FINE); // 높은 정확도
+                        criteria.setPowerRequirement(Criteria.POWER_LOW); // 낮은 전원소비
+                    }else if(criteria_selector.equals("low")){
+                        criteria.setAccuracy(Criteria.ACCURACY_COARSE); // 적당한 정확도
+                        criteria.setPowerRequirement(Criteria.POWER_LOW); // 낮은 전원소비
+                    }
+
+                    if (locationManager.getBestProvider(criteria, true) != null) {
                         locationManager.requestLocationUpdates(locationManager.getBestProvider(criteria, true),
                                 MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
                         location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, true));
                     }
                 }
 
-                updatedLocation =location;
+                updatedLocation = location;
                 sendLocation(location);
             }
         } catch (Exception e) {
@@ -350,106 +371,121 @@ public class CanaryService extends Service implements LocationListener{
                 != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
-        }return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
+        return locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
     }
 
-    public List<Data> getUserDataList(){
+    public List<Data> getUserDataList() {
         return userDataList;
     }
-    public List<DeadData> getDeadDataList() { return userDeadList; }
-    public List<RptData> getRptDataList() {return userRptDataList;}
-    public List<tmacsData> getTmacsDataList() {return userTmacsDataList;}
-    public List<tmacsData> getALLTmacsDataList(){return tmacsDataList;}
+
+    public List<DeadData> getDeadDataList() {
+        return userDeadList;
+    }
+
+    public List<RptData> getRptDataList() {
+        return userRptDataList;
+    }
+
+    public List<tmacsData> getTmacsDataList() {
+        return userTmacsDataList;
+    }
+
+    public List<tmacsData> getALLTmacsDataList() {
+        return tmacsDataList;
+    }
+
     //보행자 다발지역 리스트 중에서 user로부터 1km 이내의 것들만 골라냅니다.
-    private void setUserDataList(){
-        for(int i=0;i<dList.size();i++){
+    private void setUserDataList() {
+        for (int i = 0; i < dList.size(); i++) {
             Location l = new Location("p");
             l.setLatitude(dList.get(i).getLatitude());
             l.setLongitude(dList.get(i).getLongitude());
-            if(location.distanceTo(l) <= DISTANCETO_PARAMETER){
-               userDataList.add(dList.get(i));
+            if (location.distanceTo(l) <= DISTANCETO_PARAMETER) {
+                userDataList.add(dList.get(i));
             }
 
         }
     }
+
     private void sendLocation(Location location) {
         //intent를 활용해 Location 정보 전송
         Intent intent = new Intent("LocationSenderReciever");
-        intent.putExtra("provider",location.getProvider()+"");
+        intent.putExtra("provider", location.getProvider() + "");
         intent.putExtra("lat", location.getLatitude());
-        intent.putExtra("lng",location.getLongitude());
-        intent.putExtra("speed",location.getSpeed());
+        intent.putExtra("lng", location.getLongitude());
+        intent.putExtra("speed", location.getSpeed());
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
-        Log.d(TAG,"sendLocation(Location location) ");
+        Log.d(TAG, "sendLocation(Location location) ");
         builder.setContentText("알림 서비스 실행중 (위치 update) ");
         builder.setStyle(new NotificationCompat.InboxStyle()
-                .addLine("현재 위치: 경도 "+ String.format("%.2f", location.getLatitude()) +" 위도 "+String.format("%.2f", location.getLongitude()))
-                .addLine("반경 "+ DISTANCETO_PARAMETER+" m내의 Geofence 수: " + userGeofenceList.size()));
+                .addLine("현재 위치: 경도 " + String.format("%.2f", location.getLatitude()) + " 위도 " + String.format("%.2f", location.getLongitude()))
+                .addLine("반경 " + DISTANCETO_PARAMETER + " m내의 Geofence 수: " + userGeofenceList.size()));
         notificationManager.notify(1, builder.build());
-        Log.d(TAG,"notification 갱신");
+        Log.d(TAG, "notification 갱신");
     }
 
-    public void CanaryLocationUpdate(Location location){
-        if(location.getAccuracy() < 0.5 ){ //정확도가 0일 경우 --> 무시해야함!
+    public void CanaryLocationUpdate(Location location) {
+        if (location.getAccuracy() < 0.5) { //정확도가 0일 경우 --> 무시해야함!
             return;
         }
         this.location = location;
         latitude = location.getLatitude();
         longitude = location.getLongitude();
         sendLocation(location);
-        Log.d(TAG,"Location changed: 위도:" +location.getLatitude()+ " 경도: "+location.getLongitude() );
+        Log.d(TAG, "Location changed: 위도:" + location.getLatitude() + " 경도: " + location.getLongitude());
 
         //500미터 단위로 geofence 주기적 갱신
         //만약 300미터 이상 이동시
-        if(updatedLocation.distanceTo(location) >= 300){
+        if (updatedLocation.distanceTo(location) >= 300) {
             updatedLocation = location;
             locationChangeCount++;
-            Log.d(TAG,"사용자가 초기 위치보다 300m 멀어지면 갱신/ locationChangeCount"+locationChangeCount);
+            Log.d(TAG, "사용자가 초기 위치보다 300m 멀어지면 갱신/ locationChangeCount" + locationChangeCount);
             CanaryService.backgroundLocationUpcate task = new CanaryService.backgroundLocationUpcate();
             task.execute();
         }
     }
 
     //데이터 리스트를, Geofence에 적용시켜 넣습니다! 물론, DISTANCETO_PARAMETER 내의 데이터만 골라서 말이죠!
-    private void dataInputGeofence(){
+    private void dataInputGeofence() {
 
-        for(int i=0;i<deadDataList.size();i++){
+        for (int i = 0; i < deadDataList.size(); i++) {
             DeadData deadData = deadDataList.get(i);
             Location d = new Location("d");
             d.setLatitude(deadData.getLa_crd());
             d.setLongitude(deadData.getLo_crd());
 
-            if(location.distanceTo(d) <=DISTANCETO_PARAMETER ){
+            if (location.distanceTo(d) <= DISTANCETO_PARAMETER) {
 
-                LatLng latLng = new LatLng(d.getLatitude(),d.getLongitude());
+                LatLng latLng = new LatLng(d.getLatitude(), d.getLongitude());
                 //알림에 표시할 내용은 // 사망자는 무조건 강 알림 주자//   (년도) 사고종류 사망자수: x명
-                String geofenceId = "100"+"@"+"( "+deadData.getAcc_year() +" )" +
-                        deadData.getAcc_ty_cd()+
-                        " 사망자수: "+deadData.getDth_dnv_cnt()+"명";
-                if(addGeofenceToList(geofenceId,latLng, GEOFENCE_RADIUS)){
+                String geofenceId = "100" + "@" + "( " + deadData.getAcc_year() + " )" +
+                        deadData.getAcc_ty_cd() +
+                        " 사망자수: " + deadData.getDth_dnv_cnt() + "명"+"\n";
+                if (addGeofenceToList(geofenceId, latLng, GEOFENCE_RADIUS)) {
                     userDeadList.add(deadData);
                 }
             }
         }
 
-        for(int i=0;i<rptDataList.size();i++){
+        for (int i = 0; i < rptDataList.size(); i++) {
             addRptList(rptDataList.get(i));
         }
         if (tmacsDataList != null) {
-            for(int i=0;i<tmacsDataList.size();i++){
+            for (int i = 0; i < tmacsDataList.size(); i++) {
                 tmacsData tmacs = tmacsDataList.get(i);
                 Location t = new Location("T");
                 t.setLatitude(tmacs.getLatitude());
                 t.setLongitude(tmacs.getLongitude());
 
-                if(location.distanceTo(t) <= DISTANCETO_PARAMETER){
-                    LatLng latLng = new LatLng(t.getLatitude(),t.getLongitude());
+                if (location.distanceTo(t) <= DISTANCETO_PARAMETER) {
+                    LatLng latLng = new LatLng(t.getLatitude(), t.getLongitude());
                     //알림에 표시할 내용은 //사고 발생건수+ 사고 장소 +위험도
-                    String geofenceId = tmacs.getAccidentCount()+"@"+"("+tmacs.getPlaceName() +")" +
-
-                            " 위험도: "+tmacs.getTotalScore();
-                    if(addGeofenceToList(geofenceId,latLng, GEOFENCE_RADIUS)){
+                    String geofenceId = tmacs.getAccidentCount() + "@" + "(" + tmacs.getPlaceName() + ")" +
+                            " 발생건수: " +tmacs.getAccidentCount()+
+                            " 위험도: " + tmacs.getTotalScore()+"\n";
+                    if (addGeofenceToList(geofenceId, latLng, GEOFENCE_RADIUS)) {
                         userTmacsDataList.add(tmacs);
                     }
                 }
@@ -457,19 +493,19 @@ public class CanaryService extends Service implements LocationListener{
         }
     }
 
-    public void addRptListOnlyOne(RptData rptData){
+    public void addRptListOnlyOne(RptData rptData) {
         Location r = new Location("r");
 
         r.setLatitude(rptData.getLatitude());
         r.setLongitude(rptData.getLongitude());
-        if(location.distanceTo(r) <= DISTANCETO_PARAMETER){
-            if(!userRptDataList.contains(rptData)){
-                LatLng latLng = new LatLng(r.getLatitude(),r.getLongitude());
+        if (location.distanceTo(r) <= DISTANCETO_PARAMETER) {
+            if (!userRptDataList.contains(rptData)) {
+                LatLng latLng = new LatLng(r.getLatitude(), r.getLongitude());
                 //알림에 표시할 내용은 사용자 알림에 관한 내용
-                String geofenceId = "0"+"@"+"(제보:"+rptData.getSenderName() +") [" +
-                        rptData.getAccidentType()+
-                        "] 알림 이유 : "+rptData.getReasonSelected();
-                if(addGeofenceToList(geofenceId,latLng, GEOFENCE_RADIUS)){
+                String geofenceId = "0" + "@" + "(제보:" + rptData.getSenderName() + ") [" +
+                        rptData.getAccidentType() +
+                        "] 알림 이유 : " + rptData.getReasonSelected()+"\n";
+                if (addGeofenceToList(geofenceId, latLng, GEOFENCE_RADIUS)) {
                     rptData.setGeofenceid(geofenceId);
                     userRptDataList.add(rptData);
                     addGeofenceOnlyOne(geofenceId, latLng, GEOFENCE_RADIUS);
@@ -480,20 +516,20 @@ public class CanaryService extends Service implements LocationListener{
     }
 
 
-    public void addRptList(RptData rptData){
+    public void addRptList(RptData rptData) {
 
         Location r = new Location("r");
 
         r.setLatitude(rptData.getLatitude());
         r.setLongitude(rptData.getLongitude());
-        if(location.distanceTo(r) <= DISTANCETO_PARAMETER){
-            if(!userRptDataList.contains(rptData)){
-                LatLng latLng = new LatLng(r.getLatitude(),r.getLongitude());
+        if (location.distanceTo(r) <= DISTANCETO_PARAMETER) {
+            if (!userRptDataList.contains(rptData)) {
+                LatLng latLng = new LatLng(r.getLatitude(), r.getLongitude());
                 //알림에 표시할 내용은 사용자 알림에 관한 내용
-                String geofenceId = "0"+"@"+"(제보:"+rptData.getSenderName() +") [" +
-                        rptData.getAccidentType()+
-                        "] 알림 이유 : "+rptData.getReasonSelected();
-                if(addGeofenceToList(geofenceId,latLng, GEOFENCE_RADIUS)){
+                String geofenceId = "0" + "@" + "(제보:" + rptData.getSenderName() + ") [" +
+                        rptData.getAccidentType() +
+                        "] 알림 이유 : " + rptData.getReasonSelected();
+                if (addGeofenceToList(geofenceId, latLng, GEOFENCE_RADIUS)) {
                     rptData.setGeofenceid(geofenceId);
                     userRptDataList.add(rptData);
                 }
@@ -502,38 +538,42 @@ public class CanaryService extends Service implements LocationListener{
         }
     }
 
-    public void addGeofenceOnlyOne(String geofenceId, LatLng latLng, float radius){
-       if( addGeofenceToList(geofenceId,latLng,radius) ){
-           Geofence geofence = userGeofenceList.get(userGeofenceList.size()-1);
-           GeofencingRequest geofencingRequest = geofenceHelper.getGeofencingRequest(geofence);
+    public void addGeofenceOnlyOne(String geofenceId, LatLng latLng, float radius) {
+        if (addGeofenceToList(geofenceId, latLng, radius)) {
+            Geofence geofence = userGeofenceList.get(userGeofenceList.size() - 1);
+            GeofencingRequest geofencingRequest = geofenceHelper.getGeofencingRequest(geofence);
 
-           geofencingClient.addGeofences(geofencingRequest, geofenceHelper.getPendingIntent())
-                   .addOnSuccessListener(new OnSuccessListener<Void>() {
-                       @Override
-                       public void onSuccess(Void aVoid) {
-                           Log.d(TAG, "onSuccess: Geofence Added...");
-                       }
-                   })
-                   .addOnFailureListener(new OnFailureListener() {
-                       @Override
-                       public void onFailure(@NonNull Exception e) {
-                           String errorMessage = geofenceHelper.getErrorString(e);
-                           Log.d(TAG, "onFailure: " + errorMessage);
-                       }
-                   });
-       }
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+                return;
+            }
+            geofencingClient.addGeofences(geofencingRequest, geofenceHelper.getPendingIntent())
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "onSuccess: Geofence Added...");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            String errorMessage = geofenceHelper.getErrorString(e);
+                            Log.d(TAG, "onFailure: " + errorMessage);
+                        }
+                    });
+        }
     }
 
 
-    public void removeGeofenceOnlyOne(String geofenceId){
+    public void removeGeofenceOnlyOne(String geofenceId) {
 
         geofencingClient.removeGeofences(Collections.singletonList(geofenceId))
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "onSuccess: Geofence remove...");
-            }
-        })
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "onSuccess: Geofence remove...");
+                    }
+                })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
@@ -543,14 +583,14 @@ public class CanaryService extends Service implements LocationListener{
                 });
     }
 
-    private boolean addGeofenceToList(String geofenceId, LatLng latLng, float radius){
+    private boolean addGeofenceToList(String geofenceId, LatLng latLng, float radius) {
 
-        Log.d(TAG,"등록된 geofenceId."+geofenceId);
-        if(userGeofenceList.size() < 100){
+        Log.d(TAG, "등록된 geofenceId." + geofenceId);
+        if (userGeofenceList.size() < 100) {
             userGeofenceList.add(geofenceHelper.getGeofence(geofenceId, latLng, radius,
                     Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL | Geofence.GEOFENCE_TRANSITION_EXIT));
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -560,6 +600,11 @@ public class CanaryService extends Service implements LocationListener{
         GeofencingRequest geofencingRequest = geofenceHelper.getGeofencesRequest(userGeofenceList);
 
 
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            return;
+        }
         geofencingClient.addGeofences(geofencingRequest, geofenceHelper.getPendingIntent())
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

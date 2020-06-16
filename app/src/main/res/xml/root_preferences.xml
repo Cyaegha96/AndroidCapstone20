@@ -45,5 +45,15 @@
             android:defaultValue="false"
             android:key="useCriteria"
             />
+        <ListPreference
+            android:defaultValue="high"
+            android:entries="@array/criteria_selector_entries"
+            android:entryValues="@array/criteria_selector_values"
+            android:key="criteria_selector"
+            android:summary="criteria의 세부설정을 진행합니다."
+            android:title="@string/criteria_selector"
+            android:showDefault = "true"
+            android:dependency="useCriteria"
+            />
     </PreferenceCategory>
 </PreferenceScreen>
