@@ -5,11 +5,11 @@ android {
     buildToolsVersion "29.0.2"
 
     defaultConfig {
-        applicationId "com.example.moccaCanary"
+        applicationId "com.mocca.moccaCanary"
         minSdkVersion 16
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -53,5 +53,5 @@ dependencies {
 
     implementation 'com.google.android.material:material:1.2.0-alpha02'
 
-    compile 'com.github.paolorotolo:appintro:4.1.0'
+    implementation 'com.github.paolorotolo:appintro:4.1.0'
 }

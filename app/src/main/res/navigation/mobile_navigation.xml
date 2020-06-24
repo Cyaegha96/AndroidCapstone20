@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.example.moccaCanary.menu.home.HomeFragment"
+        android:name="com.mocca.moccaCanary.menu.home.HomeFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home">
 
@@ -17,7 +17,7 @@
     </fragment>
     <fragment
         android:id="@+id/nav_home_second"
-        android:name="com.example.moccaCanary.menu.home.HomeSecondFragment"
+        android:name="com.mocca.moccaCanary.menu.home.HomeSecondFragment"
         android:label="@string/home_second"
         tools:layout="@layout/fragment_home_second">
         <action
@@ -31,23 +31,23 @@
 
     <fragment
         android:id="@+id/nav_map"
-        android:name="com.example.moccaCanary.menu.map.MapFragment"
+        android:name="com.mocca.moccaCanary.menu.map.MapFragment"
         android:label="@string/menu_map"
         tools:layout="@layout/fragment_map"/>
     <fragment
         android:id="@+id/nav_graph"
-        android:name="com.example.moccaCanary.menu.data.GraphFragment"
+        android:name="com.mocca.moccaCanary.menu.data.GraphFragment"
         android:label="Graph 그래프보기"
         tools:layout="@layout/fragment_graph_view" />
 
     <fragment
         android:id="@+id/web_view"
-        android:name="com.example.moccaCanary.menu.data.WebViewFragment"
+        android:name="com.mocca.moccaCanary.menu.data.WebViewFragment"
         android:label="Webview 웹뷰보기"
         tools:layout="@layout/fragment_web_view" />
     <fragment
         android:id="@+id/report"
-        android:name="com.example.moccaCanary.menu.report.report"
+        android:name="com.mocca.moccaCanary.menu.report.report"
         android:label="Report 제보하기"
         tools:layout="@layout/fragment_report" />
 </navigation>

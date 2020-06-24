@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.moccaCanary">
+    package="com.mocca.moccaCanary">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -23,13 +23,13 @@
         tools:targetApi="m">
 
         <activity
-            android:name="com.example.moccaCanary.menu.settings.SettingsActivity"
-            android:parentActivityName=".MainActivity"
+            android:name="com.mocca.moccaCanary.menu.settings.SettingsActivity"
+            android:parentActivityName="com.mocca.moccaCanary.MainActivity"
             android:label="@string/title_activity_settings"
             android:theme="@style/AppTheme.PopupOverlay"/>
 
         <activity
-            android:name="com.example.moccaCanary.user.UserActivity"
+            android:name="com.mocca.moccaCanary.user.UserActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.PopupOverlay"
             />
@@ -40,7 +40,7 @@
             android:value="AIzaSyBZ1TZ6gVPWNsmVQUgl6uiQqLB66r1aOws" />
 
         <activity
-            android:name="com.example.moccaCanary.SplashActivity"
+            android:name="com.mocca.moccaCanary.SplashActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -49,30 +49,30 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.example.moccaCanary.user.IntroActivity"/>
+        <activity android:name="com.mocca.moccaCanary.user.IntroActivity"/>
         <activity
-            android:name="com.example.moccaCanary.MainActivity"
+            android:name="com.mocca.moccaCanary.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustPan"
             android:launchMode="singleTask"/>
 
         <service
-            android:name="com.example.moccaCanary.service.CanaryService"
+            android:name="com.mocca.moccaCanary.service.CanaryService"
             android:enabled="true"
             android:exported="true"
             android:foregroundServiceType="location" />
         <service
-            android:name="com.example.moccaCanary.service.DetectedActivitiesIntentService"
+            android:name="com.mocca.moccaCanary.service.DetectedActivitiesIntentService"
             android:exported="false" />
-        <service android:name="com.example.moccaCanary.service.BackgroundDetectedActivitiesService" />
+        <service android:name="com.mocca.moccaCanary.service.BackgroundDetectedActivitiesService" />
 
         <receiver
-            android:name="com.example.moccaCanary.service.GeofenceBroadcastReceiver"
+            android:name="com.mocca.moccaCanary.service.GeofenceBroadcastReceiver"
             android:enabled="true"
             android:exported="true" />
         <receiver
-            android:name="com.example.moccaCanary.service.StopServiceReceiver"
+            android:name="com.mocca.moccaCanary.service.StopServiceReceiver"
             android:enabled="true"
             android:process=":remote" />
 

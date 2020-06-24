@@ -177,7 +177,7 @@
 
                 </LinearLayout>
                 <LinearLayout
-                    android:layout_marginLeft="10dp"
+
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
@@ -217,7 +217,64 @@
                         android:layout_marginLeft="10dp"
                         android:text="0"
                         android:textSize="14sp"/>
+                </LinearLayout>
+                <LinearLayout
 
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_gravity="center"
+                    android:gravity="center_horizontal"
+                    android:textAlignment="center"
+                    >
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="다발지수"
+                        android:textStyle="bold"
+                        android:textColor="#03A9F4"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/bottomSheet_blackspot_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="0"
+                        android:textSize="12sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="심각지수"
+                        android:textStyle="bold"
+                        android:textColor="#F44336"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/bottomSheet_severity_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="0"
+                        android:textSize="12sp"/>
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="통합지수"
+                        android:textStyle="bold"
+                        android:textColor="#101010"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/bottomSheet_total_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:text="0"
+                        android:textSize="12sp"/>
 
                 </LinearLayout>
             </LinearLayout>
